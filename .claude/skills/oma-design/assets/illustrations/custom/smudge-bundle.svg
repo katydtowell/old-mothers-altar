@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
+  <g stroke="#2F3A2C" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+
+    
+    <path d="M24 22 Q21 34 25 50 Q28 62 36 68 Q44 62 47 50 Q51 34 48 22 Z" fill="#B5C5A8"></path>
+
+    
+    <path d="M36 22 Q47 24 48 22 Q51 34 47 50 Q44 62 36 68 Z" fill="#8FA08B" stroke="none"></path>
+
+    
+    <path d="M26 22 Q22 12 25 4 Q28 6 28 12 Q30 18 28 22 Z" fill="#C7D5BA"></path>
+    <path d="M30 22 Q26 6 31 2 Q34 6 33 12 Q35 18 33 22 Z" fill="#B5C5A8"></path>
+    <path d="M34 22 Q33 4 37 1 Q41 4 39 12 Q41 18 38 22 Z" fill="#C7D5BA"></path>
+    <path d="M38 22 Q37 6 42 3 Q45 8 43 13 Q45 18 42 22 Z" fill="#B5C5A8"></path>
+    <path d="M42 22 Q42 10 46 6 Q49 11 47 15 Q48 19 46 22 Z" fill="#C7D5BA"></path>
+
+    
+    <path d="M30 28 Q34 38 32 50" fill="none" stroke="#6F8068" stroke-width="0.9" opacity="0.7"></path>
+    <path d="M40 28 Q38 40 41 52" fill="none" stroke="#6F8068" stroke-width="0.9" opacity="0.7"></path>
+    <path d="M36 26 Q36 42 36 60" fill="none" stroke="#6F8068" stroke-width="0.9" opacity="0.5"></path>
+
+    
+    <path d="M23 22 Q36 25 49 22 L48.5 26 Q36 29 23.5 26 Z" fill="#D8B89A"></path>
+    <line x1="24" y1="24" x2="48" y2="24" stroke="#A89070" stroke-width="0.7"></line>
+
+    
+    <path d="M25 27 Q36 36 47 52 Q47 56 46 58" fill="none" stroke="#D8B89A" stroke-width="2.2"></path>
+    <path d="M25 27 Q36 36 47 52 Q47 56 46 58" fill="none" stroke="#2F3A2C" stroke-width="0.6" opacity="0.5"></path>
+    <path d="M47 27 Q36 36 25 52 Q25 56 26 58" fill="none" stroke="#D8B89A" stroke-width="2.2"></path>
+    <path d="M47 27 Q36 36 25 52 Q25 56 26 58" fill="none" stroke="#2F3A2C" stroke-width="0.6" opacity="0.5"></path>
+
+    
+    <ellipse cx="36" cy="59" rx="10.5" ry="2.5" fill="#D8B89A"></ellipse>
+    <line x1="27" y1="59" x2="45" y2="59" stroke="#A89070" stroke-width="0.7"></line>
+    
+    <path d="M44 60 Q47 64 45 67" fill="none" stroke="#A89070" stroke-width="1.5"></path>
+  </g>
+</svg>

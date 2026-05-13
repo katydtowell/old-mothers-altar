@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>OMA — Color · Semantic</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: var(--bg-page); }
+  body { font-family: var(--font-body); color: var(--fg-1); padding: 20px 24px; box-sizing: border-box; }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .swatch {
+    aspect-ratio: 2 / 1; border-radius: 10px; border: 1px solid var(--line-soft);
+    padding: 12px 14px; display: flex; flex-direction: column; justify-content: space-between;
+    box-sizing: border-box;
+  }
+  .name { font-size: 12px; font-weight: 600; }
+  .hex  { font-family: var(--font-mono); font-size: 10px; opacity: 0.78; }
+  .label-top { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 12px; }
+</style>
+</head>
+<body>
+  <div class="label-top">SEMANTIC — feedback states</div>
+  <div class="row">
+    <div class="swatch" style="background: var(--success); color: var(--ink-100);"><span class="name">success</span><span class="hex">#00C28A</span></div>
+    <div class="swatch" style="background: var(--info); color: var(--ink-100);"><span class="name">info</span><span class="hex">#00BCC2</span></div>
+    <div class="swatch" style="background: var(--warning); color: var(--ink-100);"><span class="name">warning</span><span class="hex">#F4AF59</span></div>
+    <div class="swatch" style="background: var(--danger); color: var(--bone);"><span class="name">danger</span><span class="hex">#D41840</span></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>OMA — Voice &amp; Tone</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: var(--bg-page); }
+  body { color: var(--fg-1); padding: 22px 26px; box-sizing: border-box; font-family: var(--font-body); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; }
+  .col h4 {
+    font-family: var(--font-body); font-weight: 700; font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; margin: 0 0 10px;
+  }
+  .col.yes h4 { color: var(--success); }
+  .col.no  h4 { color: var(--crimson-300); }
+  .row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .row .mark {
+    flex: 0 0 auto; font-family: var(--font-body); font-weight: 700; font-size: 12px;
+    width: 18px; line-height: 1.4;
+  }
+  .row .text { font-size: 14px; line-height: 1.4; color: var(--fg-1); }
+  .col.no .text { color: var(--fg-2); }
+  .col.yes .mark { color: var(--success); }
+  .col.no .mark { color: var(--crimson-300); }
+  .label-top { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 12px; }
+</style>
+</head>
+<body>
+  <div class="label-top">VOICE — terse, attentive, slightly archaic</div>
+  <div class="grid">
+    <div class="col yes">
+      <h4>WRITES LIKE THIS</h4>
+      <div class="row"><span class="mark">✓</span><span class="text">Light the candle.</span></div>
+      <div class="row"><span class="mark">✓</span><span class="text">Sealed — III ingredients, IX minutes.</span></div>
+      <div class="row"><span class="mark">✓</span><span class="text">The waning gibbous returns Friday.</span></div>
+      <div class="row"><span class="mark">✓</span><span class="text">The book could not save that entry.</span></div>
+      <div class="row"><span class="mark">✓</span><span class="text">Begin a Working <em style="opacity:0.6">(Title Case)</em></span></div>
+    </div>
+    <div class="col no">
+      <h4>NEVER LIKE THIS</h4>
+      <div class="row"><span class="mark">✕</span><span class="text">Get started! 🕯️</span></div>
+      <div class="row"><span class="mark">✕</span><span class="text">Done! ✨ Spell complete in 9 mins</span></div>
+      <div class="row"><span class="mark">✕</span><span class="text">Hey, the moon is changing on Friday!</span></div>
+      <div class="row"><span class="mark">✕</span><span class="text">Oops! Something went wrong 😬</span></div>
+      <div class="row"><span class="mark">✕</span><span class="text">Create new spell</span></div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"/Users/katytowell/Documents/Claude/Projects/Old Mother''''s Altar\" -type f -name *.scss -o -name *.sass -o -name tailwind.config.* -o -name postcss.config.*)"
+    ]
+  }
+}

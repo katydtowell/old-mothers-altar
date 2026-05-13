@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>OMA — Badges &amp; Pills</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: var(--bg-page); }
+  body { color: var(--fg-1); padding: 26px 28px; box-sizing: border-box; font-family: var(--font-body); }
+  .row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: var(--r-pill);
+    font-family: var(--font-body); font-weight: 600;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    line-height: 1;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .b-active   { background: rgba(0,194,138,0.12);  color: var(--success); }
+  .b-info     { background: rgba(0,188,194,0.12);  color: var(--info); }
+  .b-warning  { background: rgba(244,175,89,0.15); color: var(--amber); }
+  .b-danger   { background: rgba(212,24,64,0.15);  color: var(--crimson-300); }
+  .b-pending  { background: rgba(161,189,198,0.10); color: var(--slate-300); }
+  .b-ember    { background: rgba(243,83,33,0.14);  color: var(--ember); }
+  .b-moss     { background: rgba(150,165,96,0.18); color: var(--moss); }
+  .b-plum     { background: rgba(118,72,131,0.22); color: #C68FD2; }
+
+  .label-top { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 14px; }
+</style>
+</head>
+<body>
+  <div class="label-top">BADGES — semantic &amp; ritual</div>
+  <div class="row">
+    <span class="badge b-active"><span class="dot" style="background:var(--success);"></span>SEALED</span>
+    <span class="badge b-info"><span class="dot" style="background:var(--info);"></span>DRAFT</span>
+    <span class="badge b-warning"><span class="dot" style="background:var(--amber);"></span>UNFINISHED</span>
+    <span class="badge b-danger"><span class="dot" style="background:var(--crimson-300);"></span>BROKEN</span>
+    <span class="badge b-pending"><span class="dot" style="background:var(--slate-300);"></span>PENDING</span>
+  </div>
+  <div class="row">
+    <span class="badge b-ember"><span class="dot" style="background:var(--ember);"></span>BURNING · 14M</span>
+    <span class="badge b-moss"><span class="dot" style="background:var(--moss);"></span>HERB</span>
+    <span class="badge b-plum"><span class="dot" style="background:#C68FD2;"></span>DREAM</span>
+    <span class="badge b-pending">XIII · CAST</span>
+    <span class="badge b-info">SAMHAIN</span>
+  </div>
+</body>
+</html>

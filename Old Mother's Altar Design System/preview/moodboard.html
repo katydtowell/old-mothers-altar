@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>OMA — Mood-board · Aquarian Tarot</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: var(--bg-page); }
+  body { color: var(--fg-1); padding: 18px 22px; box-sizing: border-box; font-family: var(--font-body); display: grid; grid-template-columns: 0.9fr 1.4fr; gap: 18px; align-items: center; }
+  .plates { display: flex; gap: 12px; }
+  .plate {
+    border-radius: 6px; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4), 0 0 0 1px var(--line-soft);
+  }
+  .plate img { display:block; width: 100%; height: auto; }
+  .copy {
+    color: var(--fg-2); font-size: 13px; line-height: 1.55;
+  }
+  .copy .quote {
+    font-family: "Ohno Blazeface 24", var(--font-display); font-style: normal; font-weight: 400; text-transform: uppercase; letter-spacing: 0.02em; font-size: 22px; line-height: 1.1;
+    color: var(--fg-1); margin-bottom: 10px;
+  }
+  .copy .src { color: var(--fg-3); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; margin-top: 10px; }
+  .label-top { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-3); position: absolute; top: 18px; left: 22px; }
+</style>
+</head>
+<body>
+  <span class="label-top">MOOD — Palladini's Aquarian Tarot, 1970</span>
+  <div class="plates">
+    <div class="plate" style="width: 110px;"><img src="../moodboard/tarot-1.png" alt="The Lovers" /></div>
+    <div class="plate" style="width: 110px;"><img src="../moodboard/tarot-2.png" alt="The Star" /></div>
+  </div>
+  <div class="copy">
+    <div class="quote">Vermillion ribbons, slate twilight, ink lines that don't apologise.</div>
+    The brand inverts Palladini's parchment into a dark altar — and keeps the
+    warm pigments (ember, saffron, moss, amber, bone) for ritual moments only.
+    <div class="src">REFERENCE · DAVID PALLADINI · U.S. GAMES · 1970</div>
+  </div>
+</body>
+</html>
