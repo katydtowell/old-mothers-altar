@@ -434,6 +434,23 @@
       radial-gradient(circle at 80% 80%, rgba(243,83,33,0.06) 0%, transparent 50%),
       #07090A;
   }
+  /* On real phones: kill the desktop centering so the app fills the screen */
+  @media (max-width: 767px) {
+    html, body {
+      height: 100%;
+      height: 100dvh;
+    }
+    body {
+      display: block;
+      padding: 0;
+      min-height: unset;
+    }
+    #root {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+    }
+  }
   @keyframes omaFadeIn  { from { opacity: 0; } to { opacity: 1; } }
   @keyframes omaSheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .oma-flame { animation: omaCandle 2.4s var(--ease-candle) infinite; transform-origin: center bottom; filter: blur(0.2px); }
@@ -5169,7 +5186,7 @@ window.getMagicalEvents = getMagicalEvents;
       // On a real phone: fill the screen natively, no device chrome
       if (isMobile) {
         return (
-          <div style={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100dvh', overflow: 'hidden' }}>
             <App theme={theme} setTheme={setTheme} />
           </div>
         );
