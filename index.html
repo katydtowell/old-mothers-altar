@@ -434,32 +434,6 @@
       radial-gradient(circle at 80% 80%, rgba(243,83,33,0.06) 0%, transparent 50%),
       #07090A;
   }
-  /* On real phones: kill the desktop centering so the app fills the screen */
-  @media (max-width: 767px) {
-    :root {
-      /* Replace fake-iOS home-indicator gap with real safe area (or a small fallback) */
-      --bottom-inset: max(env(safe-area-inset-bottom), 8px);
-    }
-    html, body {
-      height: 100%;
-    }
-    body {
-      display: block;
-      padding: 0;
-      min-height: unset;
-    }
-    #root {
-      width: 100%;
-      height: 100%;
-    }
-    /* Strip fake-iOS status-bar padding; height fills the real viewport */
-    [data-theme] {
-      height: 100svh !important;
-      height: 100dvh !important;
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-    }
-  }
   @keyframes omaFadeIn  { from { opacity: 0; } to { opacity: 1; } }
   @keyframes omaSheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .oma-flame { animation: omaCandle 2.4s var(--ease-candle) infinite; transform-origin: center bottom; filter: blur(0.2px); }
@@ -879,6 +853,8 @@ const Ico = {
   info:     <Icon d={<><circle cx="12" cy="12" r="9"/><line x1="12" y1="10" x2="12" y2="16"/><circle cx="12" cy="7" r="1.2" fill="currentColor" stroke="none"/></>} />,
   warn:     <Icon d={<><path d="M12 3 L22 20 H2 Z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/></>} />,
   filter:   <Icon strokeWidth={2} d={<><path d="M22 3H2l8 9.46V19l4 2V12.46Z"/></>} />,
+  heart:       <Icon strokeWidth={1.9} d={<><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></>} />,
+  heartFilled: <Icon strokeWidth={1.9} fill="currentColor" d={<><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></>} />,
 };
 
 // ─── MOON GLYPH (8 phases) ──────────────────────────────────────────
@@ -1657,13 +1633,13 @@ const TIMING_TABS_WF = [
   { id: 'day',    label: 'Day',    icoKey: 'calendar' },
 ];
 
-function Workings({ workings, onOpenWorking, onCompose }) {
+function Workings({ workings, onOpenWorking, onCompose, onToggleFavorite }) {
   const [query,      setQuery]      = React.useState('');
   const [filterOpen, setFilterOpen] = React.useState(false);
   const [timingTab,  setTimingTab]  = React.useState('moon');
   const [filters,    setFilters]    = React.useState({
     cat: [], type: [], tag: [], deity: [], author: [],
-    phase: [], season: [], tod: [], dow: [],
+    phase: [], season: [], tod: [], dow: [], favorites: false,
   });
 
   // Dynamic items (user-created tags / deities / authors)
@@ -1671,17 +1647,18 @@ function Workings({ workings, onOpenWorking, onCompose }) {
   const dynDeities = React.useMemo(() => [...new Set(workings.flatMap(w => w.deities || []))].sort(), [workings]);
   const dynAuthors = React.useMemo(() => [...new Set(workings.map(w => w.author).filter(Boolean))].sort(), [workings]);
 
-  const totalActive = Object.values(filters).reduce((n, a) => n + a.length, 0);
+  const totalActive = Object.values(filters).reduce((n, a) => Array.isArray(a) ? n + a.length : n + (a ? 1 : 0), 0);
 
   function setFilter(key, val) {
     setFilters(prev => ({ ...prev, [key]: val }));
   }
   function clearAll() {
-    setFilters({ cat: [], type: [], tag: [], deity: [], author: [], phase: [], season: [], tod: [], dow: [] });
+    setFilters({ cat: [], type: [], tag: [], deity: [], author: [], phase: [], season: [], tod: [], dow: [], favorites: false });
   }
 
   // AND across groups, OR within each group
   const filtered = workings.filter(w => {
+    if (filters.favorites      && !w.favorite)                                                return false;
     if (filters.cat.length    && !filters.cat.some(v    => (w.category  || []).includes(v))) return false;
     if (filters.type.length   && !filters.type.some(v   => (w.magicType || []).includes(v))) return false;
     if (filters.tag.length    && !filters.tag.some(v    => (w.tags      || []).includes(v))) return false;
@@ -1748,6 +1725,25 @@ function Workings({ workings, onOpenWorking, onCompose }) {
           borderRadius: 'var(--r-lg)', padding: '16px',
           display: 'flex', flexDirection: 'column', gap: 16,
         }}>
+
+          {/* Favorites */}
+          <div>
+            {sectionLabel('QUICK FILTER')}
+            <button
+              onClick={() => setFilters(prev => ({ ...prev, favorites: !prev.favorites }))}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 7,
+                padding: '7px 14px', borderRadius: 999, cursor: 'pointer',
+                background: filters.favorites ? 'rgba(220,50,80,0.12)' : 'var(--bg-page)',
+                border: '1px solid ' + (filters.favorites ? 'rgba(220,50,80,0.45)' : 'var(--line-soft)'),
+                color: filters.favorites ? '#e85070' : 'var(--fg-2)',
+                fontFamily: 'var(--font-body)', fontSize: 13,
+              }}
+            >
+              {React.cloneElement(filters.favorites ? Ico.heartFilled : Ico.heart, { size: 14 })}
+              Favorites only
+            </button>
+          </div>
 
           {/* Category */}
           <div>
@@ -1915,15 +1911,24 @@ function Workings({ workings, onOpenWorking, onCompose }) {
                 flexShrink: 0,
               }}>{React.cloneElement(w.icon, { size: 20 })}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
                   <span style={{
                     fontFamily: '"Ohno Blazeface 18", var(--font-display)', fontStyle: 'normal', fontWeight: 400,
                     textTransform: 'uppercase', letterSpacing: '0.02em',
-                    fontSize: 17, color: 'var(--fg-1)',
+                    fontSize: 17, color: 'var(--fg-1)', flex: 1, minWidth: 0,
                   }}>{w.name}</span>
-                  <span style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)' }}>
-                    {w.lastCast}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                    <button onClick={e => { e.stopPropagation(); onToggleFavorite && onToggleFavorite(w.id); }} style={{
+                      background: 'none', border: 0, cursor: 'pointer', padding: 3,
+                      color: w.favorite ? '#e85070' : 'var(--line-medium)',
+                      display: 'flex', alignItems: 'center',
+                    }}>
+                      {React.cloneElement(w.favorite ? Ico.heartFilled : Ico.heart, { size: 15 })}
+                    </button>
+                    <span style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)' }}>
+                      {w.lastCast}
+                    </span>
+                  </div>
                 </div>
                 <div style={{ color: 'var(--fg-2)', fontSize: 12, marginTop: 2, lineHeight: 1.35 }}>
                   {w.summary}
@@ -1938,6 +1943,11 @@ function Workings({ workings, onOpenWorking, onCompose }) {
                   {w.duration && w.duration.val && (
                     <span style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)' }}>
                       · {w.duration.val} {w.duration.unit}
+                    </span>
+                  )}
+                  {w.rating > 0 && (
+                    <span style={{ color: 'var(--amber)', fontSize: 11, letterSpacing: '0.05em', marginLeft: 2 }}>
+                      {'★'.repeat(w.rating)}{'☆'.repeat(5 - w.rating)}
                     </span>
                   )}
                 </div>
@@ -1971,7 +1981,7 @@ window.Workings = Workings;
   <script type="text/babel">
 // WorkingDetail.jsx — single working with cast history, ingredients
 
-function WorkingDetail({ working, onBack, onCast, onDelete, onEdit }) {
+function WorkingDetail({ working, onBack, onCast, onDelete, onEdit, onToggleFavorite }) {
   if (!working) return null;
   const { name, summary, ingredients, casts, color, icon, tags, moonPhase } = working;
 
@@ -1989,20 +1999,35 @@ function WorkingDetail({ working, onBack, onCast, onDelete, onEdit }) {
             background: color + '33', color,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>{React.cloneElement(icon, { size: 22 })}</div>
-          <div>
+          <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
               {tags[0] && <Badge tone="pending" dot={false}>{tags[0]}</Badge>}
             </div>
           </div>
+          <button onClick={onToggleFavorite} style={{
+            background: 'none', border: 0, cursor: onToggleFavorite ? 'pointer' : 'default',
+            padding: 6, color: working.favorite ? '#e85070' : 'var(--fg-3)',
+            display: 'flex', alignItems: 'center',
+          }}>
+            {React.cloneElement(working.favorite ? Ico.heartFilled : Ico.heart, { size: 22 })}
+          </button>
         </div>
         <div style={{
-          fontFamily: '"Ohno Blazeface 36", var(--font-display)', fontStyle: 'normal', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.02em',
-          fontSize: 32, lineHeight: 1.0, color: 'var(--fg-1)',
-          letterSpacing: '-0.01em',
+          fontFamily: '"Ohno Blazeface 36", var(--font-display)', fontStyle: 'normal', fontWeight: 400, textTransform: 'uppercase',
+          fontSize: 32, lineHeight: 1.0, color: 'var(--fg-1)', letterSpacing: '-0.01em',
         }}>{name}</div>
         <div style={{ color: 'var(--fg-2)', fontSize: 13, marginTop: 8, lineHeight: 1.5, maxWidth: 340 }}>
           {summary}
         </div>
+        {working.rating > 0 && (
+          <div style={{ marginTop: 8, display: 'flex', gap: 2 }}>
+            {[1,2,3,4,5].map(n => (
+              <span key={n} style={{ color: n <= working.rating ? 'var(--amber)' : 'var(--line-medium)', fontSize: 16 }}>
+                {n <= working.rating ? '★' : '☆'}
+              </span>
+            ))}
+          </div>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, color: 'var(--fg-3)', fontSize: 11, fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', flexWrap: 'wrap' }}>
           <MoonGlyph phase={moonPhase} size={14} color="var(--fg-2)" />
           <span>BEST UNDER {moonPhase.replace('-', ' ').toUpperCase()}</span>
@@ -2872,9 +2897,9 @@ function StarRating({ value, onChange }) {
       {[1,2,3,4,5].map(n => (
         <button key={n} onClick={() => onChange(value === n ? 0 : n)} style={{
           background: 'none', border: 0, cursor: 'pointer', padding: '2px',
-          color: n <= value ? 'var(--amber)' : 'var(--fg-3)',
+          color: n <= value ? 'var(--amber)' : 'var(--line-medium)',
           fontSize: 22,
-        }}>★</button>
+        }}>{n <= value ? '★' : '☆'}</button>
       ))}
     </div>
   );
@@ -2894,7 +2919,7 @@ function NWSection({ title, children }) {
   );
 }
 
-function NewWorking({ editData, onCreate, onSave, submitRef }) {
+function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [] }) {
   const [name,         setName]        = React.useState('');
   const [summary,      setSummary]     = React.useState('');
   const [authorSelf,   setAuthorSelf]  = React.useState(true);
@@ -2914,6 +2939,8 @@ function NewWorking({ editData, onCreate, onSave, submitRef }) {
   const [ingName,      setIngName]     = React.useState('');
   const [ingAmt,       setIngAmt]      = React.useState('');
   const [ingNote,      setIngNote]     = React.useState('');
+  const [ingSuggestions, setIngSuggestions] = React.useState([]);
+  const [ingDropOpen,    setIngDropOpen]    = React.useState(false);
   const [ingredients,  setIngredients] = React.useState([]);
   const [taskText,     setTaskText]    = React.useState('');
   const [tasks,        setTasks]       = React.useState([]);
@@ -3154,9 +3181,59 @@ function NewWorking({ editData, onCreate, onSave, submitRef }) {
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ display: 'flex', gap: 8 }}>
-            <input value={ingName} onChange={e => setIngName(e.target.value)} autoComplete="off"
-              placeholder="Supply name…" style={{ ...field, flex: 2 }}
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addIngredient(); } }} />
+            <div style={{ flex: 2, position: 'relative' }}>
+              <input value={ingName}
+                onChange={e => {
+                  const val = e.target.value;
+                  setIngName(val);
+                  if (val.trim().length > 0) {
+                    const q = val.trim().toLowerCase();
+                    const matches = cabinet.filter(c => c.name.toLowerCase().includes(q));
+                    setIngSuggestions(matches);
+                    setIngDropOpen(matches.length > 0);
+                  } else {
+                    setIngSuggestions([]);
+                    setIngDropOpen(false);
+                  }
+                }}
+                autoComplete="off"
+                placeholder="Supply name…"
+                style={{ ...field, width: '100%' }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { e.preventDefault(); setIngDropOpen(false); addIngredient(); }
+                  if (e.key === 'Escape') { setIngDropOpen(false); }
+                }}
+                onBlur={() => setTimeout(() => setIngDropOpen(false), 150)}
+                onFocus={() => { if (ingName.trim().length > 0 && ingSuggestions.length > 0) setIngDropOpen(true); }}
+              />
+              {ingDropOpen && (
+                <div style={{
+                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                  background: 'var(--bg-elevated)', border: '1px solid var(--line-medium)',
+                  borderRadius: 'var(--r-xs)', marginTop: 2,
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.35)', overflow: 'hidden',
+                }}>
+                  {ingSuggestions.map(c => (
+                    <button key={c.id}
+                      onMouseDown={e => { e.preventDefault(); setIngName(c.name); setIngDropOpen(false); setIngSuggestions([]); }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 8,
+                        width: '100%', padding: '9px 12px', background: 'none',
+                        border: 0, borderBottom: '1px solid var(--line-soft)',
+                        cursor: 'pointer', textAlign: 'left',
+                        color: 'var(--fg-1)', fontFamily: 'var(--font-body)', fontSize: 13,
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-elevated)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                    >
+                      <span style={{ flex: 1, fontWeight: 500 }}>{c.name}</span>
+                      {c.type && <span style={{ fontSize: 10, color: 'var(--fg-3)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{c.type}</span>}
+                      {c.inv !== undefined && <span style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color: c.inv === 0 ? 'var(--danger)' : c.inv === 1 ? 'var(--amber)' : 'var(--success)' }}>×{c.inv}</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <input value={ingAmt} onChange={e => setIngAmt(e.target.value)} autoComplete="off"
               placeholder="Amount" style={{ ...field, flex: 1 }} />
           </div>
@@ -4048,6 +4125,404 @@ window.Profile = Profile;
 
   </script>
 
+  <!-- ── Splash.jsx ── -->
+  <script type="text/babel">
+// Splash.jsx — animated intro screen with moon orbit
+
+const SPLASH_PHASES = [
+  'new', 'waxing-crescent', 'first-quarter', 'waxing-gibbous',
+  'full', 'waning-gibbous', 'last-quarter', 'waning-crescent',
+];
+
+// Inline OMA logo (light version — always dark background on splash)
+function SplashLogo({ size = 220 }) {
+  // Scale from original 397×125 viewBox
+  const aspect = 125 / 397;
+  const w = size;
+  const h = Math.round(size * aspect);
+  return (
+    <svg width={w} height={h} viewBox="0 0 397 125" fill="none" xmlns="http://www.w3.org/2000/svg"
+      style={{ display: 'block', filter: 'drop-shadow(0 0 18px rgba(244,175,89,0.18))' }}>
+      <g clipPath="url(#spl-clip)">
+        <path d="M2.98 123.329C1 123.329 0 122.589 0 120.099C0 110.429 22.2 76.9286 22.2 58.0786C22.2 52.8686 18.73 51.6286 16.37 51.6286C15.01 51.6286 13.52 52.1286 12.28 52.1286C9.92 52.1286 8.81 50.2686 8.81 48.5286C8.81 46.7886 9.93 45.0586 12.28 45.0586C16.5 45.0586 31.63 45.9286 39.94 45.9286C48.25 45.9286 55.94 45.1886 57.8 45.1886C60.53 45.1886 62.51 46.6786 62.51 50.5186C62.51 66.3986 73.92 101.619 81.61 115.639C82.97 118.119 83.84 119.239 83.84 120.729C83.84 122.089 82.97 123.329 81.36 123.329C78.26 123.329 70.94 122.459 63.13 122.459C56.68 122.459 42.04 123.329 40.56 123.329C38.33 123.329 37.58 121.839 37.58 119.979C37.58 117.999 38.7 116.509 40.56 116.509C41.55 116.509 42.67 116.879 45.03 116.879C47.63 116.879 49.74 114.649 49.74 109.309C49.74 100.259 48.38 99.6386 36.84 99.6386C26.67 99.6386 25.43 100.999 25.43 104.599C25.43 112.039 32.5 115.269 32.5 119.729C32.5 121.709 31.63 123.329 29.52 123.329C27.78 123.329 19.35 122.459 15.38 122.459C10.79 122.459 5.58 123.329 2.98 123.329ZM34.98 93.1886C45.03 93.1886 46.02 91.3286 46.02 88.2286C46.14 83.2686 43.66 70.8586 40.44 63.2986C38.08 57.3486 37.09 55.8586 34.98 55.8586C29.4 55.8586 25.43 70.2486 25.43 83.2686C25.43 91.5786 26.55 93.1886 34.98 93.1886Z" fill="#FDFEEB"/>
+        <path d="M128.01 51.6397C120.2 51.6397 119.08 56.9697 118.71 62.4297C117.84 76.4497 118.09 97.1597 118.59 108.94C118.84 114.77 119.95 116.75 123.8 116.75C134.72 116.75 137.57 80.0297 148.24 80.0297C150.22 80.0297 151.22 80.8997 151.22 83.0097C151.22 85.4897 150.48 94.6697 150.48 103.48C150.48 111.42 151.22 117 151.22 120.35C151.22 122.09 149.48 123.33 148.24 123.33C140.92 123.33 120.33 123.08 106.07 123.08C99 123.08 88.58 123.33 85.11 123.33C83 123.33 82.13 121.47 82.13 119.98C82.13 118 83.49 116.51 85.11 116.51C85.73 116.51 87.09 116.88 87.47 116.88C90.57 116.88 91.19 114.77 91.44 108.94C91.94 96.4097 92.43 74.7097 91.44 59.5697C91.19 55.5997 90.94 51.6297 87.84 51.6297C86.85 51.6297 85.73 51.9997 85.11 51.9997C83 51.9997 82.13 50.0197 82.13 48.5297C82.13 46.6697 83.49 45.1797 85.11 45.1797C91.56 45.1797 97.89 45.4297 105.2 45.4297C115.74 45.4297 124.92 45.1797 134.6 45.1797C136.34 45.1797 137.58 46.4197 137.58 48.6497C137.58 50.0097 136.84 52.2497 134.6 52.2497C133.11 52.2497 130.88 51.6297 128.03 51.6297L128.01 51.6397Z" fill="#FDFEEB"/>
+        <path d="M226 45.1875C230.22 45.1875 230.59 47.5475 230.59 50.7675C230.34 55.4775 230.09 60.5675 230.09 65.7775C230.09 70.6175 231.21 77.8075 231.21 79.5475C231.21 82.0275 230.22 83.6375 228.11 83.6375C220.42 83.6375 217.69 73.0975 214.59 61.3075C212.98 54.7375 211.24 52.2575 208.26 52.2575C205.53 52.2575 204.41 54.1175 204.41 57.2175C204.41 115.637 205.77 116.878 212.35 116.878C214.83 116.878 216.32 116.137 218.06 116.137C219.8 116.137 221.16 117.498 221.16 119.738C221.16 121.718 220.54 123.337 218.06 123.337C213.84 123.337 200.82 123.087 191.89 123.087C182.96 123.087 170.18 123.337 165.97 123.337C163.49 123.337 162.74 121.728 162.74 119.738C162.74 117.507 164.23 116.137 165.97 116.137C167.71 116.137 169.19 116.878 171.68 116.878C178.13 116.878 179.62 115.637 179.62 57.2175C179.62 54.1175 178.38 52.2575 175.65 52.2575C172.67 52.2575 171.06 54.7375 169.32 61.3075C166.34 73.0875 163.61 83.6375 155.92 83.6375C153.69 83.6375 152.69 82.0275 152.69 79.5475C152.69 77.8075 153.93 70.6175 153.93 65.7775C153.93 60.5675 153.56 55.4775 153.31 50.7675C153.31 47.5375 153.81 45.1875 157.9 45.1875C169.44 45.4375 180.85 46.1775 192.38 46.1775C203.3 46.1775 214.71 45.4375 225.99 45.1875H226Z" fill="#FDFEEB"/>
+        <path d="M391.46 103.729C391.46 100.259 389.23 96.9092 389.23 94.6792C389.23 92.8192 390.22 91.2092 392.58 91.2092C395.8 91.2092 396.8 93.0692 396.8 101.499C396.8 116.009 394.94 124.449 378.07 124.569C366.29 124.569 360.21 120.719 360.21 110.549C360.21 107.079 360.71 102.979 360.71 98.8892C360.71 95.5392 359.1 93.5592 354.26 93.5592C348.55 93.5592 345.45 96.1592 345.45 100.749C345.45 103.599 345.57 107.819 345.7 110.179C345.95 115.139 346.57 116.879 349.79 116.879C350.41 116.879 352.15 116.629 353.14 116.629C354.88 116.629 355.87 118.239 355.87 119.979C355.87 121.469 354.88 123.329 353.14 123.329C349.67 123.329 339.87 123.079 333.05 123.079C326.23 123.079 315.56 123.329 312.09 123.329C309.98 123.329 309.11 121.839 309.11 119.979C309.11 117.999 310.47 116.509 312.09 116.509C312.84 116.509 314.08 116.879 314.45 116.879C317.55 116.879 318.17 114.769 318.42 108.939C318.67 101.369 319.04 90.5792 319.04 79.7892C319.04 72.7192 318.92 65.5292 318.42 59.4492C318.17 55.4792 317.92 51.6392 314.82 51.6392C313.83 51.6392 312.84 52.0092 312.09 52.0092C309.98 52.0092 309.11 50.5192 309.11 48.5392C309.11 46.6792 310.47 45.1892 312.09 45.1892C318.54 45.1892 324.99 45.4392 332.18 45.4392C340.74 45.4392 357.36 44.6992 365.05 44.6992C380.93 44.6992 390.48 50.7792 390.48 64.5492C390.48 81.2992 377.83 84.5192 364.8 86.5092C363.56 86.7592 362.82 87.4992 362.82 88.4892C362.82 89.2292 363.69 90.0992 365.05 90.0992C376.59 90.0992 382.17 92.3292 383.41 103.619C383.66 106.719 385.27 108.209 387.75 108.209C390.35 108.209 391.47 106.469 391.47 103.739L391.46 103.729ZM354 51.2592C346.31 51.2592 345.19 54.4892 345.19 80.2792C345.19 85.1192 345.93 86.1092 347.92 86.1092C358.46 86.1092 363.3 79.7792 363.3 67.6292C363.3 55.4792 361.32 51.2592 354 51.2592Z" fill="#FDFEEB"/>
+        <path d="M305.5 115.369C297.81 101.349 286.4 66.1291 286.4 50.2491C286.4 46.3991 284.42 44.9191 281.69 44.9191C279.83 44.9191 272.14 45.6591 263.83 45.6591C255.52 45.6591 240.39 44.7891 236.17 44.7891C233.81 44.7891 232.7 46.5291 232.7 48.2591C232.7 49.9891 233.82 51.8591 236.17 51.8591C237.41 51.8591 238.9 51.3591 240.26 51.3591C242.62 51.3591 246.09 52.5991 246.09 57.8091C246.09 76.6591 223.89 110.149 223.89 119.829C223.89 122.309 224.88 123.059 226.87 123.059C229.47 123.059 234.68 122.189 239.27 122.189C243.24 122.189 251.67 123.059 253.41 123.059C255.52 123.059 256.39 121.449 256.39 119.459C256.39 114.989 249.32 111.769 249.32 104.329C249.32 100.729 250.56 99.3691 260.73 99.3691C272.27 99.3691 273.63 99.9891 273.63 109.039C273.63 114.369 271.52 116.609 268.92 116.609C266.56 116.609 265.45 116.239 264.45 116.239C262.59 116.239 261.47 117.729 261.47 119.709C261.47 121.569 262.21 123.059 264.45 123.059C265.94 123.059 280.57 122.189 287.02 122.189C294.83 122.189 302.15 123.059 305.25 123.059C306.86 123.059 307.73 121.819 307.73 120.459C307.73 118.969 306.86 117.859 305.5 115.369ZM249.74 77.1091C259 63.9591 266.61 63.9791 275.86 77.1091C266.6 90.2591 258.99 90.2391 249.74 77.1091Z" fill="#FDFEEB"/>
+        <path fillRule="evenodd" clipRule="evenodd" d="M262.8 82.0076C269.15 82.0976 269.15 72.1176 262.8 72.2076C256.45 72.1176 256.45 82.0976 262.8 82.0076Z" fill="#00C28A"/>
+        <path d="M30.21 35.5495C18.06 35.5495 13.62 30.7595 13.62 20.9795C13.62 9.47953 18.06 2.26953 30.21 2.26953C42.36 2.26953 46.9 9.77953 46.9 20.9795C46.9 30.4595 42.46 35.5495 30.21 35.5495ZM30.21 4.83953C26.18 4.83953 25.07 9.42953 25.12 20.8295C25.17 28.1895 26.18 31.6695 30.21 31.6695C34.24 31.6695 35.3 28.1895 35.35 20.8295C35.45 9.42953 34.29 4.83953 30.21 4.83953Z" fill="#FDFEEB"/>
+        <path d="M67.12 5.64734C63.94 5.64734 63.49 7.81734 63.34 10.0373C62.99 15.7373 63.09 24.1573 63.29 28.9473C63.39 31.3173 63.84 32.1273 65.41 32.1273C69.85 32.1273 71.01 17.1973 75.34 17.1973C76.15 17.1973 76.55 17.5473 76.55 18.4073C76.55 19.4173 76.25 23.1473 76.25 26.7273C76.25 29.9573 76.55 32.2273 76.55 33.5873C76.55 34.2973 75.84 34.7973 75.34 34.7973C72.36 34.7973 63.99 34.6973 58.19 34.6973C55.32 34.6973 51.08 34.7973 49.67 34.7973C48.81 34.7973 48.46 34.0373 48.46 33.4373C48.46 32.6273 49.01 32.0273 49.67 32.0273C49.92 32.0273 50.48 32.1773 50.63 32.1773C51.89 32.1773 52.14 31.3173 52.24 28.9473C52.44 23.8573 52.64 15.0273 52.24 8.87734C52.14 7.26734 52.04 5.64734 50.78 5.64734C50.38 5.64734 49.92 5.79734 49.67 5.79734C48.81 5.79734 48.46 4.98734 48.46 4.38734C48.46 3.62734 49.01 3.02734 49.67 3.02734C52.29 3.02734 54.86 3.12734 57.84 3.12734C62.13 3.12734 65.86 3.02734 69.79 3.02734C70.5 3.02734 71 3.52734 71 4.43734C71 4.98734 70.7 5.89734 69.79 5.89734C69.19 5.89734 68.28 5.64734 67.12 5.64734Z" fill="#FDFEEB"/>
+        <path d="M87.55 34.5966C84.62 34.5966 80.39 34.7966 79.03 34.7966C78.37 34.7966 77.87 34.3466 77.87 33.4866C77.87 32.4766 78.37 32.0766 79.03 32.0766C79.23 32.0766 79.79 32.1766 79.99 32.1766C81.25 32.1766 81.5 31.3166 81.6 28.9466C81.7 26.0766 81.85 21.9866 81.85 17.8566C81.85 14.7266 81.8 11.5566 81.6 8.92656C81.5 7.31656 81.4 5.69656 80.14 5.69656C79.74 5.69656 79.33 5.84656 79.03 5.84656C78.22 5.84656 77.87 5.23656 77.87 4.43656C77.87 3.63656 78.37 3.02656 79.03 3.02656C81.7 3.02656 84.27 3.12656 87.2 3.12656C90.68 3.12656 93.71 2.97656 96.83 2.97656C107.82 2.97656 112.21 10.4866 112.21 21.7366C112.21 30.4566 107.87 34.8466 96.98 34.8466C95.37 34.8466 90.73 34.5966 87.55 34.5966ZM100.46 22.0366C100.46 8.67656 99.1 5.64656 95.52 5.64656C93.86 5.64656 92.95 6.50656 92.8 8.87656C92.6 11.4466 92.45 14.5266 92.45 17.4966C92.45 21.7866 92.65 25.9666 92.8 28.9466C92.9 31.3166 93.86 32.2266 95.47 32.1766C100.16 32.1266 100.46 30.4666 100.46 22.0366Z" fill="#FDFEEB"/>
+        <path d="M157.2 10.9891C157.2 9.01906 157.1 8.36906 156.19 8.36906C155.74 8.36906 155.08 8.96906 154.63 10.3391C153.22 14.7291 150.9 24.7591 149.39 32.6291C149.04 34.5991 148.13 34.7491 144.5 34.7491C140.57 34.7491 140.57 34.4991 140.06 32.6291C138.45 26.5791 134.87 14.3191 132.75 9.93906C132.35 9.07906 131.89 8.42906 131.44 8.42906C130.73 8.42906 130.53 9.23906 130.53 10.5491C130.53 21.9991 131.59 28.9591 135.22 31.5791C136.68 32.5391 136.73 32.9891 136.73 33.6991C136.73 33.9991 136.43 34.8091 135.62 34.8091C134.81 34.8091 133.4 34.7091 130.88 34.7091C128.06 34.7091 125.84 34.8091 124.58 34.8091C123.92 34.8091 123.42 34.4091 123.42 33.7491C123.42 32.8891 123.97 32.5891 124.83 31.4791C126.8 29.0591 127.86 24.7691 127.86 9.38906C127.86 7.41906 127.61 5.65906 125.94 5.65906C125.44 5.65906 124.93 5.80906 124.58 5.80906C123.77 5.80906 123.42 4.99906 123.42 4.39906C123.42 3.63906 123.77 3.03906 124.58 3.03906C127.76 3.03906 131.79 3.23906 134.62 3.23906C137.29 3.23906 138.2 3.03906 140.07 3.03906C141.73 3.03906 142.14 3.53906 142.54 5.60906C143.09 8.27906 144.51 14.6391 145.57 17.8091C146.43 20.4791 146.83 21.0391 147.64 21.0391C148.65 21.0391 149 20.2291 149.71 17.8591C150.77 14.2791 151.63 10.3991 152.53 5.60906C152.88 3.78906 152.98 3.03906 154.95 3.03906C157.62 3.03906 159.39 3.23906 163.83 3.23906C166.15 3.23906 168.52 3.03906 170.49 3.03906C171.35 3.03906 171.7 3.63906 171.7 4.39906C171.7 5.00906 171.35 5.80906 170.49 5.80906C170.14 5.80906 169.63 5.65906 169.13 5.65906C167.87 5.65906 167.77 7.21906 167.67 8.83906C167.52 11.3091 167.42 14.2391 167.42 17.1091C167.42 21.4991 167.57 25.8791 167.67 28.9591C167.77 31.3291 168.02 32.1891 169.28 32.1891C169.53 32.1891 170.09 32.0891 170.49 32.0891C171.35 32.0891 171.7 32.7491 171.7 33.4491C171.7 34.2091 171.35 34.8091 170.49 34.8091C168.88 34.8091 165.75 34.7091 161.92 34.7091C158.09 34.7091 155.77 34.8091 153.95 34.8091C153.14 34.8091 152.79 34.2091 152.79 33.4491C152.79 32.7391 153.14 32.0891 153.95 32.0891C154.4 32.0891 155.01 32.1891 155.26 32.1891C156.52 32.1891 156.67 31.3291 156.87 28.9591C157.12 26.1391 157.22 21.0391 157.22 11.0091L157.2 10.9891Z" fill="#FDFEEB"/>
+        <path d="M189.33 35.5495C177.18 35.5495 172.74 30.7595 172.74 20.9795C172.74 9.47953 177.18 2.26953 189.33 2.26953C201.48 2.26953 206.02 9.77953 206.02 20.9795C206.02 30.4595 201.58 35.5495 189.33 35.5495ZM189.33 4.83953C185.3 4.83953 184.19 9.42953 184.24 20.8295C184.29 28.1895 185.3 31.6695 189.33 31.6695C193.36 31.6695 194.42 28.1895 194.47 20.8295C194.57 9.42953 193.41 4.83953 189.33 4.83953Z" fill="#FDFEEB"/>
+        <path d="M237.24 3.02734C238.95 3.02734 239.11 3.98734 239.11 5.29734C239.01 7.21734 238.91 9.27734 238.91 11.3973C238.91 13.3673 239.36 16.2873 239.36 16.9973C239.36 18.0073 238.96 18.6573 238.1 18.6573C234.97 18.6573 233.86 14.3673 232.6 9.57734C231.94 6.90734 231.24 5.89734 230.03 5.89734C228.92 5.89734 228.47 6.65734 228.47 7.91734C228.47 31.6673 229.02 32.1773 231.7 32.1773C232.71 32.1773 233.31 31.8773 234.02 31.8773C234.73 31.8773 235.28 32.4273 235.28 33.3373C235.28 34.1473 235.03 34.7973 234.02 34.7973C232.31 34.7973 227.01 34.6973 223.38 34.6973C219.75 34.6973 214.55 34.7973 212.84 34.7973C211.83 34.7973 211.53 34.1373 211.53 33.3373C211.53 32.4273 212.13 31.8773 212.84 31.8773C213.55 31.8773 214.15 32.1773 215.16 32.1773C217.78 32.1773 218.39 31.6773 218.39 7.91734C218.39 6.65734 217.89 5.89734 216.78 5.89734C215.57 5.89734 214.91 6.90734 214.21 9.57734C213 14.3673 211.89 18.6573 208.76 18.6573C207.85 18.6573 207.45 17.9973 207.45 16.9973C207.45 16.2873 207.95 13.3673 207.95 11.3973C207.95 9.27734 207.8 7.20734 207.7 5.29734C207.7 3.98734 207.9 3.02734 209.57 3.02734C214.26 3.12734 218.9 3.42734 223.59 3.42734C228.03 3.42734 232.67 3.12734 237.26 3.02734H237.24Z" fill="#FDFEEB"/>
+        <path d="M280.06 32.1695C281.32 32.1695 281.57 31.3095 281.67 28.9395C281.77 25.7595 281.92 21.3295 281.92 16.6895C281.92 13.9695 281.87 11.1895 281.67 8.81953C281.57 7.20953 281.47 5.63953 280.21 5.63953C279.81 5.63953 279.4 5.78953 279.1 5.78953C278.29 5.78953 277.94 5.18953 277.94 4.37953C277.94 3.61953 278.44 3.01953 279.1 3.01953C281.87 3.01953 284.5 3.21953 287.52 3.21953C292.31 3.21953 303.51 3.01953 306.53 3.01953C307.69 3.01953 308.4 3.61953 308.4 4.57953C308.4 5.38953 308.25 6.89953 308.25 8.86953C308.25 10.5795 308.45 12.3495 308.45 13.0095C308.45 13.9695 308 14.6695 307.14 14.6695C303.31 14.6695 301.74 5.73953 295.24 5.73953C293.58 5.73953 293.12 7.29953 292.87 8.91953C292.62 10.9395 292.57 13.2595 292.52 15.6295C292.52 16.3395 292.92 16.7395 293.48 16.7395C296.61 16.7395 298.37 12.5995 300.84 12.5995C301.39 12.5995 301.8 12.9495 301.8 13.9595C301.8 14.9695 301.6 16.0795 301.6 18.2495C301.6 21.0195 301.7 22.1795 301.7 23.1895C301.7 24.1995 301.09 24.3495 300.54 24.3495C298.02 24.0995 297.21 19.3095 293.58 19.3095C292.82 19.3095 292.52 19.8095 292.52 20.5695C292.52 23.6995 292.52 26.8695 292.67 28.9395C292.87 31.1595 293.33 31.9695 295.04 31.9695C302.05 31.9695 303.46 22.6895 307.55 22.6895C308.36 22.6895 308.71 23.3495 308.71 24.0995C308.71 24.8095 308.41 26.5695 308.41 28.2895C308.41 30.5595 308.71 32.1195 308.71 33.1295C308.71 34.1395 308.05 34.7895 307.05 34.7895C303.42 34.7895 294.14 34.4895 287.63 34.4895C284.76 34.4895 280.52 34.7895 279.11 34.7895C278.3 34.7895 277.95 34.1895 277.95 33.3795C277.95 32.5695 278.45 32.0195 279.11 32.0195C279.41 32.0195 279.92 32.1695 280.07 32.1695H280.06Z" fill="#FDFEEB"/>
+      </g>
+      <defs>
+        <clipPath id="spl-clip">
+          <rect width="396.79" height="124.57" fill="white"/>
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
+
+function Splash({ onDone }) {
+  const [phase, setPhase] = React.useState('enter'); // enter | idle | exit
+
+  // Auto-advance after 3.2s; tap also advances
+  React.useEffect(() => {
+    const t = setTimeout(() => setPhase('exit'), 3200);
+    return () => clearTimeout(t);
+  }, []);
+
+  React.useEffect(() => {
+    if (phase !== 'exit') return;
+    const t = setTimeout(onDone, 600);
+    return () => clearTimeout(t);
+  }, [phase]);
+
+  function handleTap() {
+    if (phase === 'exit') return;
+    setPhase('exit');
+  }
+
+  const orbitR = 130; // px from center to moon
+
+  return (
+    <div
+      onClick={handleTap}
+      style={{
+        position: 'absolute', inset: 0,
+        background: 'radial-gradient(circle at 50% 44%, rgba(45,78,166,0.13) 0%, transparent 60%), #07090A',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer',
+        opacity: phase === 'exit' ? 0 : 1,
+        transition: phase === 'exit' ? 'opacity 0.55s ease-in' : 'none',
+        zIndex: 300,
+      }}
+    >
+      <style>{`
+        @keyframes splashFadeIn {
+          from { opacity: 0; transform: scale(0.94); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes splashOrbit {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes splashMoonCounter {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(-360deg); }
+        }
+        @keyframes splashPulse {
+          0%, 100% { opacity: 0.55; transform: scale(1); }
+          50%       { opacity: 0.80; transform: scale(1.04); }
+        }
+        @keyframes splashHintBlink {
+          0%, 100% { opacity: 0; }
+          50%       { opacity: 0.5; }
+        }
+      `}</style>
+
+      {/* Ambient glow ring */}
+      <div style={{
+        position: 'absolute',
+        width: 320, height: 320,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(244,175,89,0.06) 0%, transparent 70%)',
+        animation: 'splashPulse 3.5s ease-in-out infinite',
+      }} />
+
+      {/* Orbit + Logo wrapper */}
+      <div style={{
+        position: 'relative',
+        width: orbitR * 2 + 60,
+        height: orbitR * 2 + 60,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        animation: 'splashFadeIn 1.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards',
+        opacity: 0,
+      }}>
+
+        {/* Orbit ring (faint dashed circle) */}
+        <svg
+          width={orbitR * 2 + 60}
+          height={orbitR * 2 + 60}
+          style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+        >
+          <circle
+            cx={(orbitR * 2 + 60) / 2}
+            cy={(orbitR * 2 + 60) / 2}
+            r={orbitR}
+            fill="none"
+            stroke="rgba(244,175,89,0.12)"
+            strokeWidth="1"
+            strokeDasharray="3 7"
+          />
+        </svg>
+
+        {/* Spinning orbit container */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          animation: 'splashOrbit 22s linear infinite',
+          transformOrigin: '50% 50%',
+        }}>
+          {SPLASH_PHASES.map((ph, i) => {
+            const angle = (i / SPLASH_PHASES.length) * 360;
+            const rad = (angle * Math.PI) / 180;
+            const cx = (orbitR * 2 + 60) / 2;
+            const cy = (orbitR * 2 + 60) / 2;
+            const x = cx + orbitR * Math.sin(rad);
+            const y = cy - orbitR * Math.cos(rad);
+            return (
+              <div key={ph} style={{
+                position: 'absolute',
+                left: x - 14,
+                top: y - 14,
+                width: 28, height: 28,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                animation: 'splashMoonCounter 22s linear infinite',
+                transformOrigin: '14px 14px',
+                opacity: ph === 'full' ? 1 : 0.7,
+              }}>
+                <MoonGlyph
+                  phase={ph}
+                  size={ph === 'full' ? 22 : 16}
+                  color={ph === 'full' ? 'rgba(244,175,89,0.9)' : 'rgba(253,254,235,0.6)'}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Logo — centered */}
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <SplashLogo size={200} />
+        </div>
+      </div>
+
+      {/* Tagline */}
+      <div style={{
+        marginTop: 32,
+        fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.20em',
+        color: 'rgba(253,254,235,0.30)', textTransform: 'uppercase',
+        animation: 'splashFadeIn 1.6s 0.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards',
+        opacity: 0,
+      }}>
+        Your Practice. Your Book.
+      </div>
+
+      {/* Tap hint — blinks in after 1.8s */}
+      <div style={{
+        position: 'absolute', bottom: 52,
+        fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.20em',
+        color: 'rgba(253,254,235,0.28)', textTransform: 'uppercase',
+        animation: 'splashFadeIn 0.6s 1.8s ease forwards, splashHintBlink 2.2s 2.4s ease-in-out infinite',
+        opacity: 0,
+      }}>
+        Tap to enter
+      </div>
+    </div>
+  );
+}
+
+window.Splash = Splash;
+window.SplashLogo = SplashLogo;
+
+  </script>
+
+  <!-- ── Login.jsx ── -->
+  <script type="text/babel">
+// Login.jsx — sign-in screen, shown only when the user logs out
+
+function Login({ onSignIn }) {
+  const [email, setEmail]       = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [visible, setVisible]   = React.useState(false);
+  const [focused, setFocused]   = React.useState(null); // 'email' | 'password' | null
+
+  // Gentle fade-in on mount
+  React.useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 40);
+    return () => clearTimeout(t);
+  }, []);
+
+  function handleKey(e) {
+    if (e.key === 'Enter') onSignIn();
+  }
+
+  const baseInput = {
+    width: '100%',
+    boxSizing: 'border-box',
+    background: 'rgba(253,254,235,0.05)',
+    border: '1px solid rgba(253,254,235,0.12)',
+    borderRadius: 14,
+    padding: '14px 16px',
+    color: 'var(--fg-1)',
+    fontFamily: 'var(--font-body)',
+    fontSize: 15,
+    outline: 'none',
+    transition: 'border-color 0.18s, background 0.18s',
+    display: 'block',
+  };
+
+  function inputStyle(name) {
+    return {
+      ...baseInput,
+      borderColor: focused === name ? 'rgba(150,165,96,0.55)' : 'rgba(253,254,235,0.12)',
+      background: focused === name ? 'rgba(253,254,235,0.07)' : 'rgba(253,254,235,0.05)',
+    };
+  }
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0,
+      background: 'radial-gradient(circle at 50% 38%, rgba(45,78,166,0.14) 0%, transparent 62%), #07090A',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      padding: '0 32px',
+      opacity: visible ? 1 : 0,
+      transition: 'opacity 0.45s ease',
+      overflowY: 'auto',
+    }}>
+
+      {/* Logo */}
+      <div style={{
+        marginBottom: 8,
+        filter: 'drop-shadow(0 0 22px rgba(244,175,89,0.14))',
+      }}>
+        <SplashLogo size={195} />
+      </div>
+
+      {/* Tagline */}
+      <div style={{
+        fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.20em',
+        color: 'rgba(253,254,235,0.30)', textTransform: 'uppercase',
+        marginBottom: 44,
+      }}>
+        Your Practice. Your Book.
+      </div>
+
+      {/* Divider */}
+      <div style={{
+        width: '100%', height: 1,
+        background: 'linear-gradient(90deg, transparent, rgba(253,254,235,0.10), transparent)',
+        marginBottom: 32,
+      }} />
+
+      {/* Email field */}
+      <div style={{ width: '100%', marginBottom: 12 }}>
+        <label style={{
+          display: 'block', marginBottom: 6,
+          fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.14em',
+          color: 'rgba(253,254,235,0.35)', textTransform: 'uppercase',
+        }}>Email</label>
+        <input
+          type="email"
+          placeholder="witch@example.com"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          onFocus={() => setFocused('email')}
+          onBlur={() => setFocused(null)}
+          onKeyDown={handleKey}
+          style={inputStyle('email')}
+          autoComplete="email"
+        />
+      </div>
+
+      {/* Password field */}
+      <div style={{ width: '100%', marginBottom: 24 }}>
+        <label style={{
+          display: 'block', marginBottom: 6,
+          fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.14em',
+          color: 'rgba(253,254,235,0.35)', textTransform: 'uppercase',
+        }}>Password</label>
+        <input
+          type="password"
+          placeholder="••••••••"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          onFocus={() => setFocused('password')}
+          onBlur={() => setFocused(null)}
+          onKeyDown={handleKey}
+          style={inputStyle('password')}
+          autoComplete="current-password"
+        />
+      </div>
+
+      {/* Sign In button */}
+      <button
+        onClick={onSignIn}
+        style={{
+          width: '100%',
+          padding: '15px',
+          background: 'linear-gradient(135deg, #96A560 0%, #7d8c4e 100%)',
+          border: 'none',
+          borderRadius: 14,
+          color: '#FDFEEB',
+          fontFamily: 'var(--font-body)',
+          fontWeight: 700,
+          fontSize: 15,
+          letterSpacing: '0.03em',
+          cursor: 'pointer',
+          boxShadow: '0 4px 18px rgba(150,165,96,0.22)',
+          transition: 'opacity 0.15s',
+        }}
+        onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+        onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+      >
+        Sign In
+      </button>
+
+      {/* Create account link */}
+      <button
+        onClick={onSignIn}
+        style={{
+          marginTop: 18,
+          background: 'none', border: 'none',
+          color: 'rgba(253,254,235,0.38)',
+          fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.14em',
+          textTransform: 'uppercase', cursor: 'pointer',
+          padding: '6px 0',
+        }}
+      >
+        New here? Create an account
+      </button>
+
+      {/* Forgot password */}
+      <button
+        onClick={onSignIn}
+        style={{
+          marginTop: 8,
+          background: 'none', border: 'none',
+          color: 'rgba(253,254,235,0.25)',
+          fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.14em',
+          textTransform: 'uppercase', cursor: 'pointer',
+          padding: '4px 0',
+        }}
+      >
+        Forgot password?
+      </button>
+
+      {/* Copyright */}
+      <div style={{
+        position: 'absolute', bottom: 22,
+        fontFamily: 'var(--font-mono)', fontSize: 9,
+        color: 'rgba(253,254,235,0.18)', letterSpacing: '0.10em',
+        textAlign: 'center',
+        pointerEvents: 'none',
+      }}>
+        This is a concept by Katy Towell, and I'll hex you if you steal it. · © {new Date().getFullYear()}
+      </div>
+    </div>
+  );
+}
+
+window.Login = Login;
+
+  </script>
+
   <!-- ── App.jsx ── -->
   <script type="text/babel">
 // App.jsx — root: navigation, data, state
@@ -4908,6 +5383,7 @@ function App({ theme, setTheme }) {
   }
   function handleDeleteWorking(id) { setWorkings(prev => prev.filter(w => w.id !== id)); setOpenWorkingId(null); }
   function handleSealWorking(id) { setWorkings(prev => prev.map(w => w.id === id ? { ...w, sealed: !w.sealed } : w)); }
+  function handleToggleFavorite(id) { setWorkings(prev => prev.map(w => w.id === id ? { ...w, favorite: !w.favorite } : w)); }
 
   function handleSaveEntry(e) {
     setEntries(prev => {
@@ -5025,6 +5501,7 @@ function App({ theme, setTheme }) {
         onCreate={handleCreateWorking}
         onSave={handleSaveWorking}
         submitRef={newWorkingSubmitRef}
+        cabinet={cabinet}
       />
     );
     bottomBar = (
@@ -5084,7 +5561,8 @@ function App({ theme, setTheme }) {
         onBack={() => setOpenWorkingId(null)}
         onCast={() => openEntryForm(null)}
         onDelete={() => handleDeleteWorking(openWorking.id)}
-        onEdit={() => openComposer(openWorking.id)} />
+        onEdit={() => openComposer(openWorking.id)}
+        onToggleFavorite={() => handleToggleFavorite(openWorking.id)} />
     );
     // WorkingDetail has its own sticky footer
 
@@ -5138,7 +5616,7 @@ function App({ theme, setTheme }) {
       <TopBar title="Grimoire" eyebrow="YOUR SPELLS"
         leading={homeBtn} trailing={rightBtns} />
     );
-    body = <Workings workings={workings} onOpenWorking={setOpenWorkingId} onCompose={() => openComposer()} />;
+    body = <Workings workings={workings} onOpenWorking={setOpenWorkingId} onCompose={() => openComposer()} onToggleFavorite={handleToggleFavorite} />;
     bottomBar = (
       <BottomBar>
         <Btn variant="primary" size="md" icon={Ico.plus} fullWidth onClick={() => openComposer()}>
@@ -5249,31 +5727,16 @@ window.getMagicalEvents = getMagicalEvents;
   <script type="text/babel">
     function Root() {
       const [theme, setTheme] = React.useState('dark');
-      const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 768);
-      const [vh, setVh] = React.useState(() => window.innerHeight);
       const [scale, setScale] = React.useState(
         () => Math.min(1, (window.innerHeight - 40) / 874)
       );
       React.useEffect(() => {
         function onResize() {
-          setIsMobile(window.innerWidth < 768);
-          setVh(window.innerHeight);
           setScale(Math.min(1, (window.innerHeight - 40) / 874));
         }
         window.addEventListener('resize', onResize);
         return () => window.removeEventListener('resize', onResize);
       }, []);
-
-      // On a real phone: fill the screen natively, no device chrome
-      if (isMobile) {
-        return (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: vh, overflow: 'hidden' }}>
-            <App theme={theme} setTheme={setTheme} />
-          </div>
-        );
-      }
-
-      // On desktop: show the scaled iOS device frame
       const scaledH = Math.round(874 * scale);
       const scaledW = Math.round(402 * scale);
       return (

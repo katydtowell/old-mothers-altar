@@ -67,19 +67,19 @@
      COLOR — base palette
      ================================================================= */
 
-  /* Ink — the altar cloth. Near-black with a warm sepia undertone,
-     candlelit interior rather than cool dashboard. */
+  /* Ink — the altar cloth. Near-black with a dark eggplant undertone,
+     ritual interior rather than cool dashboard. */
   --ink-0:        #000000;
-  --ink-50:       #0A0807;
-  --ink-100:      #14110D;  /* page bg, deepest — warm near-black */
-  --ink-200:      #1F1A14;  /* card surface — charcoal-sepia */
-  --ink-300:      #2E2620;  /* elevated / hover */
-  --ink-400:      #4A3E2E;  /* line break */
+  --ink-50:       #08060C;
+  --ink-100:      #100D18;  /* page bg, deepest — deep eggplant near-black */
+  --ink-200:      #1A1528;  /* card surface — dark eggplant */
+  --ink-300:      #261D38;  /* elevated / hover */
+  --ink-400:      #3E2F52;  /* line break */
 
   /* Slate — bone & taupe; the smoke that drifts off the candle.
      Was a cool cyan-gray, now a warm tarot-parchment family. */
   --slate-100:    #FFFFFF;
-  --slate-200:    #EDE4D2;  /* high-contrast text on ink — warm bone */
+  --slate-200:    #FDFEEB;  /* high-contrast text on ink — bone/parchment */
   --slate-300:    #BFAA84;  /* secondary text, icons — warm taupe */
   --slate-400:    #A99378;
   --slate-500:    #7A6850;  /* eyebrow / tertiary — desaturated amber */
@@ -123,13 +123,13 @@
   --bg-page:        var(--ink-100);
   --bg-surface:     var(--ink-200);
   --bg-elevated:    var(--ink-300);
-  --bg-overlay:     rgba(20, 17, 13, 0.74);
+  --bg-overlay:     rgba(16, 13, 24, 0.74);
   --bg-vellum:      var(--bone);       /* light-mode parchment, journal pages */
 
   /* foreground */
   --fg-1:           var(--slate-200);  /* primary text */
   --fg-2:           var(--slate-300);  /* secondary text */
-  --fg-3:           var(--slate-500);  /* eyebrow / labels */
+  --fg-3:           var(--slate-400);  /* eyebrow / labels — lifted from slate-500 for contrast */
   --fg-invert:      var(--ink-100);    /* text on light surfaces */
   --fg-accent:      var(--amber);
   --fg-link:        var(--slate-200);
@@ -138,7 +138,7 @@
   --line-soft:      rgba(191, 170, 132, 0.10);
   --line-medium:    rgba(191, 170, 132, 0.22);
   --line-strong:    rgba(191, 170, 132, 0.45);
-  --line-vellum:    rgba(20, 17, 13, 0.18);
+  --line-vellum:    rgba(16, 13, 24, 0.18);
 
   /* actions */
   --action-primary-bg:     var(--indigo-500);
@@ -377,7 +377,7 @@
 }
 .oma-eyebrow {
   font-family: var(--font-eyebrow);
-  font-weight: 600;
+  font-weight: 300;
   font-size: var(--t-2xs);
   letter-spacing: var(--tk-eyebrow);
   text-transform: uppercase;

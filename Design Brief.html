@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Old Mother's Altar — Design Brief 2026</title>
+  <style>
+    @font-face { font-family: 'New Kansas'; src: url('./fonts/NewKansas-Regular.otf') format('opentype'); font-weight: 400; }
+    @font-face { font-family: 'New Kansas'; src: url('./fonts/NewKansas-Medium.otf') format('opentype'); font-weight: 500; }
+    @font-face { font-family: 'New Kansas'; src: url('./fonts/NewKansas-SemiBold.otf') format('opentype'); font-weight: 600; }
+    @font-face { font-family: 'New Kansas'; src: url('./fonts/NewKansas-Bold.otf') format('opentype'); font-weight: 700; }
+    @font-face { font-family: 'Ohno Blazeface'; src: url('./fonts/OhnoBlazeface-48Point.otf') format('opentype'); font-weight: 400; }
+    @font-face { font-family: 'Ohno Blazeface 36'; src: url('./fonts/OhnoBlazeface-36Point.otf') format('opentype'); font-weight: 400; }
+    @font-face { font-family: 'Ohno Blazeface 24'; src: url('./fonts/OhnoBlazeface-24Point.otf') format('opentype'); font-weight: 400; }
+
+    :root {
+      --bg-page: #0E0F0E;
+      --bg-surface: #182023;
+      --bg-surface-2: #1e2a2e;
+      --fg-1: #EDE4D2;
+      --fg-2: #BFAA84;
+      --fg-3: rgba(191,170,132,0.45);
+      --line-soft: rgba(161,189,198,0.10);
+      --indigo: #2D4EA6;
+      --indigo-light: #4a6fd4;
+      --crimson: #D41840;
+      --ember: #F35321;
+      --saffron: #F59823;
+      --amber: #F4AF59;
+      --moss: #96A560;
+      --plum: #9b6aaa;
+      --bone: #FDFEEB;
+      --nav-w: 224px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg-page);
+      color: var(--fg-2);
+      font-family: 'New Kansas', Georgia, 'Times New Roman', serif;
+      font-size: 15px;
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────────── */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────────────────── */
+    aside {
+      width: var(--nav-w);
+      min-height: 100vh;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--line-soft);
+      position: fixed;
+      top: 0; left: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 0 0 32px;
+      z-index: 10;
+      overflow-y: auto;
+    }
+
+    .nav-top {
+      padding: 28px 24px 24px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .nav-logo {
+      height: 26px;
+      display: block;
+    }
+
+    .nav-doc-label {
+      margin-top: 14px;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--fg-3);
+      line-height: 1.4;
+    }
+
+    .nav-section-label {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--fg-3);
+      padding: 20px 24px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 24px;
+      cursor: pointer;
+      color: var(--fg-2);
+      font-size: 13px;
+      font-weight: 500;
+      border-left: 2px solid transparent;
+      transition: color 140ms, background 140ms, border-color 140ms;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      color: var(--fg-1);
+      background: rgba(191,170,132,0.05);
+    }
+
+    .nav-item.active {
+      color: var(--amber);
+      border-left-color: var(--amber);
+      background: rgba(244,175,89,0.06);
+    }
+
+    .nav-num {
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--fg-3);
+      flex-shrink: 0;
+      width: 14px;
+      transition: color 140ms;
+    }
+
+    .nav-item.active .nav-num { color: var(--amber); opacity: 0.7; }
+
+    /* ── Main ─────────────────────────────────────────────────────────── */
+    main {
+      margin-left: var(--nav-w);
+      flex: 1;
+      padding: 56px 64px 80px;
+      max-width: calc(var(--nav-w) + 880px);
+    }
+
+    /* ── Pages ───────────────────────────────────────────────────────── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Typography ──────────────────────────────────────────────────── */
+    .eyebrow {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: 'Ohno Blazeface', Georgia, serif;
+      font-size: 52px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: var(--fg-1);
+      line-height: 1.05;
+      letter-spacing: 0.015em;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-family: 'Ohno Blazeface 36', 'Ohno Blazeface', Georgia, serif;
+      font-size: 30px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: var(--fg-1);
+      letter-spacing: 0.015em;
+      margin-top: 52px;
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg-1);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    p {
+      line-height: 1.75;
+      color: var(--fg-2);
+      max-width: 620px;
+      margin-bottom: 16px;
+    }
+
+    p.wide { max-width: 100%; }
+
+    .divider {
+      height: 1px;
+      background: var(--line-soft);
+      margin: 48px 0;
+    }
+
+    a { color: var(--indigo-light); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Cards ───────────────────────────────────────────────────────── */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Lists ───────────────────────────────────────────────────────── */
+    .brief-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .brief-list li {
+      padding: 9px 0 9px 20px;
+      border-bottom: 1px solid var(--line-soft);
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--fg-2);
+      position: relative;
+    }
+
+    .brief-list li:last-child { border-bottom: none; }
+
+    .brief-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--amber);
+      font-weight: 400;
+    }
+
+    .brief-list li strong { color: var(--fg-1); font-weight: 600; }
+
+    /* ── Pill tags ───────────────────────────────────────────────────── */
+    .pill {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line-soft);
+      color: var(--fg-2);
+      margin: 2px 2px 2px 0;
+    }
+    .pill.amber { border-color: rgba(244,175,89,0.4); color: var(--amber); }
+    .pill.moss  { border-color: rgba(150,165,96,0.4); color: var(--moss); }
+    .pill.plum  { border-color: rgba(155,106,170,0.4); color: var(--plum); }
+    .pill.indigo { border-color: rgba(74,111,212,0.4); color: var(--indigo-light); }
+    .pill.ember  { border-color: rgba(243,83,33,0.4); color: var(--ember); }
+
+    /* ── Source cite ─────────────────────────────────────────────────── */
+    .cite {
+      font-size: 11px;
+      color: var(--fg-3);
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    /* ── Personas ─────────────────────────────────────────────────────  */
+    .persona {
+      background: var(--bg-surface);
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 32px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 188px 1fr;
+      gap: 36px;
+    }
+
+    .persona-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--line-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 16px;
+    }
+
+    .persona-name {
+      font-family: 'Ohno Blazeface 24', 'Ohno Blazeface', Georgia, serif;
+      font-size: 22px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: var(--fg-1);
+      letter-spacing: 0.015em;
+      margin-bottom: 3px;
+    }
+
+    .persona-role {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 18px;
+    }
+
+    .persona-stat {
+      font-size: 12px;
+      color: var(--fg-3);
+      margin-bottom: 5px;
+    }
+
+    .persona-stat strong { color: var(--fg-2); font-weight: 500; }
+
+    .meta-label {
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--fg-3);
+      margin: 20px 0 8px;
+    }
+
+    /* ── Review quotes ────────────────────────────────────────────────── */
+    .review {
+      border-left: 2px solid rgba(244,175,89,0.35);
+      padding: 10px 16px;
+      margin: 12px 0;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--fg-2);
+      background: rgba(244,175,89,0.03);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .review-attr {
+      font-size: 11px;
+      font-style: normal;
+      color: var(--fg-3);
+      margin-top: 5px;
+    }
+
+    /* ── Opportunity blocks ───────────────────────────────────────────── */
+    .opportunity {
+      background: rgba(244,175,89,0.05);
+      border: 1px solid rgba(244,175,89,0.18);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+
+    .opportunity strong {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .opportunity p {
+      font-size: 13px;
+      line-height: 1.65;
+      max-width: 100%;
+      margin: 0;
+    }
+
+    /* ── Feature compare table ────────────────────────────────────────── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 20px 0;
+    }
+
+    .compare-table th {
+      text-align: left;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-3);
+      font-weight: 500;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .compare-table th.center { text-align: center; }
+
+    .compare-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--line-soft);
+      color: var(--fg-2);
+      vertical-align: middle;
+    }
+
+    .compare-table td.center { text-align: center; }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .feature-name { color: var(--fg-2); }
+    .compare-table .oma-col { color: var(--moss); font-weight: 600; }
+
+    .chk  { color: var(--moss); font-size: 15px; }
+    .xmark { color: var(--crimson); font-size: 13px; opacity: 0.7; }
+    .part { color: var(--amber); font-size: 13px; }
+
+    /* ── UX Flow ──────────────────────────────────────────────────────── */
+    .flow-group {
+      background: var(--bg-surface);
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+
+    .flow-group-label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 16px;
+    }
+
+    .flow-tree {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .flow-indent {
+      margin-left: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+      padding-left: 16px;
+      border-left: 1px solid var(--line-soft);
+    }
+
+    .fn {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .fn-screen {
+      background: rgba(45,78,166,0.12);
+      border: 1px solid rgba(45,78,166,0.3);
+      color: var(--fg-1);
+    }
+
+    .fn-action {
+      background: rgba(244,175,89,0.07);
+      border: 1px solid rgba(244,175,89,0.25);
+      color: var(--amber);
+    }
+
+    .fn-end {
+      background: rgba(150,165,96,0.08);
+      border: 1px solid rgba(150,165,96,0.3);
+      color: var(--moss);
+    }
+
+    .fn-danger {
+      background: rgba(212,24,64,0.07);
+      border: 1px solid rgba(212,24,64,0.25);
+      color: #e05070;
+    }
+
+    .flow-arrow {
+      color: var(--fg-3);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .flow-note {
+      font-size: 11px;
+      color: var(--fg-3);
+      font-style: italic;
+      margin-left: 8px;
+    }
+
+    /* ── Screen spec cards ─────────────────────────────────────────────── */
+    .screen-spec {
+      margin-top: 16px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      padding: 16px 20px;
+    }
+
+    .screen-spec h3 {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--fg-3);
+      margin-bottom: 10px;
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 24px;
+    }
+
+    /* ── Cover / page header ─────────────────────────────────────────── */
+    .page-header {
+      margin-bottom: 52px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    /* ── Market stat card ────────────────────────────────────────────── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 20px 22px;
+    }
+
+    .stat-num {
+      font-family: 'Ohno Blazeface 36', 'Ohno Blazeface', Georgia, serif;
+      font-size: 28px;
+      text-transform: uppercase;
+      color: var(--amber);
+      letter-spacing: 0.01em;
+      margin-bottom: 4px;
+    }
+
+    .stat-desc {
+      font-size: 12px;
+      color: var(--fg-3);
+      line-height: 1.5;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 760px) {
+      aside { display: none; }
+      main { margin-left: 0; padding: 28px 20px 60px; }
+      .persona { grid-template-columns: 1fr; }
+      .card-grid, .spec-grid, .stat-row { grid-template-columns: 1fr; }
+      h1 { font-size: 36px; }
+      h2 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── Sidebar nav ── -->
+  <aside>
+    <div class="nav-top">
+      <img class="nav-logo" src="./assets/logo-dark.svg" alt="Old Mother's Altar"
+        onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\'font-size:12px;font-weight:600;color:var(--fg-1);letter-spacing:0.08em\'>OLD MOTHER\'S ALTAR</span>')">
+      <div class="nav-doc-label">Design Brief<br>May 2026</div>
+    </div>
+    <div class="nav-section-label">Sections</div>
+    <div class="nav-item active" onclick="show('p1',this)">
+      <span class="nav-num">I</span> Problem Statement
+    </div>
+    <div class="nav-item" onclick="show('p2',this)">
+      <span class="nav-num">II</span> User Personas
+    </div>
+    <div class="nav-item" onclick="show('p3',this)">
+      <span class="nav-num">III</span> Competitor Analysis
+    </div>
+    <div class="nav-item" onclick="show('p4',this)">
+      <span class="nav-num">IV</span> UX Flow
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main id="main-scroll">
+
+    <!-- ════════════════════════════════════════════
+         PAGE I — PROBLEM STATEMENT
+    ════════════════════════════════════════════ -->
+    <div class="page active" id="p1">
+
+      <div class="page-header">
+        <div class="eyebrow">Design Brief · Section I of IV</div>
+        <h1>Problem Statement</h1>
+        <p>Old Mother's Altar is a private, ritual-minded mobile app for practitioners of witchcraft and folk magic — a spell journal and tracker that takes the work as seriously as the practitioner does.</p>
+        <p>This brief establishes the design foundation: what the app must accomplish, who it serves, how it compares to existing tools, and how users move through it.</p>
+      </div>
+
+      <h2>The Problem</h2>
+      <p>Serious practitioners have no purpose-built, private tool for their working life. Generic notes apps lack ritual structure. Existing "witch apps" skew toward reference libraries, wellness aesthetics, or social features. None treat the practitioner's own record as the primary object.</p>
+      <p>The result: practice is fragmented across handwritten notebooks, phone notes, screenshots, and spreadsheets — with no unified history of what was cast, when, under what conditions, and what came of it. The spell is remembered; the pattern is lost.</p>
+
+      <div class="divider"></div>
+
+      <h2>What This App Must Accomplish</h2>
+
+      <ul class="brief-list" style="margin-bottom: 32px;">
+        <li><strong>Serve as a private, secure, offline-first spell journal.</strong> All data lives on the device. No account required. No cloud sync. Biometric lock available. Notifications use discreet wording. The practitioner's record is theirs alone — including those in the broom closet.</li>
+        <li><strong>Enable creation of spells with full ritual metadata.</strong> Each spell should capture intent, ingredients with amounts and notes, timing affinity (moon phase, day, season, time of day), chant or spoken words, deities invoked, duration, and a sealed/draft state — not just a title and text block.</li>
+        <li><strong>Record cast history as a first-class concept.</strong> Every time a spell is performed, the event is logged with a date, notes, task completion, and outcome. Multiple casts of the same working build a real history over time. The practitioner can see what they've done and what came of it.</li>
+        <li><strong>Provide a running journal of practice.</strong> Beyond spells, the practitioner records notes, observations, and dreams on a shared timeline — all linked to their broader practice, not siloed in a separate app.</li>
+        <li><strong>Integrate live magical calendar data.</strong> The current moon phase, current sabbat, Mercury retrograde windows, and eclipse dates surface automatically in the home view and as context when logging entries. The practitioner never has to look this up.</li>
+        <li><strong>Manage ingredient and supply inventory.</strong> A cabinet of herbs, crystals, candles, and cords — tracked by type, quantity, and notes — so the practitioner knows what they have before the ritual begins.</li>
+        <li><strong>Deliver an aesthetic that honors the practice.</strong> Dark by default. Serifed. Candlelit. Terse. The visual language of a working grimoire, not a wellness dashboard. No gamification, no streaks, no coach-y copy, no exclamation marks.</li>
+        <li><strong>Work fully offline.</strong> Moon calculations, journaling, spell management — everything must function without internet access. At the altar, in the woods, wherever the practice calls.</li>
+      </ul>
+
+      <h2>What This App Is Not</h2>
+      <ul class="brief-list" style="margin-bottom: 40px;">
+        <li>Not a wellness or mindfulness app</li>
+        <li>Not a social platform, community, or sharing tool</li>
+        <li>Not a pre-written spell library or encyclopedia</li>
+        <li>Not a shop, marketplace, or affiliate surface</li>
+        <li>Not gamified — no streaks, badges, completion rates, or achievement systems</li>
+        <li>Not a beginner's guide — it assumes the practitioner knows their work</li>
+      </ul>
+
+      <div class="divider"></div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-num">$2.16B</div>
+          <div class="stat-desc">Global spiritual wellness apps market, 2024</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">14.6%</div>
+          <div class="stat-desc">Projected CAGR through 2033</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">64.8B</div>
+          <div class="stat-desc">#WitchTok video views — the audience exists</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">The Gap</div>
+        <p class="wide" style="margin-bottom: 8px;">The serious private-practice journal for this audience does not exist. The market is occupied by reference libraries (pre-written spells, herb databases), wellness-adjacent trackers, and generic notes apps repurposed by practitioners who have no better option. Old Mother's Altar is built for the practitioner who has outgrown all of them.</p>
+        <p class="wide" style="margin-bottom: 0; font-size: 13px; color: var(--fg-3)">Around 41% of Americans say they have become more spiritual over time — with the rate highest among younger generations who are simultaneously walking away from institutional religion.</p>
+        <div class="cite">Sources: <a href="https://www.grandviewresearch.com/industry-analysis/spiritual-wellness-apps-market-report" target="_blank">Grand View Research: Spiritual Wellness Apps Market, 2024</a> · <a href="https://thegauntlet.ca/2024/10/17/witchcraft-is-making-a-comeback-among-genz/" target="_blank">The Gauntlet: Witchcraft & Gen Z, 2024</a> · <a href="https://www.pewresearch.org/short-reads/2024/01/17/around-4-in-10-americans-have-become-more-spiritual-over-time-fewer-have-become-more-religious/" target="_blank">Pew Research: Spiritual vs. Religious Growth, 2024</a></div>
+      </div>
+
+    </div><!-- /p1 -->
+
+
+    <!-- ════════════════════════════════════════════
+         PAGE II — USER PERSONAS
+    ════════════════════════════════════════════ -->
+    <div class="page" id="p2">
+
+      <div class="page-header">
+        <div class="eyebrow">Design Brief · Section II of IV</div>
+        <h1>User Personas</h1>
+        <p>Three personas grounded in documented demographic data. Women account for a substantially larger share of new age practitioners than men. Gen Z is the least institutionally religious generation on record, with roughly one third claiming no religion — yet actively seeking spiritual structure outside those institutions. The #WitchTok community is the most visible expression of this shift.</p>
+        <div class="cite">Demographic sources: <a href="https://www.pewresearch.org/religious-landscape-study/religious-family/new-age/" target="_blank">Pew Research: New Age Religious Landscape Study</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10784987/" target="_blank">PMC: Gen Z &amp; Spiritual Self-Care Apps (2024)</a> · <a href="https://www.newstatesman.com/politics/religion/2023/08/strongfaith-faithless-age-strong" target="_blank">New Statesman: The Witchcraft Generation</a> · <a href="https://thegauntlet.ca/2024/10/17/witchcraft-is-making-a-comeback-among-genz/" target="_blank">The Gauntlet, 2024</a></div>
+      </div>
+
+      <!-- Persona 1: Margot -->
+      <div class="persona">
+        <div>
+          <div class="persona-avatar">🌙</div>
+          <div class="persona-name">Margot</div>
+          <div class="persona-role">The Solitary Millennial</div>
+          <div class="persona-stat">Age: <strong>29</strong></div>
+          <div class="persona-stat">Location: <strong>Portland, OR</strong></div>
+          <div class="persona-stat">Practice: <strong>4 years, eclectic</strong></div>
+          <div class="persona-stat">iPhone fluency: <strong>High</strong></div>
+          <div class="persona-stat" style="margin-top: 10px;">Status: <strong>In the broom closet</strong></div>
+        </div>
+        <div>
+          <p class="wide">Margot came to witchcraft during the pandemic — isolated, drawn to ritual as a way of imposing rhythm and agency on an unstable world. Self-taught through books and a curated WitchTok feed, she is now a confident solitary practitioner with a small physical grimoire she keeps hidden. Her roommate doesn't know about her practice.</p>
+
+          <div class="meta-label">Modalities</div>
+          <span class="pill moss">Candle Magic</span>
+          <span class="pill moss">Knot Work</span>
+          <span class="pill moss">Dream Work</span>
+          <span class="pill moss">Herbal</span>
+
+          <div class="meta-label">Goals</div>
+          <ul class="brief-list">
+            <li>A complete, private record of every spell: what she used, when, what happened</li>
+            <li>Ingredient inventory so she's never mid-ritual without what she needs</li>
+            <li>Dreams and moon observations alongside her spell work, on one timeline</li>
+          </ul>
+
+          <div class="meta-label">Frustrations with existing tools</div>
+          <ul class="brief-list">
+            <li>Existing apps feel like wellness tools — pastel, coach-y, gamified, built for mood tracking not magic</li>
+            <li>Practice scattered across Notes, a physical journal, and screenshots — no connected record</li>
+            <li>App notification wording could out her practice to people around her</li>
+          </ul>
+
+          <div class="meta-label">Technology relationship</div>
+          <p class="wide" style="font-size: 13px; margin-bottom: 0;">iPhone-primary. Uses apps deliberately and expects them to be polished. Will abandon an app that feels generic in the first session. Privacy controls are non-negotiable.</p>
+        </div>
+      </div>
+
+      <!-- Persona 2: Rowan -->
+      <div class="persona">
+        <div>
+          <div class="persona-avatar">🕯</div>
+          <div class="persona-name">Rowan</div>
+          <div class="persona-role">The Established Practitioner</div>
+          <div class="persona-stat">Age: <strong>38</strong></div>
+          <div class="persona-stat">Location: <strong>Edinburgh, UK</strong></div>
+          <div class="persona-stat">Practice: <strong>14 years, Wiccan / eclectic</strong></div>
+          <div class="persona-stat">iPhone fluency: <strong>Medium</strong></div>
+          <div class="persona-stat" style="margin-top: 10px;">Status: <strong>Open practitioner</strong></div>
+        </div>
+        <div>
+          <p class="wide">Rowan has kept a physical Book of Shadows for over a decade — leather-bound, carefully handwritten. She came to the craft through Wicca, then drifted toward a broader eclectic path. Openly a practitioner among her social circle. She wants a digital companion: searchable, indexed, always with her — not a replacement for her sacred object, but a record she can actually query.</p>
+
+          <div class="meta-label">Modalities</div>
+          <span class="pill amber">Wiccan Ritual</span>
+          <span class="pill amber">Sabbat Work</span>
+          <span class="pill amber">Deity Work</span>
+          <span class="pill amber">Divination</span>
+
+          <div class="meta-label">Goals</div>
+          <ul class="brief-list">
+            <li>Digitize and index her existing spell records — searchable by ingredient, moon, outcome</li>
+            <li>Track the sabbat calendar and plan seasonal ritual work in advance</li>
+            <li>Log outcomes across multiple casts of the same working over years — build a real history</li>
+          </ul>
+
+          <div class="meta-label">Frustrations with existing tools</div>
+          <ul class="brief-list">
+            <li>Reference-heavy apps with 200 pre-written spells aren't useful — she writes her own</li>
+            <li>No app lets her build a serious, long-form cast history per working</li>
+            <li>UIs that treat her as a beginner who needs instruction rather than a tool that needs data</li>
+          </ul>
+
+          <div class="meta-label">Technology relationship</div>
+          <p class="wide" style="font-size: 13px; margin-bottom: 0;">Comfortable with smartphones but not an early adopter. Chooses apps deliberately. Prefers calm, unhurried interfaces — nothing that feels urgent. Expects depth over breadth and will read every field label carefully.</p>
+        </div>
+      </div>
+
+      <!-- Persona 3: Zola -->
+      <div class="persona">
+        <div>
+          <div class="persona-avatar">✦</div>
+          <div class="persona-name">Zola</div>
+          <div class="persona-role">The Gen Z Seeker</div>
+          <div class="persona-stat">Age: <strong>22</strong></div>
+          <div class="persona-stat">Location: <strong>Austin, TX</strong></div>
+          <div class="persona-stat">Practice: <strong>18 months, exploratory</strong></div>
+          <div class="persona-stat">iPhone fluency: <strong>Very high</strong></div>
+          <div class="persona-stat" style="margin-top: 10px;">Status: <strong>Openly spiritual, selectively witchy</strong></div>
+        </div>
+        <div>
+          <p class="wide">Zola found her way to witchcraft through TikTok — a combination of aesthetic resonance, community warmth, and a felt need for agency in an anxious world. She's young, curious, and not committed to a single tradition. She might call herself a "baby witch," but she takes her journaling seriously. Her phone is her primary computer, and she expects everything on it to be beautiful.</p>
+
+          <div class="meta-label">Modalities</div>
+          <span class="pill plum">Moon Work</span>
+          <span class="pill plum">Crystal Work</span>
+          <span class="pill plum">Herbal</span>
+          <span class="pill plum">Intuitive</span>
+
+          <div class="meta-label">Goals</div>
+          <ul class="brief-list">
+            <li>A record of what she's tried and what happened — building her own tradition through documented experiment</li>
+            <li>Understand which moon phases and timings seem to work for her specifically</li>
+            <li>Feel that her practice is taken seriously by the tool she uses — not patronized</li>
+          </ul>
+
+          <div class="meta-label">Frustrations with existing tools</div>
+          <ul class="brief-list">
+            <li>Apps that feel specifically Wiccan — she doesn't identify with a tradition yet</li>
+            <li>Gamification: streaks and badges feel infantilizing — she's not building a habit, she's building a practice</li>
+            <li>Beauty without depth — apps that look right but don't give her the fields she needs to record what actually happened</li>
+          </ul>
+
+          <div class="meta-label">Technology relationship</div>
+          <p class="wide" style="font-size: 13px; margin-bottom: 0;">Digital native. iPhone is primary. Highest aesthetic bar of the three personas — if the first screen doesn't feel right, she won't return. Responds strongly to considered, distinctive visual identity over generic design.</p>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card">
+        <div class="eyebrow">Cross-Persona Pattern</div>
+        <p class="wide" style="margin-bottom: 10px;">All three personas share: rejection of gamification, demand for genuine privacy, and the expectation that the app treats their practice as serious — not as a wellness activity or aesthetic hobby. The tone, visual language, and data model of Old Mother's Altar are calibrated to serve all three without condescending to any.</p>
+        <p class="wide" style="margin-bottom: 0; font-size: 13px; color: var(--fg-3)">Gen Z's draw to witchcraft is documented as a response to institutional distrust, chronic burnout, and a need for structures they control. The app should never feel like another institution demanding compliance.</p>
+        <div class="cite">Sources: <a href="https://www.pewresearch.org/religious-landscape-study/religious-family/new-age/" target="_blank">Pew Research: New Age Landscape Study</a> · <a href="https://www.newsweek.com/gen-z-becomes-more-religious-survey-2060426" target="_blank">Newsweek: Gen Z &amp; Religion Survey</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10784987/" target="_blank">PMC: Gen Z Spiritual Self-Care App Study, 2024</a></div>
+      </div>
+
+    </div><!-- /p2 -->
+
+
+    <!-- ════════════════════════════════════════════
+         PAGE III — COMPETITOR ANALYSIS
+    ════════════════════════════════════════════ -->
+    <div class="page" id="p3">
+
+      <div class="page-header">
+        <div class="eyebrow">Design Brief · Section III of IV</div>
+        <h1>Competitor Analysis</h1>
+        <p>Three competitors assessed across Old Mother's Altar's core feature set. Feature data drawn directly from App Store listings and published user reviews.</p>
+      </div>
+
+      <!-- ─── Competitor 1 ─── -->
+      <h2>Digital Book of Shadows</h2>
+      <div style="margin-bottom: 12px;">
+        <span class="pill">Oasis Code Studio</span>
+        <span class="pill amber">Free · $34.99 unlock</span>
+        <span class="pill">iOS · Launched April 2026</span>
+        <span class="pill" style="color: var(--fg-3); border-color: rgba(161,189,198,0.12);">No reviews yet — too new</span>
+      </div>
+      <p>The closest current competitor. Launched April 2026, built for the same serious-practitioner audience: offline-first, biometric lock, no social features, no pre-written spells. The most feature-complete rival.</p>
+
+      <div class="card">
+        <div class="card-grid">
+          <div>
+            <h3>Feature Set</h3>
+            <ul class="brief-list">
+              <li>Spell tracker with automatic moon phase + moon sign tagging</li>
+              <li>Spell follow-up reminders at custom intervals ("Did it manifest?")</li>
+              <li>Built-in tarot reader — 5 spread types, upright + reversed meanings</li>
+              <li>Entry types: Spells, Dreams, Rituals, Sigils, Quick Notes, Voice Notes</li>
+              <li>Sigil design workspace with witch's alphabet canvas</li>
+              <li>Full-text search + filter by type / moon / tag / date range</li>
+              <li>Grid, list, and calendar views</li>
+              <li>Biometric lock (Face ID / Touch ID)</li>
+              <li>Insights: most-used ingredients, mood patterns across lunar cycles, spell outcomes</li>
+              <li>Offline-first — moon calc, tarot, journaling all work without WiFi</li>
+              <li>Wheel of the Year sabbat integration</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Gaps vs. Old Mother's Altar</h3>
+            <ul class="brief-list">
+              <li>No ingredient / supply inventory — The Cabinet has no equivalent</li>
+              <li>No full ritual metadata per spell (deities, chant, duration, detailed timing tags)</li>
+              <li>No distinct cast history timeline — outcomes are follow-up note prompts, not a true cast log</li>
+              <li>No live magical events: no sabbat banner, no retrograde flag, no eclipse alert</li>
+              <li>Aesthetic: midnight blue + gold — reads as a fantasy prop, not a working altar</li>
+              <li>Very new (v1.08 as of May 2026) — unproven at scale, active patching</li>
+            </ul>
+            <div class="review" style="margin-top: 16px;">
+              <strong style="font-style: normal; color: var(--fg-3); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">Pricing note</strong>
+              $34.99 one-time unlock is a high barrier for a category where users are price-sensitive. Creates a fragmented freemium experience.
+            </div>
+          </div>
+        </div>
+        <div class="cite" style="margin-top: 4px;">Source: <a href="https://apps.apple.com/us/app/digital-book-of-shadows/id6760369126" target="_blank">App Store — Digital Book of Shadows (id6760369126)</a></div>
+      </div>
+
+      <!-- ─── Competitor 2 ─── -->
+      <h2>Book of Shadows</h2>
+      <div style="margin-bottom: 12px;">
+        <span class="pill">Nicholas Robinson</span>
+        <span class="pill">$1.99</span>
+        <span class="pill">iOS only · Last updated Oct 2017</span>
+        <span class="pill" style="color: var(--fg-3); border-color: rgba(161,189,198,0.12);">4.0 ★ · 60 ratings</span>
+      </div>
+      <p>The original category incumbent — released 2010, last meaningfully updated 2017. A reference library first, personal journal second. Serves practitioners who want a database of pre-written spells and ingredient lookups on their phone, not a record of their own practice.</p>
+
+      <div class="card">
+        <div class="card-grid">
+          <div>
+            <h3>Feature Set</h3>
+            <ul class="brief-list">
+              <li>200+ pre-written spells across common categories</li>
+              <li>Herb, Crystal, and Essential Oil reference database</li>
+              <li>Expanded witchcraft glossary</li>
+              <li>Add custom herbs, crystals, oils, and spells</li>
+              <li>Search across all sections</li>
+              <li>Favorites system</li>
+              <li>Fully offline reference content</li>
+            </ul>
+          </div>
+          <div>
+            <h3>User Reviews — Documented Pain Points</h3>
+            <div class="review">
+              "I would give 5 stars IF the information you enter would transfer from my iPad to my iPhone without having to re-enter everything."
+              <div class="review-attr">— RumpShaker13, Jan 2014</div>
+            </div>
+            <div class="review">
+              "It doesn't work with VoiceOver, so I almost literally purchased nothing."
+              <div class="review-attr">— PrimeMinisterRetsuko, Jun 2021</div>
+            </div>
+            <div class="review">
+              "Would love to see a community place and the ability to add pictures."
+              <div class="review-attr">— Starla93006, Jun 2011</div>
+            </div>
+            <div class="review">
+              "Wow this really is a wonderful tool… Really good job."
+              <div class="review-attr">— TreeHaven, Jul 2020</div>
+            </div>
+          </div>
+        </div>
+        <div class="cite">Source: <a href="https://apps.apple.com/us/app/book-of-shadows/id371895681" target="_blank">App Store — Book of Shadows (id371895681)</a></div>
+      </div>
+
+      <!-- ─── Competitor 3 ─── -->
+      <h2>The Generic Notes Problem</h2>
+      <div style="margin-bottom: 12px;">
+        <span class="pill">Apple Notes · Notion · Google Docs</span>
+        <span class="pill">Free</span>
+        <span class="pill">Cross-platform</span>
+      </div>
+      <p>The silent competitor. In the absence of a purpose-built serious tool, practitioners — particularly Rowan and Margot — default to generic apps. This is the best available option for practitioners who refuse to compromise on depth, and it is winning by default.</p>
+
+      <div class="card">
+        <div class="card-grid">
+          <div>
+            <h3>Why They Use It</h3>
+            <ul class="brief-list">
+              <li>Complete freedom to structure entries their own way</li>
+              <li>Reliable cross-device sync</li>
+              <li>Search works perfectly on their own text</li>
+              <li>No "witch app" aesthetic — just clean, private text</li>
+            </ul>
+          </div>
+          <div>
+            <h3>What It Cannot Do</h3>
+            <ul class="brief-list">
+              <li>No moon phase integration or live magical calendar</li>
+              <li>No structured spell metadata fields</li>
+              <li>No ingredient inventory</li>
+              <li>No cast history or outcome tracking per working</li>
+              <li>No ritual calendar awareness</li>
+              <li>No aesthetic alignment with the practice</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Feature comparison table -->
+      <h2>Feature Comparison</h2>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="width: 36%">Feature</th>
+            <th class="center">Digital BoS<br><span style="font-weight:400; letter-spacing:0; font-size:9px; text-transform:none; color:var(--fg-3)">Oasis, 2026</span></th>
+            <th class="center">Book of Shadows<br><span style="font-weight:400; letter-spacing:0; font-size:9px; text-transform:none; color:var(--fg-3)">Robinson, 2017</span></th>
+            <th class="center">Notes App</th>
+            <th class="center" style="color: var(--amber);">Old Mother's Altar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="feature-name">Custom spell creation</td>
+            <td class="center"><span class="chk">✓</span></td>
+            <td class="center"><span class="part">~</span></td>
+            <td class="center"><span class="part">~</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Full ritual metadata (deities, chant, timing)</td>
+            <td class="center"><span class="part">~</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center"><span class="part">~</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Cast history per spell</td>
+            <td class="center"><span class="part">~</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Practice journal / timeline</td>
+            <td class="center"><span class="chk">✓</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center"><span class="part">~</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Live moon phase</td>
+            <td class="center"><span class="chk">✓</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Sabbat calendar + retrograde + eclipses</td>
+            <td class="center"><span class="part">~</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Ingredient inventory (The Cabinet)</td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Offline-first</td>
+            <td class="center"><span class="chk">✓</span></td>
+            <td class="center"><span class="chk">✓</span></td>
+            <td class="center"><span class="part">~</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Biometric lock / no account</td>
+            <td class="center"><span class="chk">✓</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center"><span class="part">~</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+          <tr>
+            <td class="feature-name">No gamification</td>
+            <td class="center"><span class="chk">✓</span></td>
+            <td class="center"><span class="chk">✓</span></td>
+            <td class="center"><span class="chk">✓</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Pre-written spell library</td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center"><span class="chk">✓</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center" style="color: var(--fg-3); font-size: 11px;">by design, no</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Purposeful, distinct aesthetic</td>
+            <td class="center"><span class="part">~</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center"><span class="xmark">✕</span></td>
+            <td class="center oma-col">✓</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size: 11px; color: var(--fg-3); margin-top: -4px;">✓ present · ~ partial or limited · ✕ absent</p>
+
+      <div class="divider"></div>
+
+      <h2>Where OMA Wins</h2>
+
+      <div class="opportunity">
+        <strong>The Cabinet — no equivalent exists</strong>
+        <p>No competitor tracks ingredient inventory. For practitioners who work regularly with herbs, crystals, and candles, knowing what they have stocked is a genuine practical need. This feature has no direct rival in the category.</p>
+      </div>
+
+      <div class="opportunity">
+        <strong>Cast history as a first-class concept</strong>
+        <p>Digital Book of Shadows logs follow-up prompts. OMA logs every cast as a distinct, timestamped event in a timeline — a real practice history. The difference between a reminder system and an actual record.</p>
+      </div>
+
+      <div class="opportunity">
+        <strong>Depth-first, not breadth-first</strong>
+        <p>Every existing app leads with what it provides (pre-written spells, databases, tarot decks). OMA leads with what the practitioner brings — their own spells, their own casts, their own record. The tool is a vessel, not a library.</p>
+      </div>
+
+      <div class="opportunity">
+        <strong>Aesthetic: candlelit altar vs. fantasy prop</strong>
+        <p>Midnight-blue-and-gold reads as Hogwarts merchandise. OMA's warm near-black with tarot pigments reads as a working altar at night. Practitioners who take the work seriously will feel the difference in the first second on screen.</p>
+      </div>
+
+      <div class="opportunity">
+        <strong>Live magical calendar, fully integrated</strong>
+        <p>Sabbat dates, Mercury retrograde windows, eclipse events, and the current moon phase surface automatically in the home view. No competitor integrates all four. This is not a feature — it is the ambient context of the practice, made visible.</p>
+      </div>
+
+    </div><!-- /p3 -->
+
+
+    <!-- ════════════════════════════════════════════
+         PAGE IV — UX FLOW
+    ════════════════════════════════════════════ -->
+    <div class="page" id="p4">
+
+      <div class="page-header">
+        <div class="eyebrow">Design Brief · Section IV of IV</div>
+        <h1>UX Flow Outline</h1>
+        <p>Primary navigation structure and key user flows for Old Mother's Altar, based on the current app build — May 2026.</p>
+      </div>
+
+      <!-- App Structure -->
+      <h2>App Structure</h2>
+
+      <div class="card-grid">
+        <div class="card" style="margin-bottom: 0;">
+          <div class="eyebrow">Navigation Pattern</div>
+          <p class="wide" style="font-size: 13px; margin-bottom: 0;">A hamburger menu (top-right of every screen) opens a full-height side drawer listing all five sections. There is no persistent bottom tab bar — the drawer is the navigation. Back arrows handle in-section routing. A home icon appears on non-home sections for fast return.</p>
+        </div>
+        <div class="card" style="margin-bottom: 0;">
+          <div class="eyebrow">Five Primary Sections</div>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+            <div style="display:flex; align-items:center; gap:12px; font-size:13px;">
+              <span style="color:var(--amber); font-size:9px; letter-spacing:0.1em; width:14px;">I</span>
+              <span><strong style="color:var(--fg-1);">Home</strong> — Today view, ambient dashboard</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; font-size:13px;">
+              <span style="color:var(--amber); font-size:9px; letter-spacing:0.1em; width:14px;">II</span>
+              <span><strong style="color:var(--fg-1);">Grimoire</strong> — Spell library</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; font-size:13px;">
+              <span style="color:var(--amber); font-size:9px; letter-spacing:0.1em; width:14px;">III</span>
+              <span><strong style="color:var(--fg-1);">Journal</strong> — Practice timeline</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; font-size:13px;">
+              <span style="color:var(--amber); font-size:9px; letter-spacing:0.1em; width:14px;">IV</span>
+              <span><strong style="color:var(--fg-1);">The Cabinet</strong> — Supply inventory</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; font-size:13px;">
+              <span style="color:var(--amber); font-size:9px; letter-spacing:0.1em; width:14px;">V</span>
+              <span><strong style="color:var(--fg-1);">Settings</strong> — Profile &amp; preferences</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; margin-bottom: 12px; font-size: 11px; color: var(--fg-3);">
+        <span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px;"><span class="fn fn-screen" style="font-size:10px; padding: 3px 8px;">Screen</span> destination screen</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px;"><span class="fn fn-action" style="font-size:10px; padding: 3px 8px;">Action</span> user action or trigger</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px;"><span class="fn fn-end" style="font-size:10px; padding: 3px 8px;">Terminal</span> end state / saved</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span class="fn fn-danger" style="font-size:10px; padding: 3px 8px;">Destructive</span> confirm required</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Flow I: Home -->
+      <h2>Flow I — Home</h2>
+      <p>The ambient entry point. Greets the practitioner by name with time-of-day awareness, surfaces the current moon phase and live magical events (sabbats, Mercury retrograde, eclipses), shows the last three journal entries, and lists pending tasks from active spells. Two primary actions live at the bottom of every Home view.</p>
+
+      <div class="flow-group">
+        <div class="flow-group-label">Home</div>
+        <div class="flow-tree">
+          <div class="flow-row">
+            <span class="fn fn-screen">Home</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Tap recent entry</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-screen">Entry Detail</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Edit Entry</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Journal Entry Editor</span>
+          </div>
+          <div class="flow-indent">
+            <div class="flow-row">
+              <span class="fn fn-action">Delete Entry</span>
+              <span class="flow-arrow">→</span>
+              <span class="fn fn-danger">Confirm → Removed</span>
+            </div>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Home</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">New Journal Entry (bottom)</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Journal Entry Editor</span>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Home</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">New Spell (bottom)</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Spell Composer</span>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Home</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Tap pending task</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-screen">Spell Detail</span>
+            <span class="flow-note">(routes to linked spell)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-spec">
+        <h3>Home — Elements</h3>
+        <div class="spec-grid">
+          <ul class="brief-list">
+            <li>Time-of-day greeting with practitioner's name</li>
+            <li>Live moon phase glyph + label</li>
+            <li>Magical events strip (sabbat · retrograde · eclipse)</li>
+          </ul>
+          <ul class="brief-list">
+            <li>Recent journal entries (last 3)</li>
+            <li>Pending tasks from active spells</li>
+            <li>New Journal Entry + New Spell bottom CTAs</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Flow II: Grimoire -->
+      <h2>Flow II — Grimoire</h2>
+      <p>The spell library. Every spell the practitioner has written lives here — searchable by name or tag, filterable by sealed / draft status, sorted by recency. Each card shows name, color, moon phase affinity, tags, cast count, rating (when set), and a favorite heart. Tapping the heart marks a spell as a favorite (solid heart) or removes it. The full spell composer is a separate page, not a modal sheet.</p>
+
+      <div class="flow-group">
+        <div class="flow-group-label">Grimoire · YOUR SPELLS</div>
+        <div class="flow-tree">
+          <div class="flow-row">
+            <span class="fn fn-screen">Grimoire</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Tap spell card</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-screen">Spell Detail</span>
+          </div>
+          <div class="flow-indent">
+            <div class="flow-row">
+              <span class="fn fn-action">Cast Now</span>
+              <span class="flow-arrow">→</span>
+              <span class="fn fn-end">Journal Entry Editor</span>
+              <span class="flow-note">(pre-linked to this spell)</span>
+            </div>
+            <div class="flow-row">
+              <span class="fn fn-action">Edit Spell</span>
+              <span class="flow-arrow">→</span>
+              <span class="fn fn-end">Spell Composer</span>
+              <span class="flow-note">(prefilled)</span>
+            </div>
+            <div class="flow-row">
+              <span class="fn fn-action">Seal / Unseal toggle</span>
+              <span class="flow-arrow">→</span>
+              <span class="fn fn-end">Status updated</span>
+            </div>
+            <div class="flow-row">
+              <span class="fn fn-action">Delete</span>
+              <span class="flow-arrow">→</span>
+              <span class="fn fn-danger">Confirm → Removed</span>
+            </div>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Grimoire</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Add a Spell (bottom)</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Spell Composer (new)</span>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Grimoire</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Tap heart on card</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Spell favorited / unfavorited</span>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Grimoire</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Search / filter</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-screen">Filtered list</span>
+            <span class="flow-note">(category · magic type · timing · favorites)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-spec">
+        <h3>Spell Composer — Fields</h3>
+        <div class="spec-grid">
+          <ul class="brief-list">
+            <li>Name + intent summary</li>
+            <li>Icon + accent color</li>
+            <li>Moon phase affinity</li>
+            <li>Timing tags: season, time of day, day of week</li>
+            <li>Magic type + category tags</li>
+            <li>Rating (1–5 stars, outline when unset)</li>
+          </ul>
+          <ul class="brief-list">
+            <li>Ingredients list (name, amount, note per item; cabinet autocomplete on name)</li>
+            <li>Task checklist (step-by-step)</li>
+            <li>Chant / spoken words</li>
+            <li>Deities invoked</li>
+            <li>Duration + Sealed toggle</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-spec">
+        <h3>Spell Detail — Read-only Display</h3>
+        <ul class="brief-list">
+          <li>Hero band: spell icon, name, category badge, favorite heart (tappable), and summary</li>
+          <li>Rating stars shown below summary when a rating has been set</li>
+          <li>Ingredients, tasks, cast history, and chant rendered in read-only sections</li>
+          <li>Actions: Send to Journal, Edit Spell, Delete</li>
+        </ul>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Flow III: Journal -->
+      <h2>Flow III — Journal</h2>
+      <p>The practice timeline. All recorded activity surfaces here in reverse-chronological order: cast entries (linked to spells), freeform notes, and moon observations — all on one timeline. Each entry can carry multiple timestamped note blocks, an outcome field, task-completion state, and an image attachment.</p>
+
+      <div class="flow-group">
+        <div class="flow-group-label">Journal · YOUR PRACTICE</div>
+        <div class="flow-tree">
+          <div class="flow-row">
+            <span class="fn fn-screen">Journal</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Tap entry</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-screen">Entry Detail</span>
+          </div>
+          <div class="flow-indent">
+            <div class="flow-row">
+              <span class="fn fn-action">Edit Entry</span>
+              <span class="flow-arrow">→</span>
+              <span class="fn fn-end">Journal Entry Editor</span>
+              <span class="flow-note">(prefilled)</span>
+            </div>
+            <div class="flow-row">
+              <span class="fn fn-action">Delete</span>
+              <span class="flow-arrow">→</span>
+              <span class="fn fn-danger">Confirm → Removed</span>
+            </div>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Journal</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Write an Entry (bottom)</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Journal Entry Editor (new)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-spec">
+        <h3>Journal Entry Editor — Fields</h3>
+        <div class="spec-grid">
+          <ul class="brief-list">
+            <li>Title + date + time</li>
+            <li>Entry kind: Cast · Note · Dream · Moon</li>
+            <li>Link to spell (optional)</li>
+            <li>Timestamped note blocks (multi-entry, additive)</li>
+          </ul>
+          <ul class="brief-list">
+            <li>Outcome / result field</li>
+            <li>Task completion tracking (linked to spell's tasks)</li>
+            <li>Status: Ongoing / Completed</li>
+            <li>Image attachment (optional)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Flow IV: The Cabinet -->
+      <h2>Flow IV — The Cabinet</h2>
+      <p>Ingredient and supply inventory. The practitioner tracks what they have — herbs, crystals, candles, cords, and anything else they work with. Type, quantity, and free-text notes per item. No equivalent exists in any competitor app.</p>
+
+      <div class="flow-group">
+        <div class="flow-group-label">The Cabinet · YOUR STORES</div>
+        <div class="flow-tree">
+          <div class="flow-row">
+            <span class="fn fn-screen">The Cabinet</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Tap item</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Edit Item form (inline)</span>
+          </div>
+          <div class="flow-indent">
+            <div class="flow-row">
+              <span class="fn fn-action">Delete item</span>
+              <span class="flow-arrow">→</span>
+              <span class="fn fn-danger">Confirm → Removed</span>
+            </div>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">The Cabinet</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Add to Cabinet (bottom)</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">New Item form</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-spec">
+        <h3>Cabinet Item — Fields</h3>
+        <ul class="brief-list" style="max-width: 480px;">
+          <li>Name</li>
+          <li>Type: herb · crystal · candle · cord · other</li>
+          <li>Quantity on hand (numeric, or null if not tracked)</li>
+          <li>Free-text note (e.g. "Dried," "Thin twine," "Unscented pillar")</li>
+        </ul>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Flow V: Settings -->
+      <h2>Flow V — Settings</h2>
+      <p>Profile and preferences. Minimal and direct. No account management, no subscription, no social profile — just the practitioner's name, their practice note, the deities they work with, and the theme toggle. The app summary (spell count, entry count, cabinet count) is visible here.</p>
+
+      <div class="flow-group">
+        <div class="flow-group-label">Settings · YOUR PRACTICE</div>
+        <div class="flow-tree">
+          <div class="flow-row">
+            <span class="fn fn-screen">Settings</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Edit name</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Name saved, greeting updates</span>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Settings</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Edit practice note</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Note saved</span>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Settings</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Manage deities</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Deity list updated</span>
+          </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Settings</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Theme toggle (dark / light)</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">Theme applied globally</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card">
+        <div class="eyebrow">Data Architecture Note</div>
+        <p class="wide" style="margin-bottom: 8px;">All data — spells, journal entries, cabinet items, and profile — is persisted in <code style="font-size:12px; color:var(--fg-3);">localStorage</code> on the device. No account. No sync. No cloud. The practitioner owns their own record entirely. This is a deliberate privacy and trust decision, not a technical limitation to revisit.</p>
+        <p class="wide" style="margin-bottom: 0; font-size: 13px; color: var(--fg-3);">All data persists across sessions and app restarts. A future export-to-file feature (JSON or vellum PDF) is a natural extension that maintains the same offline-first, no-account philosophy.</p>
+      </div>
+
+    </div><!-- /p4 -->
+
+  </main>
+</div><!-- /layout -->
+
+<script>
+  function show(pageId, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+</script>
+
+</body>
+</html>

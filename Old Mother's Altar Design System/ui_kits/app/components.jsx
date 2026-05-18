@@ -25,6 +25,10 @@ const Ico = {
   calendar: <Icon d={<><rect x="4" y="6" width="16" height="14"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="9" y1="3" x2="9" y2="7"/><line x1="15" y1="3" x2="15" y2="7"/><circle cx="9" cy="15" r="1.3" fill="currentColor" stroke="none"/></>} />,
   settings: <Icon strokeWidth={1.9} d={<><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.7" y1="4.7" x2="7.6" y2="7.6"/><line x1="16.4" y1="16.4" x2="19.3" y2="19.3"/><line x1="4.7" y1="19.3" x2="7.6" y2="16.4"/><line x1="16.4" y1="7.6" x2="19.3" y2="4.7"/></>} />,
   user:     <Icon d={<><circle cx="12" cy="8" r="4"/><path d="M4 20 c0 -4 4 -7 8 -7 s8 3 8 7"/></>} />,
+  cabinet:  <Icon d={<><rect x="3" y="2" width="18" height="20" rx="1.5"/><line x1="12" y1="2" x2="12" y2="22"/><circle cx="8.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="12" r="1.3" fill="currentColor" stroke="none"/></>} />,
+  star:     <Icon d={<><polygon points="12 2 15.1 8.4 22.1 9.3 17 14.3 18.2 21.3 12 18 5.8 21.3 7 14.3 1.9 9.3 8.9 8.4"/></>} />,
+  photo:    <Icon d={<><rect x="3" y="6" width="18" height="13" rx="1.5"/><circle cx="12" cy="12.5" r="3"/><path d="M9 6 L10.5 3 L13.5 3 L15 6"/><circle cx="17" cy="9" r="0.8" fill="currentColor" stroke="none"/></>} />,
+  image:    <Icon d={<><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></>} />,
 
   // ── ritual ──────────────────────────────────────────
   moon:     <Icon d={<><path d="M19 14 a8 8 0 1 1 -9 -9 a6 6 0 0 0 9 9 Z"/><path d="M6 7 L7 5.5 L7.5 7 L9 7.5 L7.5 8 L7 9.5 L6.5 8 L5 7.5 Z" fill="currentColor" stroke="none"/></>} />,
@@ -43,10 +47,14 @@ const Ico = {
   hand:     <Icon d={<><path d="M9 11 V4.5 a1.2 1.2 0 0 1 2.4 0 V11"/><path d="M11.4 11 V3 a1.2 1.2 0 0 1 2.4 0 V11"/><path d="M13.8 11 V4 a1.2 1.2 0 0 1 2.4 0 V13"/><path d="M16.2 11 V6 a1.2 1.2 0 0 1 2.4 0 V14 a7 7 0 0 1 -7 7 a 5 5 0 0 1 -5 -5 V11 a1.2 1.2 0 0 1 2.4 0 V14"/></>} />,
   jar:      <Icon d={<><path d="M8 3 H16 V6 H8 Z"/><path d="M7 6 H17 L17 18 a3 3 0 0 1 -3 3 H10 a3 3 0 0 1 -3 -3 Z"/><line x1="9" y1="11" x2="15" y2="11"/><circle cx="12" cy="15" r="1.2" fill="currentColor" stroke="none"/></>} />,
   feather:  <Icon d={<><path d="M4 20 L10 14 a 8 8 0 0 1 10 -10 a 14 14 0 0 1 -10 16 Z"/><line x1="4" y1="20" x2="13" y2="11"/></>} />,
+  penTool:  <Icon d={<><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></>} />,
   tag:      <Icon d={<><path d="M3 12 L3 4 L11 4 L21 14 L13 22 Z"/><circle cx="7" cy="8" r="1.3" fill="currentColor" stroke="none"/></>} />,
   lock:     <Icon d={<><rect x="5" y="10" width="14" height="11"/><path d="M8 10 V7 a4 4 0 0 1 8 0 V10"/><circle cx="12" cy="15" r="1.3" fill="currentColor" stroke="none"/><line x1="12" y1="15" x2="12" y2="18"/></>} />,
   info:     <Icon d={<><circle cx="12" cy="12" r="9"/><line x1="12" y1="10" x2="12" y2="16"/><circle cx="12" cy="7" r="1.2" fill="currentColor" stroke="none"/></>} />,
   warn:     <Icon d={<><path d="M12 3 L22 20 H2 Z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/></>} />,
+  filter:   <Icon strokeWidth={2} d={<><path d="M22 3H2l8 9.46V19l4 2V12.46Z"/></>} />,
+  heart:       <Icon strokeWidth={1.9} d={<><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></>} />,
+  heartFilled: <Icon strokeWidth={1.9} fill="currentColor" d={<><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></>} />,
 };
 
 // ─── MOON GLYPH (8 phases) ──────────────────────────────────────────
@@ -113,7 +121,7 @@ const omaBtnStyles = {
   base: {
     fontFamily: 'var(--font-body)', fontWeight: 600, letterSpacing: '0.04em',
     border: 0, cursor: 'pointer', lineHeight: 1, borderRadius: 'var(--r-sm)',
-    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     transition: 'background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out)',
   },
   lg: { padding: '14px 20px', fontSize: 15 },
@@ -129,7 +137,7 @@ function Btn({ variant = 'primary', size = 'md', icon, children, onClick, style,
   return (
     <button onClick={onClick} style={{
       ...omaBtnStyles.base, ...omaBtnStyles[size], ...omaBtnStyles[variant],
-      width: fullWidth ? '100%' : undefined, ...style,
+      width: fullWidth ? '100%' : 'fit-content', ...style,
     }}>
       {icon && React.cloneElement(icon, { size: 16 })}
       {children}
@@ -153,15 +161,17 @@ function IconBtn({ icon, onClick, label, style, active }) {
 }
 
 // ─── BADGE ─────────────────────────────────────────────────────────
+// Each tone carries fg (text) and dot (accent dot) separately.
+// Contrast targets: all text ≥4.5:1 on composited badge bg.
 function Badge({ tone = 'pending', dot = true, children, style }) {
   const tones = {
-    pending: { bg: 'var(--action-secondary-bg)', fg: 'var(--fg-2)' },
-    sealed:  { bg: 'rgba(0,194,138,0.14)',  fg: 'var(--success)' },
-    burning: { bg: 'rgba(243,83,33,0.16)',  fg: 'var(--ember)' },
-    moss:    { bg: 'rgba(150,165,96,0.22)', fg: 'var(--olive)' },
-    plum:    { bg: 'rgba(118,72,131,0.26)', fg: 'var(--plum)' },
-    amber:   { bg: 'rgba(244,175,89,0.18)', fg: 'var(--olive)' },
-    indigo:  { bg: 'rgba(45,78,166,0.22)',  fg: 'var(--indigo-500)' },
+    pending: { bg: 'var(--action-secondary-bg)', fg: 'var(--fg-2)',   dot: 'var(--fg-2)' },   // ~8.9:1 ✓
+    sealed:  { bg: 'rgba(0,194,138,0.14)',        fg: 'var(--success)', dot: 'var(--success)' }, // ~6.6:1 ✓
+    burning: { bg: 'rgba(243,83,33,0.18)',        fg: 'var(--saffron)', dot: 'var(--ember)' },   // saffron ~6.8:1 ✓; dot stays ember
+    moss:    { bg: 'rgba(150,165,96,0.22)',       fg: 'var(--moss)',   dot: 'var(--moss)' },    // moss ~4.7:1 ✓ (was --olive: 2.8:1 ✗)
+    plum:    { bg: 'rgba(118,72,131,0.26)',       fg: 'var(--fg-1)',   dot: 'var(--plum)' },    // bone ~15:1 ✓ (was --plum: 2.1:1 ✗)
+    amber:   { bg: 'rgba(244,175,89,0.18)',       fg: 'var(--amber)',  dot: 'var(--amber)' },   // amber ~6.9:1 ✓ (was --olive: 2.8:1 ✗)
+    indigo:  { bg: 'rgba(45,78,166,0.26)',        fg: 'var(--fg-1)',   dot: 'var(--indigo-300)' }, // bone ~15:1 ✓ (was --indigo-500: 2.0:1 ✗)
   };
   const t = tones[tone] || tones.pending;
   return (
@@ -173,7 +183,7 @@ function Badge({ tone = 'pending', dot = true, children, style }) {
       fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase',
       lineHeight: 1, ...style,
     }}>
-      {dot && <span style={{ width: 5, height: 5, borderRadius: 50, background: t.fg, display: 'inline-block' }} />}
+      {dot && <span style={{ width: 5, height: 5, borderRadius: 50, background: t.dot, display: 'inline-block' }} />}
       {children}
     </span>
   );
@@ -200,14 +210,14 @@ function Card({ children, glow, vellum, padding = 16, style, onClick }) {
 function TopBar({ title, leading, trailing, eyebrow }) {
   return (
     <div style={{
-      height: 56, padding: '0 8px 0 12px',
-      display: 'grid', gridTemplateColumns: '40px 1fr 40px',
-      alignItems: 'center', gap: 6,
+      height: 56, padding: '0 4px 0 4px',
+      display: 'grid', gridTemplateColumns: '40px 1fr auto',
+      alignItems: 'center', gap: 0,
       borderBottom: '1px solid var(--line-soft)',
       background: 'var(--bg-page)',
     }}>
-      <div>{leading}</div>
-      <div style={{ textAlign: 'center', minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>{leading}</div>
+      <div style={{ textAlign: 'center', minWidth: 0, padding: '0 4px' }}>
         {eyebrow && <div className="oma-eyebrow" style={{ fontSize: 9, marginBottom: 2 }}>{eyebrow}</div>}
         <div style={{
           fontFamily: '"Ohno Blazeface 18", var(--font-display)', fontStyle: 'normal', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.02em',
@@ -215,7 +225,7 @@ function TopBar({ title, leading, trailing, eyebrow }) {
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>{title}</div>
       </div>
-      <div style={{ textAlign: 'right' }}>{trailing}</div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>{trailing}</div>
     </div>
   );
 }
@@ -223,13 +233,15 @@ function TopBar({ title, leading, trailing, eyebrow }) {
 // ─── TAB BAR (bottom) ───────────────────────────────────────────────
 function TabBar({ active, onChange }) {
   const tabs = [
-    { id: 'altar',    label: 'Altar',    icon: Ico.altar },
-    { id: 'workings', label: 'Workings', icon: Ico.sparkle },
-    { id: 'book',     label: 'The Book', icon: Ico.book },
+    { id: 'altar',    label: 'Home',     icon: Ico.altar },
+    { id: 'workings', label: 'Grimoire', icon: Ico.sparkle },
+    { id: 'book',     label: 'Journal',  icon: Ico.book },
+    { id: 'cabinet',  label: 'Cabinet',  icon: Ico.cabinet },
+    { id: 'profile',  label: 'Settings', icon: Ico.settings },
   ];
   return (
     <div style={{
-      padding: '8px 6px 28px',
+      padding: '8px 6px var(--bottom-inset, 28px)',
       display: 'flex', justifyContent: 'space-around',
       borderTop: '1px solid var(--line-soft)',
       background: 'var(--bg-page)',
@@ -257,6 +269,337 @@ function TabBar({ active, onChange }) {
   );
 }
 
+// ─── BOTTOM BAR (contextual action bar) ────────────────────────────
+function BottomBar({ children, style }) {
+  return (
+    <div style={{
+      padding: '10px 16px var(--bottom-inset, 40px)',
+      display: 'flex', gap: 8, alignItems: 'stretch',
+      borderTop: '1px solid var(--line-soft)',
+      background: 'var(--bg-page)',
+      flexShrink: 0,
+      ...style,
+    }}>
+      {children}
+    </div>
+  );
+}
+
+// ─── SLIDE-IN DRAWER ────────────────────────────────────────────────
+function Drawer({ open, onClose, activeTab, onChangeTab, onLogOut, theme }) {
+  const tabs = [
+    { id: 'altar',    label: 'Home',        icon: Ico.altar   },
+    { id: 'workings', label: 'Grimoire',     icon: Ico.sparkle },
+    { id: 'book',     label: 'The Journal',  icon: Ico.book    },
+    { id: 'cabinet',  label: 'The Cabinet',  icon: Ico.cabinet },
+    { id: 'profile',  label: 'Settings',     icon: Ico.settings },
+    { id: 'help',     label: 'How to Use',   icon: Ico.info    },
+  ];
+  return (
+    <>
+      {/* Backdrop */}
+      <div onClick={onClose} style={{
+        position: 'absolute', inset: 0, zIndex: 150,
+        background: open ? 'rgba(0,0,0,0.55)' : 'transparent',
+        backdropFilter: open ? 'blur(2px)' : 'none',
+        pointerEvents: open ? 'auto' : 'none',
+        transition: 'background 0.25s, backdrop-filter 0.25s',
+      }} />
+      {/* Panel */}
+      <div style={{
+        position: 'absolute', top: 0, right: 0, bottom: 0,
+        width: '72%', maxWidth: 280, zIndex: 160,
+        background: 'var(--bg-surface)',
+        borderLeft: '1px solid var(--line-soft)',
+        transform: open ? 'translateX(0)' : 'translateX(100%)',
+        transition: 'transform 0.28s cubic-bezier(0.32,0,0.15,1)',
+        display: 'flex', flexDirection: 'column',
+        overflow: 'hidden',
+      }}>
+        {/* Header */}
+        <div style={{ padding: '18px 18px 16px', borderBottom: '1px solid var(--line-soft)', position: 'relative', paddingTop: 62 }}>
+          {/* Close X */}
+          <button onClick={onClose} aria-label="Close menu" style={{
+            position: 'absolute', top: 14, right: 14,
+            width: 32, height: 32, borderRadius: 'var(--r-md)',
+            background: 'transparent', border: 0, cursor: 'pointer',
+            color: 'var(--fg-3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'color 0.15s, background 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg-1)'; e.currentTarget.style.background = 'var(--action-secondary-bg)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-3)'; e.currentTarget.style.background = 'transparent'; }}
+          >
+            {React.cloneElement(Ico.close, { size: 18 })}
+          </button>
+          {/* Logo */}
+          {(() => {
+            const src = theme === 'light' ? window.OMA_LOGO_PRIMARY : window.OMA_LOGO_WHITE;
+            return src
+              ? <img src={src} alt="Old Mother's Altar" style={{ height: 28, display: 'block', opacity: 0.9 }} />
+              : <div className="oma-eyebrow">Old Mother's Altar</div>;
+          })()}
+        </div>
+        {/* Nav links */}
+        <nav style={{ flex: 1, overflowY: 'auto', padding: '10px 8px' }}>
+          {tabs.map(t => {
+            const isActive = activeTab === t.id;
+            return (
+              <button key={t.id} onClick={() => { onChangeTab(t.id); onClose(); }} style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                padding: '12px 14px', borderRadius: 'var(--r-md)',
+                background: isActive ? 'var(--chrome-active-bg)' : 'transparent',
+                border: 0, cursor: 'pointer', textAlign: 'left', marginBottom: 2,
+                color: isActive ? 'var(--chrome-active-fg)' : 'var(--fg-2)',
+                fontFamily: 'var(--font-body)', fontWeight: 600,
+                fontSize: 14, letterSpacing: '0.02em',
+              }}>
+                <span style={{ color: isActive ? 'var(--amber)' : 'var(--fg-3)' }}>
+                  {React.cloneElement(t.icon, { size: 20 })}
+                </span>
+                {t.label}
+              </button>
+            );
+          })}
+        </nav>
+        {/* Log Out */}
+        <div style={{ padding: '10px 8px 32px', borderTop: '1px solid var(--line-soft)' }}>
+          <button onClick={() => { onClose(); onLogOut && onLogOut(); }} style={{
+            width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+            padding: '12px 14px', borderRadius: 'var(--r-md)',
+            background: 'transparent',
+            border: 0, cursor: 'pointer', textAlign: 'left',
+            color: 'var(--fg-3)',
+            fontFamily: 'var(--font-body)', fontWeight: 600,
+            fontSize: 14, letterSpacing: '0.02em',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color = 'var(--ember)'; e.currentTarget.style.background = 'rgba(243,83,33,0.08)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-3)'; e.currentTarget.style.background = 'transparent'; }}
+          >
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              {React.cloneElement(Ico.key, { size: 20 })}
+            </span>
+            Log Out
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ─── SEARCH SELECT (single or multi-select with search) ─────────────
+function SearchSelect({ items, value, onChange, placeholder = 'Select…', multi = false }) {
+  const [open, setOpen] = React.useState(false);
+  const [q, setQ] = React.useState('');
+  const [otherInput, setOtherInput] = React.useState('');
+  const containerRef = React.useRef(null);
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    if (!open) return;
+    function handleOutside(e) {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+        setQ('');
+      }
+    }
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [open]);
+
+  const normalize = item =>
+    typeof item === 'string' ? { key: item, label: item } : { key: item.key, label: item.label };
+  const normalized = items.map(normalize);
+  const filtered = normalized.filter(i => i.label.toLowerCase().includes(q.toLowerCase()));
+
+  const isSelected = key =>
+    multi ? (Array.isArray(value) && value.includes(key)) : value === key;
+
+  // True when "Other" is the current / one of the current selections
+  const otherSelected = multi
+    ? (Array.isArray(value) && value.includes('Other'))
+    : value === 'Other';
+
+  // Commit the typed custom value, replacing "Other"
+  function commitOther() {
+    const trimmed = otherInput.trim();
+    if (!trimmed) return; // nothing typed yet — leave "Other" in place
+    if (multi) {
+      const arr = Array.isArray(value) ? value : [];
+      onChange([...arr.filter(k => k !== 'Other'), trimmed]);
+    } else {
+      onChange(trimmed);
+    }
+    setOtherInput('');
+  }
+
+  function handleSelect(key) {
+    if (multi) {
+      const arr = Array.isArray(value) ? value : [];
+      onChange(arr.includes(key) ? arr.filter(k => k !== key) : [...arr, key]);
+    } else {
+      onChange(value === key ? '' : key);
+      setOpen(false);
+      setQ('');
+    }
+  }
+
+  // All currently-selected items, including any custom values not in the list
+  const knownKeys = new Set(normalized.map(i => i.key));
+  const allSelected = multi
+    ? (Array.isArray(value) ? value : []).map(k =>
+        knownKeys.has(k) ? normalized.find(i => i.key === k) : { key: k, label: k }
+      )
+    : [];
+  const selectedItems = multi ? allSelected : normalized.filter(i => isSelected(i.key));
+  const displayText = multi
+    ? selectedItems.map(i => i.label).join(', ')
+    : (value && !knownKeys.has(value) ? value : (selectedItems[0]?.label || ''));
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative' }}>
+      <button
+        onClick={() => { setOpen(o => !o); setQ(''); }}
+        style={{
+          width: '100%', padding: '11px 14px', boxSizing: 'border-box',
+          background: 'var(--bg-page)',
+          border: '1px solid var(--line-medium)',
+          borderRadius: 'var(--r-xs)',
+          color: selectedItems.length ? 'var(--fg-1)' : 'var(--fg-3)',
+          fontFamily: 'var(--font-body)', fontSize: 14, outline: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
+          textAlign: 'left',
+        }}
+      >
+        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {displayText || placeholder}
+        </span>
+        {React.cloneElement(Ico.chevron, { size: 14, style: {
+          transform: open ? 'rotate(270deg)' : 'rotate(90deg)',
+          transition: 'transform 0.18s', flexShrink: 0, color: 'var(--fg-3)',
+        }})}
+      </button>
+
+      {open && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 200,
+          marginTop: 2,
+          border: '1px solid var(--line-medium)',
+          borderRadius: 'var(--r-xs)',
+          background: 'var(--bg-page)',
+          boxShadow: 'var(--shadow-3)',
+          maxHeight: 240, display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
+        }}>
+          <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--line-soft)', flexShrink: 0 }}>
+            <input
+              value={q} onChange={e => setQ(e.target.value)}
+              placeholder="Search…"
+              style={{
+                width: '100%', border: 0, background: 'transparent', outline: 0,
+                color: 'var(--fg-1)', fontFamily: 'var(--font-body)', fontSize: 13, boxSizing: 'border-box',
+              }}
+            />
+          </div>
+          <div style={{ overflowY: 'auto', flex: 1 }}>
+            {filtered.length === 0 ? (
+              <div style={{ padding: '12px 14px', color: 'var(--fg-3)', fontSize: 13 }}>No matches</div>
+            ) : filtered.map((item, i) => {
+              const active = isSelected(item.key);
+              return (
+                <button key={item.key}
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => handleSelect(item.key)}
+                  style={{
+                    width: '100%', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10,
+                    background: active ? 'var(--chrome-active-bg)' : 'transparent',
+                    border: 0, borderTop: i === 0 ? 0 : '1px solid var(--line-soft)',
+                    cursor: 'pointer', textAlign: 'left',
+                    color: active ? 'var(--chrome-active-fg)' : 'var(--fg-1)',
+                    fontFamily: 'var(--font-body)', fontSize: 13,
+                  }}>
+                  <div style={{
+                    width: 16, height: 16, flexShrink: 0,
+                    borderRadius: multi ? 3 : '50%',
+                    background: active ? 'var(--chrome-active-fg)' : 'transparent',
+                    border: '1.5px solid ' + (active ? 'var(--chrome-active-fg)' : 'var(--line-medium)'),
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {active && <span style={{ color: 'var(--bg-page)', fontSize: 9, fontWeight: 800, lineHeight: 1 }}>✓</span>}
+                  </div>
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {multi && selectedItems.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 8 }}>
+          {selectedItems.map(item => (
+            <span key={item.key} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '3px 8px', borderRadius: 999, fontSize: 12,
+              background: 'var(--chrome-active-bg)', color: 'var(--chrome-active-fg)',
+              border: '1px solid var(--chrome-active-line)',
+            }}>
+              {item.label}
+              <button onClick={e => { e.stopPropagation(); handleSelect(item.key); }} style={{
+                background: 'none', border: 0, cursor: 'pointer', padding: 0,
+                lineHeight: 1, color: 'inherit', fontSize: 15, display: 'flex', alignItems: 'center',
+              }}>×</button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* When "Other" is selected, show an inline text input to capture the custom value */}
+      {otherSelected && (
+        <input
+          autoFocus
+          value={otherInput}
+          onChange={e => setOtherInput(e.target.value)}
+          onBlur={commitOther}
+          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); commitOther(); } }}
+          placeholder="Describe your custom option…"
+          style={{
+            marginTop: 8, width: '100%', boxSizing: 'border-box',
+            padding: '9px 12px',
+            background: 'var(--bg-page)',
+            border: '1px solid var(--line-medium)',
+            borderRadius: 'var(--r-xs)',
+            color: 'var(--fg-1)', fontFamily: 'var(--font-body)', fontSize: 13,
+            outline: 'none',
+          }}
+        />
+      )}
+
+      {/* Single-select: show the same input beneath the trigger when "Other" is chosen */}
+      {!multi && value === 'Other' && (
+        <input
+          autoFocus
+          value={otherInput}
+          onChange={e => setOtherInput(e.target.value)}
+          onBlur={commitOther}
+          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); commitOther(); } }}
+          placeholder="Describe your custom option…"
+          style={{
+            marginTop: 8, width: '100%', boxSizing: 'border-box',
+            padding: '9px 12px',
+            background: 'var(--bg-page)',
+            border: '1px solid var(--line-medium)',
+            borderRadius: 'var(--r-xs)',
+            color: 'var(--fg-1)', fontFamily: 'var(--font-body)', fontSize: 13,
+            outline: 'none',
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 Object.assign(window, {
   Ico, MoonGlyph, Flame, Btn, IconBtn, Badge, Card, TopBar, TabBar, ThemeToggle,
+  BottomBar, Drawer, SearchSelect,
 });
