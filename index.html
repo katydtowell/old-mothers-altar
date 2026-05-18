@@ -5171,12 +5171,14 @@ window.getMagicalEvents = getMagicalEvents;
     function Root() {
       const [theme, setTheme] = React.useState('dark');
       const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 768);
+      const [vh, setVh] = React.useState(() => window.innerHeight);
       const [scale, setScale] = React.useState(
         () => Math.min(1, (window.innerHeight - 40) / 874)
       );
       React.useEffect(() => {
         function onResize() {
           setIsMobile(window.innerWidth < 768);
+          setVh(window.innerHeight);
           setScale(Math.min(1, (window.innerHeight - 40) / 874));
         }
         window.addEventListener('resize', onResize);
@@ -5186,7 +5188,7 @@ window.getMagicalEvents = getMagicalEvents;
       // On a real phone: fill the screen natively, no device chrome
       if (isMobile) {
         return (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100dvh', overflow: 'hidden' }}>
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: vh, overflow: 'hidden' }}>
             <App theme={theme} setTheme={setTheme} />
           </div>
         );
