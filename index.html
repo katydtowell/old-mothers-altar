@@ -448,10 +448,14 @@
       width: 100%;
       height: 100%;
     }
-    /* Force App's root div to fill the viewport directly */
+    /* Force App's root div to fill the viewport directly,
+       and strip the fake-iOS-status-bar padding that only makes sense
+       inside the device frame */
     [data-theme] {
       height: 100svh !important;
       height: 100dvh !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
     }
   }
   @keyframes omaFadeIn  { from { opacity: 0; } to { opacity: 1; } }
@@ -4957,7 +4961,7 @@ function App({ theme, setTheme }) {
           onClick={() => { setComposerOpen(false); setEditWorkingId(null); }}>
           Cancel
         </Btn>
-        <Btn variant="primary" size="lg" icon={Ico.feather} fullWidth
+        <Btn variant="primary" size="lg" icon={Ico.sparkle} fullWidth
           onClick={() => newWorkingSubmitRef.current?.()}>
           Save Spell
         </Btn>
