@@ -388,7 +388,7 @@
 }
 .oma-eyebrow {
   font-family: var(--font-eyebrow);
-  font-weight: 600;
+  font-weight: 300;
   font-size: var(--t-2xs);
   letter-spacing: var(--tk-eyebrow);
   text-transform: uppercase;
@@ -436,6 +436,10 @@
   }
   /* On real phones: kill the desktop centering so the app fills the screen */
   @media (max-width: 767px) {
+    :root {
+      /* Replace fake-iOS home-indicator gap with real safe area (or a small fallback) */
+      --bottom-inset: max(env(safe-area-inset-bottom), 8px);
+    }
     html, body {
       height: 100%;
     }
@@ -448,9 +452,7 @@
       width: 100%;
       height: 100%;
     }
-    /* Force App's root div to fill the viewport directly,
-       and strip the fake-iOS-status-bar padding that only makes sense
-       inside the device frame */
+    /* Strip fake-iOS status-bar padding; height fills the real viewport */
     [data-theme] {
       height: 100svh !important;
       height: 100dvh !important;
@@ -1063,7 +1065,7 @@ function TabBar({ active, onChange }) {
   ];
   return (
     <div style={{
-      padding: '8px 6px 28px',
+      padding: '8px 6px var(--bottom-inset, 28px)',
       display: 'flex', justifyContent: 'space-around',
       borderTop: '1px solid var(--line-soft)',
       background: 'var(--bg-page)',
@@ -1095,7 +1097,7 @@ function TabBar({ active, onChange }) {
 function BottomBar({ children, style }) {
   return (
     <div style={{
-      padding: '10px 16px 40px',
+      padding: '10px 16px var(--bottom-inset, 40px)',
       display: 'flex', gap: 8, alignItems: 'stretch',
       borderTop: '1px solid var(--line-soft)',
       background: 'var(--bg-page)',
@@ -1213,6 +1215,7 @@ function Drawer({ open, onClose, activeTab, onChangeTab, onLogOut, theme }) {
 function SearchSelect({ items, value, onChange, placeholder = 'Select…', multi = false }) {
   const [open, setOpen] = React.useState(false);
   const [q, setQ] = React.useState('');
+  const [otherInput, setOtherInput] = React.useState('');
   const containerRef = React.useRef(null);
 
   // Close dropdown when clicking outside
@@ -1236,6 +1239,24 @@ function SearchSelect({ items, value, onChange, placeholder = 'Select…', multi
   const isSelected = key =>
     multi ? (Array.isArray(value) && value.includes(key)) : value === key;
 
+  // True when "Other" is the current / one of the current selections
+  const otherSelected = multi
+    ? (Array.isArray(value) && value.includes('Other'))
+    : value === 'Other';
+
+  // Commit the typed custom value, replacing "Other"
+  function commitOther() {
+    const trimmed = otherInput.trim();
+    if (!trimmed) return; // nothing typed yet — leave "Other" in place
+    if (multi) {
+      const arr = Array.isArray(value) ? value : [];
+      onChange([...arr.filter(k => k !== 'Other'), trimmed]);
+    } else {
+      onChange(trimmed);
+    }
+    setOtherInput('');
+  }
+
   function handleSelect(key) {
     if (multi) {
       const arr = Array.isArray(value) ? value : [];
@@ -1247,8 +1268,17 @@ function SearchSelect({ items, value, onChange, placeholder = 'Select…', multi
     }
   }
 
-  const selectedItems = normalized.filter(i => isSelected(i.key));
-  const displayText = selectedItems.map(i => i.label).join(', ');
+  // All currently-selected items, including any custom values not in the list
+  const knownKeys = new Set(normalized.map(i => i.key));
+  const allSelected = multi
+    ? (Array.isArray(value) ? value : []).map(k =>
+        knownKeys.has(k) ? normalized.find(i => i.key === k) : { key: k, label: k }
+      )
+    : [];
+  const selectedItems = multi ? allSelected : normalized.filter(i => isSelected(i.key));
+  const displayText = multi
+    ? selectedItems.map(i => i.label).join(', ')
+    : (value && !knownKeys.has(value) ? value : (selectedItems[0]?.label || ''));
 
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>
@@ -1346,6 +1376,48 @@ function SearchSelect({ items, value, onChange, placeholder = 'Select…', multi
             </span>
           ))}
         </div>
+      )}
+
+      {/* When "Other" is selected, show an inline text input to capture the custom value */}
+      {otherSelected && (
+        <input
+          autoFocus
+          value={otherInput}
+          onChange={e => setOtherInput(e.target.value)}
+          onBlur={commitOther}
+          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); commitOther(); } }}
+          placeholder="Describe your custom option…"
+          style={{
+            marginTop: 8, width: '100%', boxSizing: 'border-box',
+            padding: '9px 12px',
+            background: 'var(--bg-page)',
+            border: '1px solid var(--line-medium)',
+            borderRadius: 'var(--r-xs)',
+            color: 'var(--fg-1)', fontFamily: 'var(--font-body)', fontSize: 13,
+            outline: 'none',
+          }}
+        />
+      )}
+
+      {/* Single-select: show the same input beneath the trigger when "Other" is chosen */}
+      {!multi && value === 'Other' && (
+        <input
+          autoFocus
+          value={otherInput}
+          onChange={e => setOtherInput(e.target.value)}
+          onBlur={commitOther}
+          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); commitOther(); } }}
+          placeholder="Describe your custom option…"
+          style={{
+            marginTop: 8, width: '100%', boxSizing: 'border-box',
+            padding: '9px 12px',
+            background: 'var(--bg-page)',
+            border: '1px solid var(--line-medium)',
+            borderRadius: 'var(--r-xs)',
+            color: 'var(--fg-1)', fontFamily: 'var(--font-body)', fontSize: 13,
+            outline: 'none',
+          }}
+        />
       )}
     </div>
   );
@@ -1624,7 +1696,7 @@ function Workings({ workings, onOpenWorking, onCompose }) {
   });
 
   const sectionLabel = txt => (
-    <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', marginBottom: 8 }}>
+    <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: '"New Kansas", var(--font-body)', fontWeight: 300, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
       {txt}
     </div>
   );
@@ -2128,7 +2200,7 @@ function TheBook({ entries, workings, onWrite, onOpenEntry }) {
   }), [entries, workings, filters, query]);
 
   const sectionLabel = txt => (
-    <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', marginBottom: 8 }}>
+    <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: '"New Kansas", var(--font-body)', fontWeight: 300, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
       {txt}
     </div>
   );
@@ -2813,7 +2885,7 @@ function NWSection({ title, children }) {
   return (
     <div>
       <div style={{
-        color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)',
+        color: 'var(--fg-3)', fontSize: 10, fontFamily: '"New Kansas", var(--font-body)', fontWeight: 300,
         letterSpacing: '0.12em', textTransform: 'uppercase',
         borderBottom: '1px solid var(--line-soft)', paddingBottom: 6, marginBottom: 12,
       }}>{title}</div>
