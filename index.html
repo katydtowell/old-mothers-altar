@@ -2494,17 +2494,172 @@ const CAB_TYPES = [
   { id: 'other',   label: 'Other',    emoji: '✨' },
 ];
 
-function typeEmoji(type) {
-  return CAB_TYPES.find(t => t.id === type)?.emoji || '✨';
+// Module-level custom types store — updated by App whenever profile changes
+let _customCabTypes = [];
+window._setCustomCabTypes = function(types) { _customCabTypes = types || []; };
+function getAllCabTypes() {
+  const base = CAB_TYPES.filter(t => t.id !== 'other');
+  const other = CAB_TYPES.find(t => t.id === 'other');
+  return [...base, ..._customCabTypes, other];
 }
-function typeLabel(type) {
-  return CAB_TYPES.find(t => t.id === type)?.label || 'Other';
+function typeEmoji(typeId) {
+  return getAllCabTypes().find(t => t.id === typeId)?.emoji || '✨';
+}
+function typeLabel(typeId) {
+  return getAllCabTypes().find(t => t.id === typeId)?.label || typeId || 'Other';
 }
 
-// ── Item Form (bottom sheet) ────────────────────────────────────────────────
-function CabinetForm({ item, onSave, onDelete, submitRef }) {
+// ── Cabinet type single-select with emoji icons and custom "Other" flow ────────
+function CabinetTypeSelect({ value, onChange, allTypes, onAddCustomType }) {
+  const [open, setOpen]             = React.useState(false);
+  const [q, setQ]                   = React.useState('');
+  const [otherMode, setOtherMode]   = React.useState(false);
+  const [otherLabel, setOtherLabel] = React.useState('');
+  const containerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!open) return;
+    function h(e) {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false); setQ('');
+      }
+    }
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, [open]);
+
+  const filtered = allTypes.filter(t =>
+    !q || t.label.toLowerCase().includes(q.toLowerCase())
+  );
+
+  function select(typeId) {
+    if (typeId === 'other') { setOtherMode(true); setOpen(false); setQ(''); return; }
+    onChange([typeId]);
+    setOpen(false); setQ('');
+  }
+
+  function commitOther() {
+    const label = otherLabel.trim();
+    if (!label) { setOtherMode(false); setOtherLabel(''); return; }
+    const id = 'custom_' + Date.now();
+    onAddCustomType({ id, label, emoji: '✨' });
+    onChange([id]);
+    setOtherMode(false); setOtherLabel('');
+  }
+
+  const selected = allTypes.find(x => x.id === value[0]);
+  const triggerText = selected ? `${selected.emoji} ${selected.label}` : '';
+
+  const fieldBase = {
+    background: 'var(--bg-page)', border: '1px solid var(--line-medium)',
+    borderRadius: 'var(--r-xs)', padding: '10px 12px',
+    color: 'var(--fg-1)', fontFamily: 'var(--font-body)',
+    fontSize: 13, outline: 'none', width: '100%', boxSizing: 'border-box',
+  };
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative' }}>
+      {/* Trigger */}
+      <button
+        onClick={() => { setOpen(o => !o); setQ(''); }}
+        style={{
+          width: '100%', padding: '11px 14px', boxSizing: 'border-box',
+          background: 'var(--bg-page)', border: '1px solid var(--line-medium)',
+          borderRadius: 'var(--r-xs)',
+          color: value.length ? 'var(--fg-1)' : 'var(--fg-3)',
+          fontFamily: 'var(--font-body)', fontSize: 14, outline: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
+          textAlign: 'left',
+        }}
+      >
+        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {triggerText || 'Select type…'}
+        </span>
+        {React.cloneElement(Ico.chevron, { size: 14, style: {
+          transform: open ? 'rotate(270deg)' : 'rotate(90deg)',
+          transition: 'transform 0.18s', flexShrink: 0, color: 'var(--fg-3)',
+        }})}
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 200,
+          marginTop: 2, border: '1px solid var(--line-medium)',
+          borderRadius: 'var(--r-xs)', background: 'var(--bg-page)',
+          boxShadow: 'var(--shadow-3)', maxHeight: 260,
+          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        }}>
+          <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--line-soft)', flexShrink: 0 }}>
+            <input value={q} onChange={e => setQ(e.target.value)}
+              placeholder="Search…"
+              style={{ width: '100%', border: 0, background: 'transparent', outline: 0,
+                color: 'var(--fg-1)', fontFamily: 'var(--font-body)', fontSize: 13 }} />
+          </div>
+          <div style={{ overflowY: 'auto', flex: 1 }}>
+            {filtered.length === 0
+              ? <div style={{ padding: '12px 14px', color: 'var(--fg-3)', fontSize: 13 }}>No matches</div>
+              : filtered.map((t, i) => {
+                const active = value[0] === t.id;
+                return (
+                  <button key={t.id}
+                    onMouseDown={e => e.preventDefault()}
+                    onClick={() => select(t.id)}
+                    style={{
+                      width: '100%', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10,
+                      background: active ? 'var(--chrome-active-bg)' : 'transparent',
+                      border: 0, borderTop: i === 0 ? 0 : '1px solid var(--line-soft)',
+                      cursor: 'pointer', textAlign: 'left',
+                      color: active ? 'var(--chrome-active-fg)' : 'var(--fg-1)',
+                      fontFamily: 'var(--font-body)', fontSize: 13,
+                    }}>
+                    <span style={{ fontSize: 18, flexShrink: 0 }}>{t.emoji}</span>
+                    <span>{t.label}</span>
+                  </button>
+                );
+              })
+            }
+          </div>
+        </div>
+      )}
+
+      {/* "Other" custom type form */}
+      {otherMode && (
+        <div style={{
+          marginTop: 10, padding: '14px', borderRadius: 'var(--r-xs)',
+          background: 'var(--bg-surface)', border: '1px solid var(--line-medium)',
+          display: 'flex', flexDirection: 'column', gap: 10,
+        }}>
+          <div style={{ fontSize: 11, color: 'var(--fg-3)', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            New Supply Type
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <span style={{ fontSize: 20, flexShrink: 0, width: 32, textAlign: 'center', lineHeight: 1 }}>✨</span>
+            <input
+              autoFocus
+              value={otherLabel}
+              onChange={e => setOtherLabel(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); commitOther(); } }}
+              placeholder="Type name (e.g. Selenite Wand)"
+              style={{ ...fieldBase, flex: 1 }}
+            />
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Btn variant="secondary" size="sm" onClick={() => { setOtherMode(false); setOtherLabel(''); }}>
+              Cancel
+            </Btn>
+            <Btn variant="primary" size="sm" onClick={commitOther}>Add Type</Btn>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Cabinet item form ─────────────────────────────────────────────────────────
+function CabinetForm({ item, onSave, onDelete, submitRef, allCabTypes, onAddCustomType }) {
   const [name,      setName]      = React.useState('');
-  const [type,      setType]      = React.useState('herb');
+  const [types,     setTypes]     = React.useState(['herb']);
   const [color,     setColor]     = React.useState('');
   const [colorMode, setColorMode] = React.useState('preset'); // 'preset' | 'custom'
   const [inv,       setInv]       = React.useState('');
@@ -2512,7 +2667,8 @@ function CabinetForm({ item, onSave, onDelete, submitRef }) {
 
   React.useEffect(() => {
     setName(item?.name || '');
-    setType(item?.type || 'herb');
+    // Migrate: item.types (array) or fall back to [item.type]
+    setTypes(item?.types || (item?.type ? [item.type] : ['herb']));
     const c = item?.color || '';
     const isPreset = RITUAL_COLORS.some(rc => rc.name === c);
     setColor(c);
@@ -2533,7 +2689,8 @@ function CabinetForm({ item, onSave, onDelete, submitRef }) {
     onSave({
       id: item?.id || Date.now().toString(),
       name: name.trim(),
-      type,
+      types,
+      type: types[0] || 'other', // backward-compat primary
       color: color.trim() || null,
       inv: inv !== '' ? parseInt(inv) : null,
       note: note.trim(),
@@ -2545,32 +2702,27 @@ function CabinetForm({ item, onSave, onDelete, submitRef }) {
   return (
     <div style={{ padding: '14px 18px 22px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-        {/* Type chips */}
+        {/* Type multiselect */}
         <div>
           <span className="oma-eyebrow" style={{ fontSize: 10, display: 'block', marginBottom: 8 }}>Type</span>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {CAB_TYPES.map(t => (
-              <button key={t.id} onClick={() => setType(t.id)} style={{
-                padding: '7px 10px', borderRadius: 999, cursor: 'pointer',
-                background: type === t.id ? 'var(--chrome-active-bg)' : 'var(--bg-page)',
-                border: '1px solid ' + (type === t.id ? 'var(--chrome-active-line)' : 'var(--line-soft)'),
-                color: type === t.id ? 'var(--chrome-active-fg)' : 'var(--fg-2)',
-                fontFamily: 'var(--font-body)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 5,
-              }}>{t.emoji} {t.label}</button>
-            ))}
-          </div>
+          <CabinetTypeSelect
+            value={types}
+            onChange={setTypes}
+            allTypes={allCabTypes}
+            onAddCustomType={onAddCustomType}
+          />
         </div>
 
         {/* Name */}
         <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <span className="oma-eyebrow" style={{ fontSize: 10 }}>Name</span>
           <input value={name} onChange={e => setName(e.target.value)} autoComplete="off"
-            placeholder={`e.g. ${type === 'herb' ? 'Mugwort, Bay Laurel…' : type === 'crystal' ? 'Rose Quartz, Pyrite…' : type === 'candle' ? 'White Pillar, Black Taper…' : 'Name this item…'}`}
+            placeholder={`e.g. ${types[0] === 'herb' ? 'Mugwort, Bay Laurel…' : types[0] === 'crystal' ? 'Rose Quartz, Pyrite…' : types[0] === 'candle' ? 'White Pillar, Black Taper…' : 'Name this item…'}`}
             style={{ ...field }} />
         </label>
 
         {/* Color swatches — candle and cord only */}
-        {(type === 'candle' || type === 'cord') && (
+        {(types.includes('candle') || types.includes('cord')) && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <span className="oma-eyebrow" style={{ fontSize: 10 }}>Color (optional)</span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -2646,7 +2798,7 @@ function CabinetForm({ item, onSave, onDelete, submitRef }) {
 }
 
 // ── Cabinet main view ───────────────────────────────────────────────────────
-function Cabinet({ cabinet, onAdd, onEditItem }) {
+function Cabinet({ cabinet, onAdd, onEditItem, allCabTypes }) {
   const [search,     setSearch]    = React.useState('');
   const [typeFilter, setTypeFilter] = React.useState([]);
   const [filterOpen, setFilterOpen] = React.useState(false);
@@ -2669,8 +2821,8 @@ function Cabinet({ cabinet, onAdd, onEditItem }) {
     return () => document.removeEventListener('mousedown', handleDown);
   }, [filterOpen]);
 
-  // Derive present types as SearchSelect items
-  const presentTypes = [...new Set(cabinet.map(c => c.type))];
+  // Derive present types across all items (items may have multiple types)
+  const presentTypes = [...new Set(cabinet.flatMap(c => c.types || (c.type ? [c.type] : ['other'])))];
   const typeItems = presentTypes.map(t => ({ key: t, label: typeEmoji(t) + ' ' + typeLabel(t) }));
 
   const filtered = cabinet.filter(c => {
@@ -2679,11 +2831,14 @@ function Cabinet({ cabinet, onAdd, onEditItem }) {
     return matchSearch && matchFilter;
   });
 
-  // Group by type for display
+  // Group by all types — an item with multiple types appears in each group
   const grouped = {};
   filtered.forEach(c => {
-    if (!grouped[c.type]) grouped[c.type] = [];
-    grouped[c.type].push(c);
+    const itemTypes = c.types || (c.type ? [c.type] : ['other']);
+    itemTypes.forEach(typeId => {
+      if (!grouped[typeId]) grouped[typeId] = [];
+      grouped[typeId].push(c);
+    });
   });
 
   return (
@@ -2790,7 +2945,9 @@ function Cabinet({ cabinet, onAdd, onEditItem }) {
                     borderTop: i === 0 ? 0 : '1px solid var(--line-soft)',
                     textAlign: 'left',
                   }}>
-                    <div style={{ fontSize: 20, flexShrink: 0 }}>{typeEmoji(item.type)}</div>
+                    <div style={{ fontSize: 20, flexShrink: 0 }}>
+                      {(item.types || [item.type || 'other']).map(t => typeEmoji(t)).join('')}
+                    </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ color: 'var(--fg-1)', fontSize: 14, fontWeight: 600 }}>{item.name}</div>
                       {item.color && <div style={{ color: 'var(--fg-3)', fontSize: 12, marginTop: 2 }}>{item.color}</div>}
@@ -3192,7 +3349,7 @@ function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [], profi
                       onMouseLeave={e => e.currentTarget.style.background = 'none'}
                     >
                       <span style={{ flex: 1, fontWeight: 500 }}>{c.name}</span>
-                      {c.type && <span style={{ fontSize: 10, color: 'var(--fg-3)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{c.type}</span>}
+                      {(c.types?.[0] || c.type) && <span style={{ fontSize: 10, color: 'var(--fg-3)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{typeLabel(c.types?.[0] || c.type)}</span>}
                       {c.inv !== undefined && <span style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color: c.inv === 0 ? 'var(--danger)' : c.inv === 1 ? 'var(--amber)' : 'var(--success)' }}>×{c.inv}</span>}
                     </button>
                   ))}
@@ -3904,12 +4061,14 @@ window.EntryDetail = EntryDetail;
 // Profile.jsx — profile, preferences, and settings
 
 function Profile({ profile, onUpdateProfile, workings, entries, cabinet, theme, setTheme, onLogOut }) {
-  const [editingName,  setEditingName]  = React.useState(false);
-  const [nameVal,      setNameVal]      = React.useState(profile.name || '');
-  const [editingNote,  setEditingNote]  = React.useState(false);
-  const [noteVal,      setNoteVal]      = React.useState(profile.practiceNote || '');
-  const [newDeity,     setNewDeity]     = React.useState('');
-  const [privacyLock,  setPrivacyLock]  = React.useState(false);
+  const [editingName,      setEditingName]      = React.useState(false);
+  const [nameVal,          setNameVal]          = React.useState(profile.name || '');
+  const [editingNote,      setEditingNote]      = React.useState(false);
+  const [noteVal,          setNoteVal]          = React.useState(profile.practiceNote || '');
+  const [newDeity,         setNewDeity]         = React.useState('');
+  const [privacyLock,      setPrivacyLock]      = React.useState(false);
+  const [editingTypeId,    setEditingTypeId]    = React.useState(null);
+  const [editingTypeLabel, setEditingTypeLabel] = React.useState('');
 
   function saveName() {
     onUpdateProfile({ ...profile, name: nameVal.trim() || 'Witch' });
@@ -3929,6 +4088,18 @@ function Profile({ profile, onUpdateProfile, workings, entries, cabinet, theme, 
   }
   function removeDeity(name) {
     onUpdateProfile({ ...profile, deities: (profile.deities || []).filter(d => d !== name) });
+  }
+  function saveTypeLabel(id) {
+    const label = editingTypeLabel.trim();
+    if (!label) return;
+    onUpdateProfile({
+      ...profile,
+      customCabinetTypes: (profile.customCabinetTypes || []).map(t =>
+        t.id === id ? { ...t, label } : t
+      ),
+    });
+    setEditingTypeId(null);
+    setEditingTypeLabel('');
   }
 
   const field = {
@@ -4052,6 +4223,58 @@ function Profile({ profile, onUpdateProfile, workings, entries, cabinet, theme, 
           ))}
         </div>
       </div>
+
+      {/* ── Custom Supply Types ── */}
+      {(profile.customCabinetTypes || []).length > 0 && (
+        <div>
+          <div className="oma-eyebrow" style={{ marginBottom: 10 }}>Custom Supply Types</div>
+          <div style={{ borderRadius: 'var(--r-lg)', border: '1px solid var(--line-soft)', overflow: 'hidden', background: 'var(--bg-surface)' }}>
+            {(profile.customCabinetTypes || []).map((t, i) => (
+              <div key={t.id} style={{ borderTop: i === 0 ? 0 : '1px solid var(--line-soft)' }}>
+                {editingTypeId === t.id ? (
+                  <div style={{ padding: '12px 14px', display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <span style={{ fontSize: 22, flexShrink: 0 }}>{t.emoji}</span>
+                    <input
+                      autoFocus
+                      value={editingTypeLabel}
+                      onChange={e => setEditingTypeLabel(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') saveTypeLabel(t.id);
+                        if (e.key === 'Escape') { setEditingTypeId(null); setEditingTypeLabel(''); }
+                      }}
+                      style={{ ...field, flex: 1, padding: '8px 12px', fontSize: 14 }}
+                    />
+                    <Btn variant="primary" size="sm" onClick={() => saveTypeLabel(t.id)}>Save</Btn>
+                    <Btn variant="ghost" size="sm" onClick={() => { setEditingTypeId(null); setEditingTypeLabel(''); }}>Cancel</Btn>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px' }}>
+                    <span style={{ fontSize: 22, flexShrink: 0 }}>{t.emoji}</span>
+                    <span style={{ flex: 1, color: 'var(--fg-1)', fontSize: 14, fontWeight: 500 }}>{t.label}</span>
+                    <button
+                      onClick={() => { setEditingTypeId(t.id); setEditingTypeLabel(t.label); }}
+                      style={{
+                        background: 'none', border: 0, cursor: 'pointer', padding: '4px',
+                        color: 'var(--fg-3)', display: 'flex', alignItems: 'center',
+                      }}
+                      title={`Rename ${t.label}`}
+                    >{React.cloneElement(Ico.edit, { size: 15 })}</button>
+                    <button
+                      onClick={() => onUpdateProfile({ ...profile, customCabinetTypes: (profile.customCabinetTypes || []).filter(x => x.id !== t.id) })}
+                      style={{
+                        background: 'none', border: 0, cursor: 'pointer', padding: '4px 6px',
+                        color: 'var(--fg-3)', display: 'flex', alignItems: 'center',
+                        lineHeight: 1, fontSize: 13,
+                      }}
+                      title={`Remove ${t.label}`}
+                    >✕</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Deities ── */}
       <div>
@@ -4845,7 +5068,7 @@ const DEFAULT_CABINET = [
   { id: 'cab7', name: 'Pyrite Chunk', type: 'crystal', inv: 1, note: '' },
 ];
 
-const DEFAULT_PROFILE = { name: 'Zola', practiceNote: '', deities: ['Hecate', 'Lilith'] };
+const DEFAULT_PROFILE = { name: 'Zola', practiceNote: '', deities: ['Hecate', 'Lilith'], customCabinetTypes: [] };
 
 // ── localStorage helpers ──────────────────────────────────────────────────────
 function loadLS(key, fallback) {
@@ -5430,7 +5653,10 @@ function App({ theme, setTheme, isMobile }) {
     loadLS('oma_entries', DEFAULT_ENTRIES).map(migrateEntry)
   );
   const [cabinet, setCabinet] = React.useState(() =>
-    loadLS('oma_cabinet', DEFAULT_CABINET)
+    loadLS('oma_cabinet', DEFAULT_CABINET).map(c => ({
+      ...c,
+      types: c.types || (c.type ? [c.type] : ['other']),
+    }))
   );
   const [profile, setProfile] = React.useState(() =>
     loadLS('oma_profile', DEFAULT_PROFILE)
@@ -5498,6 +5724,25 @@ function App({ theme, setTheme, isMobile }) {
   function handleDeleteCabinetItem(id) { setCabinet(prev => prev.filter(c => c.id !== id)); }
 
   function handleUpdateProfile(p) { setProfile(p); }
+
+  function handleAddCustomCabType(customType) {
+    const existing = profile.customCabinetTypes || [];
+    if (existing.find(t => t.id === customType.id)) return;
+    handleUpdateProfile({ ...profile, customCabinetTypes: [...existing, customType] });
+  }
+
+  // Keep module-level type store in sync so typeEmoji/typeLabel work everywhere
+  React.useEffect(() => {
+    window._setCustomCabTypes(profile.customCabinetTypes || []);
+  }, [profile.customCabinetTypes]);
+
+  // All available cabinet types: base + custom + Other at the end
+  const allCabTypes = React.useMemo(() => {
+    const base = CAB_TYPES.filter(t => t.id !== 'other');
+    const custom = profile.customCabinetTypes || [];
+    const other = CAB_TYPES.find(t => t.id === 'other');
+    return [...base, ...custom, other];
+  }, [profile.customCabinetTypes]);
 
   // ── Altar data ─────────────────────────────────────────────────────────────
   const now = new Date();
@@ -5610,6 +5855,8 @@ function App({ theme, setTheme, isMobile }) {
         onSave={item => { handleSaveCabinetItem(item); setCabinetFormOpen(false); setEditCabinetItem(null); }}
         onDelete={id => { handleDeleteCabinetItem(id); setCabinetFormOpen(false); setEditCabinetItem(null); }}
         submitRef={cabinetFormSubmitRef}
+        allCabTypes={allCabTypes}
+        onAddCustomType={handleAddCustomCabType}
       />
     );
     bottomBar = (
@@ -5752,7 +5999,7 @@ function App({ theme, setTheme, isMobile }) {
       <TopBar title="The Cabinet" eyebrow="YOUR STORES"
         leading={homeBtn} trailing={rightBtns} />
     );
-    body = <Cabinet cabinet={cabinet} onAdd={() => openCabinetForm()} onEditItem={item => openCabinetForm(item)} />;
+    body = <Cabinet cabinet={cabinet} onAdd={() => openCabinetForm()} onEditItem={item => openCabinetForm(item)} allCabTypes={allCabTypes} />;
     bottomBar = (
       <BottomBar>
         <Btn variant="primary" size="md" icon={Ico.plus} fullWidth onClick={() => openCabinetForm()}>
