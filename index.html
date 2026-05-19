@@ -452,6 +452,11 @@
     :root { --bottom-inset: env(safe-area-inset-bottom, 0px); }
     /* Stack date/time fields vertically so they fill the width */
     .oma-date-time-row { flex-direction: column !important; }
+    /* Strip native picker chrome so inputs respect container width */
+    input[type="date"], input[type="time"] {
+      -webkit-appearance: none;
+      appearance: none;
+    }
   }
 </style>
 </head>
