@@ -3684,16 +3684,16 @@ function JournalEntry({ editId, onClose, onSave, onDelete, workings, entries, su
           </div>
 
           {/* Date + Time */}
-          <div style={{ display: 'flex', gap: 10, minWidth: 0 }}>
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', gap: 10, minWidth: 0, overflow: 'hidden' }}>
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 0, overflow: 'hidden' }}>
               <span className="oma-eyebrow" style={{ fontSize: 10 }}>Date</span>
               <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                style={{ ...field, colorScheme: 'dark', minWidth: 0 }} />
+                style={{ ...field, colorScheme: 'dark', minWidth: 0, width: '100%' }} />
             </label>
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 0 }}>
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 0, overflow: 'hidden' }}>
               <span className="oma-eyebrow" style={{ fontSize: 10 }}>Time</span>
               <input type="time" value={time} onChange={e => setTime(e.target.value)}
-                style={{ ...field, colorScheme: 'dark', minWidth: 0 }} />
+                style={{ ...field, colorScheme: 'dark', minWidth: 0, width: '100%' }} />
             </label>
           </div>
 
