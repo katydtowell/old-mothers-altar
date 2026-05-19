@@ -1464,8 +1464,8 @@ Object.assign(window, {
   <script type="text/babel">
 // Altar.jsx — home / today view
 
-function Altar({ data, onOpenWorking, onCompose, onNewEntry, onOpenEntry, onGoToJournal }) {
-  const { moonPhase, moonLabel, monthRoman, recentEntries, totalEntries, pendingTasks, magicalEvents, timeOfDay, userName } = data;
+function Altar({ data, onOpenWorking, onCompose, onNewEntry, onOpenEntry, onGoToJournal, onDismissProgress }) {
+  const { moonPhase, moonLabel, monthRoman, recentEntries, totalEntries, pendingTasks, progressReminder, magicalEvents, timeOfDay, userName } = data;
   const [showAllTasks, setShowAllTasks] = React.useState(false);
 
   const statusTone = { Pending: 'amber', Ongoing: 'pending', Active: 'pending', Completed: 'sealed' };
@@ -1542,6 +1542,54 @@ function Altar({ data, onOpenWorking, onCompose, onNewEntry, onOpenEntry, onGoTo
                 <span style={{ color: 'var(--fg-1)', fontSize: 14, fontWeight: 500 }}>{ev.name}</span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Progress Report ── */}
+      {progressReminder && (
+        <div>
+          <div style={{
+            borderRadius: 'var(--r-md)',
+            border: '1px solid rgba(244,175,89,0.35)',
+            background: 'rgba(244,175,89,0.10)',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              padding: '9px 14px',
+              borderBottom: '1px solid rgba(244,175,89,0.20)',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 13, color: 'var(--amber)' }}>
+                How's It Going? ·
+              </span>
+              <button
+                onClick={() => onDismissProgress && onDismissProgress(progressReminder.entryId)}
+                style={{ background: 'none', border: 0, cursor: 'pointer', color: 'var(--amber)', opacity: 0.6, padding: 2, flexShrink: 0, display: 'flex', alignItems: 'center' }}
+                aria-label="Dismiss"
+              >
+                {React.cloneElement(Ico.close, { size: 14 })}
+              </button>
+            </div>
+            <div
+              onClick={() => onOpenEntry && onOpenEntry(progressReminder.entryId)}
+              style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px', cursor: 'pointer' }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            >
+              <span style={{ color: 'var(--amber)', marginTop: 1, flexShrink: 0 }}>
+                {React.cloneElement(Ico.sparkle, { size: 18 })}
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ color: 'var(--fg-1)', fontSize: 14, fontWeight: 500, lineHeight: 1.3 }}>
+                  {progressReminder.entryTitle}
+                </div>
+                <div style={{ color: 'var(--amber)', opacity: 0.8, fontSize: 11, fontFamily: 'var(--font-mono)', marginTop: 3, letterSpacing: '0.04em' }}>
+                  {progressReminder.duration.val}-{progressReminder.duration.unit.toUpperCase()} WORKING COMPLETE · {progressReminder.spellName.toUpperCase()}
+                </div>
+              </div>
+              {React.cloneElement(Ico.chevron, { size: 14, style: { color: 'var(--amber)', opacity: 0.6, flexShrink: 0, marginTop: 2 } })}
+            </div>
           </div>
         </div>
       )}
@@ -2146,7 +2194,14 @@ function WorkingDetail({ working, onBack, onCast, onDelete, onEdit, onToggleFavo
                   color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)',
                   flexShrink: 0, paddingTop: 2, width: 16, textAlign: 'right',
                 }}>{i + 1}.</span>
-                <span style={{ color: 'var(--fg-1)', fontSize: 14, lineHeight: 1.45 }}>{t.text}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ color: 'var(--fg-1)', fontSize: 14, lineHeight: 1.45 }}>{t.text}</span>
+                  {t.repeat && t.repeat.val > 0 && (
+                    <span style={{ color: 'var(--fg-3)', fontSize: 11, fontFamily: 'var(--font-body)', marginLeft: 6 }}>
+                      (Repeats every {t.repeat.val} {t.repeat.unit})
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -3154,6 +3209,16 @@ function NWSection({ title, children }) {
   );
 }
 
+const ALL_REPEAT_UNITS = [
+  { label: 'minute(s)', value: 'minutes' },
+  { label: 'hour(s)',   value: 'hours'   },
+  { label: 'day(s)',    value: 'days'    },
+  { label: 'week(s)',   value: 'weeks'   },
+  { label: 'month(s)', value: 'months'  },
+  { label: 'year(s)',  value: 'years'   },
+];
+const REPEAT_UNIT_MS = { minutes: 60e3, hours: 36e5, days: 864e5, weeks: 6048e5, months: 2592e6, years: 31536e6 };
+
 function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [], profileDeities = [] }) {
   const [name,         setName]        = React.useState('');
   const [summary,      setSummary]     = React.useState('');
@@ -3180,8 +3245,12 @@ function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [], profi
   const [ingredients,  setIngredients] = React.useState([]);
   const [taskText,     setTaskText]    = React.useState('');
   const [tasks,        setTasks]       = React.useState([]);
-  const [editingTaskId,   setEditingTaskId]   = React.useState(null);
-  const [editingTaskText, setEditingTaskText] = React.useState('');
+  const [editingTaskId,        setEditingTaskId]        = React.useState(null);
+  const [editingTaskText,      setEditingTaskText]      = React.useState('');
+  const [editingTaskRepeatVal, setEditingTaskRepeatVal] = React.useState('');
+  const [editingTaskRepeatUnit,setEditingTaskRepeatUnit]= React.useState('days');
+  const [taskRepeatVal,        setTaskRepeatVal]        = React.useState('');
+  const [taskRepeatUnit,       setTaskRepeatUnit]       = React.useState('days');
   const [durVal,       setDurVal]      = React.useState('');
   const [durUnit,      setDurUnit]     = React.useState('days');
   const [timingTab,    setTimingTab]   = React.useState('moon');
@@ -3211,6 +3280,13 @@ function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [], profi
     }
   }, []); // Run once on mount — component is re-keyed by App.jsx each open
 
+  function availableRepeatUnits() {
+    const dv = parseInt(durVal);
+    if (!dv || dv <= 0) return ALL_REPEAT_UNITS;
+    const durMs = dv * (REPEAT_UNIT_MS[durUnit] || 864e5);
+    return ALL_REPEAT_UNITS.filter(u => (REPEAT_UNIT_MS[u.value] || 0) < durMs);
+  }
+
   const field = {
     background: 'var(--bg-page)', border: '1px solid var(--line-medium)',
     borderRadius: 'var(--r-xs)', padding: '11px 14px',
@@ -3232,8 +3308,10 @@ function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [], profi
 
   function addTask() {
     if (!taskText.trim()) return;
-    setTasks([...tasks, { id: Date.now().toString(), text: taskText.trim() }]);
-    setTaskText('');
+    const rv = parseInt(taskRepeatVal);
+    const repeat = (rv > 0) ? { val: rv, unit: taskRepeatUnit } : null;
+    setTasks([...tasks, { id: Date.now().toString(), text: taskText.trim(), repeat }]);
+    setTaskText(''); setTaskRepeatVal('');
   }
 
   function iconForCategory(cats) {
@@ -3579,50 +3657,98 @@ function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [], profi
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {tasks.map((t, i) => (
               <div key={t.id} style={{
-                display: 'flex', alignItems: 'center', gap: 8,
+                display: 'flex', alignItems: 'flex-start', gap: 8,
                 padding: '9px 12px', borderRadius: 'var(--r-xs)',
                 background: 'var(--bg-page)', border: '1px solid var(--line-soft)',
               }}>
-                <span style={{ color: 'var(--fg-3)', fontSize: 11, fontFamily: 'var(--font-mono)', flexShrink: 0, width: 16 }}>{i + 1}.</span>
+                <span style={{ color: 'var(--fg-3)', fontSize: 11, fontFamily: 'var(--font-mono)', flexShrink: 0, width: 16, paddingTop: 2 }}>{i + 1}.</span>
                 {editingTaskId === t.id ? (
-                  <>
-                    <input
-                      value={editingTaskText}
-                      onChange={e => setEditingTaskText(e.target.value)}
-                      autoComplete="off"
-                      style={{ ...field, flex: 1, padding: '5px 8px', fontSize: 13 }}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') { e.preventDefault(); setTasks(tasks.map(x => x.id === t.id ? { ...x, text: editingTaskText.trim() || x.text } : x)); setEditingTaskId(null); }
-                        if (e.key === 'Escape') { setEditingTaskId(null); }
-                      }}
-                    />
-                    <button onClick={() => { setTasks(tasks.map(x => x.id === t.id ? { ...x, text: editingTaskText.trim() || x.text } : x)); setEditingTaskId(null); }} style={{
-                      background: 'none', border: 0, cursor: 'pointer', color: 'var(--success)', padding: 4, flexShrink: 0,
-                    }}>{React.cloneElement(Ico.check, { size: 14 })}</button>
-                    <button onClick={() => setEditingTaskId(null)} style={{
-                      background: 'none', border: 0, cursor: 'pointer', color: 'var(--fg-3)', padding: 4, flexShrink: 0,
-                    }}>{React.cloneElement(Ico.close, { size: 14 })}</button>
-                  </>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <input
+                        value={editingTaskText}
+                        onChange={e => setEditingTaskText(e.target.value)}
+                        autoComplete="off"
+                        style={{ ...field, flex: 1, padding: '5px 8px', fontSize: 13 }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const rv2 = parseInt(editingTaskRepeatVal);
+                            const rep2 = (rv2 > 0) ? { val: rv2, unit: editingTaskRepeatUnit } : null;
+                            setTasks(tasks.map(x => x.id === t.id ? { ...x, text: editingTaskText.trim() || x.text, repeat: rep2 } : x));
+                            setEditingTaskId(null);
+                          }
+                          if (e.key === 'Escape') { setEditingTaskId(null); }
+                        }}
+                      />
+                      <button onClick={() => {
+                        const rv2 = parseInt(editingTaskRepeatVal);
+                        const rep2 = (rv2 > 0) ? { val: rv2, unit: editingTaskRepeatUnit } : null;
+                        setTasks(tasks.map(x => x.id === t.id ? { ...x, text: editingTaskText.trim() || x.text, repeat: rep2 } : x));
+                        setEditingTaskId(null);
+                      }} style={{ background: 'none', border: 0, cursor: 'pointer', color: 'var(--success)', padding: 4, flexShrink: 0 }}>
+                        {React.cloneElement(Ico.check, { size: 14 })}
+                      </button>
+                      <button onClick={() => setEditingTaskId(null)} style={{ background: 'none', border: 0, cursor: 'pointer', color: 'var(--fg-3)', padding: 4, flexShrink: 0 }}>
+                        {React.cloneElement(Ico.close, { size: 14 })}
+                      </button>
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <span style={{ fontSize: 9, color: 'var(--fg-3)', fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>REPEATS EVERY</span>
+                      <input type="number" min="1" value={editingTaskRepeatVal}
+                        onChange={e => setEditingTaskRepeatVal(e.target.value)}
+                        placeholder="—"
+                        style={{ ...field, width: 54, padding: '4px 8px', fontSize: 12 }} />
+                      <select value={editingTaskRepeatUnit} onChange={e => setEditingTaskRepeatUnit(e.target.value)}
+                        style={{ ...selectStyle, flex: 1, padding: '4px 8px', fontSize: 12 }}>
+                        {availableRepeatUnits().map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
+                      </select>
+                    </div>
+                  </div>
                 ) : (
                   <>
-                    <div style={{ flex: 1, color: 'var(--fg-1)', fontSize: 13, lineHeight: 1.4 }}>{t.text}</div>
-                    <button onClick={() => { setEditingTaskId(t.id); setEditingTaskText(t.text); }} style={{
-                      background: 'none', border: 0, cursor: 'pointer', color: 'var(--fg-3)', padding: 4, flexShrink: 0,
-                    }}>{React.cloneElement(Ico.edit, { size: 13 })}</button>
-                    <button onClick={() => { setTasks(tasks.filter(x => x.id !== t.id)); if (editingTaskId === t.id) setEditingTaskId(null); }} style={{
-                      background: 'none', border: 0, cursor: 'pointer', color: 'var(--fg-3)', padding: 4, flexShrink: 0,
-                    }}>{React.cloneElement(Ico.close, { size: 14 })}</button>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ color: 'var(--fg-1)', fontSize: 13, lineHeight: 1.4 }}>{t.text}</div>
+                      {t.repeat && t.repeat.val > 0 && (
+                        <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', marginTop: 2, letterSpacing: '0.04em' }}>
+                          EVERY {t.repeat.val} {t.repeat.unit.toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <button onClick={() => {
+                      setEditingTaskId(t.id); setEditingTaskText(t.text);
+                      setEditingTaskRepeatVal(t.repeat ? String(t.repeat.val) : '');
+                      setEditingTaskRepeatUnit(t.repeat ? t.repeat.unit : (availableRepeatUnits()[2]?.value || 'days'));
+                    }} style={{ background: 'none', border: 0, cursor: 'pointer', color: 'var(--fg-3)', padding: 4, flexShrink: 0 }}>
+                      {React.cloneElement(Ico.edit, { size: 13 })}
+                    </button>
+                    <button onClick={() => { setTasks(tasks.filter(x => x.id !== t.id)); if (editingTaskId === t.id) setEditingTaskId(null); }} style={{ background: 'none', border: 0, cursor: 'pointer', color: 'var(--fg-3)', padding: 4, flexShrink: 0 }}>
+                      {React.cloneElement(Ico.close, { size: 14 })}
+                    </button>
                   </>
                 )}
               </div>
             ))}
           </div>
         )}
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input value={taskText} onChange={e => setTaskText(e.target.value)} autoComplete="off"
-            placeholder="Add a step or task…" style={{ ...field, flex: 1 }}
-            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTask(); } }} />
-          <Btn variant="secondary" size="sm" onClick={addTask}>Add</Btn>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input value={taskText} onChange={e => setTaskText(e.target.value)} autoComplete="off"
+              placeholder="Add a step or task…" style={{ ...field, flex: 1 }}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTask(); } }} />
+            <Btn variant="secondary" size="sm" onClick={addTask}>Add</Btn>
+          </div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <span style={{ fontSize: 9, color: 'var(--fg-3)', fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>REPEATS EVERY</span>
+            <input type="number" min="1" value={taskRepeatVal}
+              onChange={e => setTaskRepeatVal(e.target.value)}
+              placeholder="optional"
+              style={{ ...field, width: 90, padding: '8px 10px', fontSize: 13 }} />
+            <select value={taskRepeatUnit} onChange={e => setTaskRepeatUnit(e.target.value)}
+              style={{ ...selectStyle, flex: 1, padding: '8px 10px', fontSize: 13 }}>
+              {availableRepeatUnits().map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
+            </select>
+          </div>
         </div>
       </NWSection>
 
@@ -4063,7 +4189,9 @@ window.JournalEntry = JournalEntry;
 window.NewEntry = JournalEntry;
 
 // ── EntryDetail — read-only single-entry view ─────────────────────────────────
-function EntryDetail({ entryId, entries, workings }) {
+const ENTRY_DETAIL_UNIT_MS = { minutes: 60e3, hours: 36e5, days: 864e5, weeks: 6048e5, months: 2592e6, years: 31536e6 };
+
+function EntryDetail({ entryId, entries, workings, onToggleTask }) {
   const e = entries.find(x => x.id === entryId);
   if (!e) return null;
 
@@ -4173,24 +4301,45 @@ function EntryDetail({ entryId, entries, workings }) {
               overflow: 'hidden', background: 'var(--bg-surface)',
             }}>
               {linkedWorking.tasks.map((t, i) => {
-                const done = !!(e.tasksDone && e.tasksDone[t.id]);
+                // Compute done key — repeating tasks use occurrence index
+                let doneKey = t.id;
+                let repeatLabel = null;
+                if (t.repeat && t.repeat.val > 0) {
+                  const repeatMs = t.repeat.val * (ENTRY_DETAIL_UNIT_MS[t.repeat.unit] || 864e5);
+                  const castDate = new Date(e.date);
+                  const occIdx = Math.max(0, Math.floor((new Date() - castDate) / repeatMs));
+                  doneKey = `${t.id}_${occIdx}`;
+                  repeatLabel = `Every ${t.repeat.val} ${t.repeat.unit}`;
+                }
+                const done = !!(e.tasksDone && e.tasksDone[doneKey]);
                 return (
-                  <div key={t.id} style={{
-                    display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
-                    borderTop: i === 0 ? 'none' : '1px solid var(--line-soft)',
-                  }}>
+                  <div key={t.id}
+                    onClick={() => onToggleTask && onToggleTask(doneKey)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
+                      borderTop: i === 0 ? 'none' : '1px solid var(--line-soft)',
+                      cursor: onToggleTask ? 'pointer' : 'default',
+                    }}>
                     <div style={{
                       width: 18, height: 18, borderRadius: 4, flexShrink: 0,
                       border: '1.5px solid ' + (done ? 'var(--success)' : 'var(--line-medium)'),
                       background: done ? 'var(--success)' : 'transparent',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'background 150ms, border-color 150ms',
                     }}>
                       {done && <span style={{ color: 'var(--bg-page)', fontSize: 11, fontWeight: 700 }}>✓</span>}
                     </div>
-                    <span style={{
-                      color: done ? 'var(--fg-3)' : 'var(--fg-1)', fontSize: 13,
-                      textDecoration: done ? 'line-through' : 'none',
-                    }}>{t.text}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{
+                        color: done ? 'var(--fg-3)' : 'var(--fg-1)', fontSize: 13,
+                        textDecoration: done ? 'line-through' : 'none',
+                      }}>{t.text}</span>
+                      {repeatLabel && (
+                        <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', marginTop: 2, letterSpacing: '0.04em' }}>
+                          {repeatLabel.toUpperCase()}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -5009,7 +5158,7 @@ const DEFAULT_WORKINGS = [
       { id: 't1', text: 'Set intention at sunrise — hold pyrite and speak your need aloud' },
       { id: 't2', text: 'Anoint each bay laurel leaf with a drop of oil, then lay them in a line' },
       { id: 't3', text: 'Tie nine knots while chanting — one per knot, breath between each' },
-      { id: 't4', text: 'Carry cord in your left pocket for nine days without removing it' },
+      { id: 't4', text: 'Carry cord in your left pocket for nine days without removing it', repeat: { val: 1, unit: 'days' } },
       { id: 't5', text: 'On day nine, bury or burn the cord to release the working' },
     ],
     rating: 4,
@@ -5072,7 +5221,7 @@ const DEFAULT_WORKINGS = [
       { id: 't2', text: 'Hold the rose quartz and set your dream intention before placing in sachet' },
       { id: 't3', text: 'Blend herbs together while reciting the chant softly' },
       { id: 't4', text: 'Tie sachet closed with purple cord — three knots, each for a night of clear dreaming' },
-      { id: 't5', text: 'Place under pillow and replace contents at the next new moon' },
+      { id: 't5', text: 'Place under pillow and replace contents at the next new moon', repeat: { val: 2, unit: 'weeks' } },
     ],
     rating: 0,
     author: 'Self', authorSelf: true, source: '',
@@ -5088,7 +5237,7 @@ const DEFAULT_ENTRIES = [
     id: 'e1',
     workingId: 'money-knot',
     workingName: 'Money Drawing Knot Spell',
-    title: 'Money Drawing Knot Spell — begun',
+    title: 'Drawing in some good financial luck',
     date: '2026-05-08',
     romanDay: 'VIII', month: 'MAY', time: '07:30',
     kind: 'cast',
@@ -5824,6 +5973,9 @@ function App({ theme, setTheme, isMobile }) {
   const [profile, setProfile] = React.useState(() =>
     loadLS('oma_profile', DEFAULT_PROFILE)
   );
+  const [dismissedProgressIds, setDismissedProgressIds] = React.useState(() =>
+    loadLS('oma_dismissed_progress', [])
+  );
 
   // ── Persist ────────────────────────────────────────────────────────────────
   React.useEffect(() => {
@@ -5832,6 +5984,7 @@ function App({ theme, setTheme, isMobile }) {
   React.useEffect(() => { localStorage.setItem('oma_entries', JSON.stringify(entries)); }, [entries]);
   React.useEffect(() => { localStorage.setItem('oma_cabinet', JSON.stringify(cabinet)); }, [cabinet]);
   React.useEffect(() => { localStorage.setItem('oma_profile', JSON.stringify(profile)); }, [profile]);
+  React.useEffect(() => { localStorage.setItem('oma_dismissed_progress', JSON.stringify(dismissedProgressIds)); }, [dismissedProgressIds]);
 
   // Reset scroll to top on every page/view change
   React.useEffect(() => {
@@ -5900,6 +6053,15 @@ function App({ theme, setTheme, isMobile }) {
   function handleDeleteCabinetItem(id) { setCabinet(prev => prev.filter(c => c.id !== id)); }
 
   function handleUpdateProfile(p) { setProfile(p); }
+  function handleDismissProgress(entryId) { setDismissedProgressIds(prev => [...prev, entryId]); }
+  function handleToggleEntryTask(entryId, doneKey) {
+    setEntries(prev => prev.map(e => {
+      if (e.id !== entryId) return e;
+      const tasksDone = { ...(e.tasksDone || {}) };
+      tasksDone[doneKey] = !tasksDone[doneKey];
+      return { ...e, tasksDone };
+    }));
+  }
 
   function handleAddCustomCabType(customType) {
     const existing = profile.customCabinetTypes || [];
@@ -5938,21 +6100,65 @@ function App({ theme, setTheme, isMobile }) {
   const moonIdx = Math.floor((moonDiff / synodic) * 8) % 8;
   const currentMoon = MOON_PHASES[moonIdx];
 
+  // ── Progress reminders — cast entries whose spell duration has elapsed ──────
+  function durationToMs({ val, unit }) {
+    const map = { minutes: 60e3, hours: 36e5, days: 864e5, weeks: 6048e5, months: 2592e6 };
+    return val * (map[unit] || 864e5);
+  }
+  const progressReminders = [];
+  entries.forEach(entry => {
+    if (entry.kind !== 'cast') return;
+    if (!entry.workingId) return;
+    if (entry.status === 'Completed') return;
+    const spell = workings.find(w => w.id === entry.workingId);
+    if (!spell || spell.sealed || !spell.duration || !spell.duration.val) return;
+    if (dismissedProgressIds.includes(entry.id)) return;
+    const dueDate = new Date(new Date(entry.date).getTime() + durationToMs(spell.duration));
+    if (now < dueDate) return;
+    progressReminders.push({
+      entryId: entry.id,
+      entryTitle: entry.title,
+      spellName: spell.name,
+      duration: spell.duration,
+      castDate: entry.date,
+    });
+  });
+  progressReminders.sort((a, b) => new Date(a.castDate) - new Date(b.castDate));
+  const progressReminder = progressReminders[0] ?? null;
+
   // Compute pending tasks from journal entries that are linked to spells
   const pendingTasks = [];
   entries.forEach(entry => {
     if (!entry.workingId) return;
+    if (entry.status === 'Completed') return;
     const spell = workings.find(w => w.id === entry.workingId);
     if (!spell || !spell.tasks || spell.tasks.length === 0) return;
+    const castDate = new Date(entry.date);
     spell.tasks.forEach(task => {
-      if (!entry.tasksDone || !entry.tasksDone[task.id]) {
-        pendingTasks.push({
-          taskId: task.id,
-          taskText: task.text,
-          entryId: entry.id,
-          entryTitle: entry.title,
-          spellName: spell.name,
-        });
+      if (task.repeat && task.repeat.val > 0) {
+        // Repeating task — show if current occurrence is undone
+        const repeatMs = task.repeat.val * (
+          { minutes: 60e3, hours: 36e5, days: 864e5, weeks: 6048e5, months: 2592e6, years: 31536e6 }[task.repeat.unit] || 864e5
+        );
+        const occIdx = Math.max(0, Math.floor((now - castDate) / repeatMs));
+        const doneKey = `${task.id}_${occIdx}`;
+        if (!entry.tasksDone || !entry.tasksDone[doneKey]) {
+          pendingTasks.push({
+            taskId: task.id, doneKey,
+            taskText: task.text,
+            entryId: entry.id, entryTitle: entry.title, spellName: spell.name,
+            repeatInfo: `Every ${task.repeat.val} ${task.repeat.unit}`,
+          });
+        }
+      } else {
+        // Non-repeating task
+        if (!entry.tasksDone || !entry.tasksDone[task.id]) {
+          pendingTasks.push({
+            taskId: task.id, doneKey: task.id,
+            taskText: task.text,
+            entryId: entry.id, entryTitle: entry.title, spellName: spell.name,
+          });
+        }
       }
     });
   });
@@ -5964,6 +6170,7 @@ function App({ theme, setTheme, isMobile }) {
     recentEntries: entries.slice(0, 3),
     totalEntries: entries.length,
     pendingTasks,
+    progressReminder,
     magicalEvents,
     timeOfDay,
     userName: profile.name || 'Witch',
@@ -6088,7 +6295,7 @@ function App({ theme, setTheme, isMobile }) {
         leading={<IconBtn icon={Ico.back} onClick={() => setViewEntryId(null)} label="Back" />}
         trailing={rightBtns} />
     );
-    body = <EntryDetail entryId={viewEntryId} entries={entries} workings={workings} />;
+    body = <EntryDetail entryId={viewEntryId} entries={entries} workings={workings} onToggleTask={doneKey => handleToggleEntryTask(viewEntryId, doneKey)} />;
     bottomBar = (
       <BottomBar>
         <Btn variant="ghost" size="md" onClick={() => {
@@ -6131,7 +6338,7 @@ function App({ theme, setTheme, isMobile }) {
           : "Home"}
         trailing={rightBtns} />
     );
-    body = <Altar data={altarData} onOpenWorking={setOpenWorkingId} onCompose={() => openComposer()} onNewEntry={() => openEntryForm()} onOpenEntry={id => setViewEntryId(id)} onGoToJournal={() => setTab('book')} />;
+    body = <Altar data={altarData} onOpenWorking={setOpenWorkingId} onCompose={() => openComposer()} onNewEntry={() => openEntryForm()} onOpenEntry={id => setViewEntryId(id)} onGoToJournal={() => setTab('book')} onDismissProgress={handleDismissProgress} />;
     bottomBar = (
       <BottomBar>
         <Btn variant="secondary" size="lg" icon={Ico.penTool} style={{ flex: 1 }} onClick={() => openEntryForm()}>
