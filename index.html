@@ -1414,9 +1414,48 @@ function SearchSelect({ items, value, onChange, placeholder = 'Select…', multi
   );
 }
 
+// ── Confirm Modal ─────────────────────────────────────────────────────────────
+function ConfirmModal({ state, onClose, invertedTheme }) {
+  if (!state) return null;
+  const { message, confirmLabel = 'Confirm', onConfirm, isDanger = true } = state;
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, zIndex: 300,
+      background: 'rgba(0,0,0,0.45)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '24px',
+      animation: 'omaFadeIn 180ms var(--ease-out)',
+    }} onClick={onClose}>
+      <div data-theme={invertedTheme} onClick={e => e.stopPropagation()} style={{
+        background: 'var(--bg-surface)',
+        borderRadius: 'var(--r-xl)',
+        border: '1px solid var(--line-medium)',
+        boxShadow: 'var(--shadow-3)',
+        padding: '24px 22px 20px',
+        width: '100%', maxWidth: 300,
+        animation: 'omaSheetUp 260ms var(--ease-candle)',
+      }}>
+        <div style={{
+          color: 'var(--fg-1)', fontSize: 15, fontWeight: 600,
+          fontFamily: 'var(--font-body)', lineHeight: 1.5,
+          marginBottom: 20,
+        }}>{message}</div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Btn variant="secondary" size="md" fullWidth onClick={onClose}>Cancel</Btn>
+          <Btn variant="primary" size="md" fullWidth onClick={() => { onConfirm(); onClose(); }}
+            style={isDanger ? { background: 'var(--crimson-300)', borderColor: 'var(--crimson-300)' } : {}}>
+            {confirmLabel}
+          </Btn>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 Object.assign(window, {
   Ico, MoonGlyph, Flame, Btn, IconBtn, Badge, Card, TopBar, TabBar, ThemeToggle,
-  BottomBar, Drawer, SearchSelect,
+  BottomBar, Drawer, SearchSelect, ConfirmModal,
 });
 
   </script>
@@ -2147,7 +2186,7 @@ function WorkingDetail({ working, onBack, onCast, onDelete, onEdit, onToggleFavo
         </div>
         {onDelete && (
           <Btn variant="ghost" size="sm" fullWidth onClick={() => {
-            if (window.confirm(`Delete the spell "${name}"? This cannot be undone.`)) onDelete();
+            window.showConfirm(`Delete the spell "${name}"? This cannot be undone.`, onDelete, 'Delete');
           }} style={{ color: 'var(--crimson-300)', fontSize: 12 }}>
             Delete this spell
           </Btn>
@@ -2788,7 +2827,7 @@ function CabinetForm({ item, onSave, onDelete, submitRef, allCabTypes, onAddCust
         {/* Delete — edit only */}
         {item && (
           <Btn variant="ghost" size="sm" fullWidth onClick={() => {
-            if (window.confirm(`Remove "${item.name}" from the cabinet?`)) { onDelete(item.id); }
+            window.showConfirm(`Remove "${item.name}" from the cabinet?`, () => onDelete(item.id), 'Remove');
           }} style={{ color: 'var(--crimson-300)', fontSize: 12 }}>
             Remove from cabinet
           </Btn>
@@ -3893,7 +3932,7 @@ function JournalEntry({ editId, onClose, onSave, onDelete, workings, entries, su
           {editId && onDelete && (
             <div style={{ paddingTop: 4 }}>
               <Btn variant="ghost" size="sm" fullWidth onClick={() => {
-                if (window.confirm('Delete this entry? This cannot be undone.')) onDelete(editId);
+                window.showConfirm('Delete this entry? This cannot be undone.', () => onDelete(editId), 'Delete');
               }} style={{ color: 'var(--crimson-300)', fontSize: 12 }}>
                 Delete this entry
               </Btn>
@@ -4395,10 +4434,10 @@ function Profile({ profile, onUpdateProfile, workings, entries, cabinet, theme, 
       {/* ── Reset demo data ── */}
       <div style={{ marginBottom: 8 }}>
         <Btn variant="secondary" size="lg" fullWidth onClick={() => {
-          if (window.confirm('Reset all data to demo defaults? This cannot be undone.')) {
+          window.showConfirm('Reset all data to demo defaults? This cannot be undone.', () => {
             ['oma_workings','oma_entries','oma_cabinet','oma_profile'].forEach(k => localStorage.removeItem(k));
             window.location.reload();
-          }
+          }, 'Reset');
         }}>
           Reset to Demo Data
         </Btn>
@@ -5676,6 +5715,14 @@ function App({ theme, setTheme, isMobile }) {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [tab, openWorkingId, viewEntryId, composerOpen, cabinetFormOpen, entryOpen]);
 
+  // ── Custom confirm modal ───────────────────────────────────────────────────
+  const [confirmState, setConfirmState] = React.useState(null);
+  React.useEffect(() => {
+    window.showConfirm = (message, onConfirm, confirmLabel = 'Confirm', isDanger = true) => {
+      setConfirmState({ message, onConfirm, confirmLabel, isDanger });
+    };
+  }, []);
+
   // ── Handlers ──────────────────────────────────────────────────────────────
   function handleCreateWorking(w) {
     setWorkings(prev => [hydrateWorking(w), ...prev]);
@@ -5938,9 +5985,7 @@ function App({ theme, setTheme, isMobile }) {
     bottomBar = (
       <BottomBar>
         <Btn variant="ghost" size="md" onClick={() => {
-          if (window.confirm('Delete this entry? This cannot be undone.')) {
-            handleDeleteEntry(viewEntryId);
-          }
+          window.showConfirm('Delete this entry? This cannot be undone.', () => handleDeleteEntry(viewEntryId), 'Delete');
         }} style={{ color: 'var(--crimson-300)', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           {React.cloneElement(Ico.trash, { size: 15 })}
           Delete
@@ -6066,6 +6111,13 @@ function App({ theme, setTheme, isMobile }) {
         </div>
       </div>
       {bottomBar}
+
+      {/* Confirm modal */}
+      <ConfirmModal
+        state={confirmState}
+        onClose={() => setConfirmState(null)}
+        invertedTheme={theme === 'dark' ? 'light' : 'dark'}
+      />
 
       {/* Drawer navigation */}
       <Drawer
