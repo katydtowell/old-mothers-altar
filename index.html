@@ -5270,11 +5270,11 @@ window.Login = Login;
 
 // ── Create Profile screen ─────────────────────────────────────────────────────
 function CreateProfile({ onComplete, onBack, hasFrame }) {
-  const [name,     setName]     = React.useState('');
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [confirm,  setConfirm]  = React.useState('');
-  const [deities,  setDeities]  = React.useState('');
+  const [name,     setName]     = React.useState('Demo Witch');
+  const [username, setUsername] = React.useState('demo');
+  const [password, setPassword] = React.useState('demo');
+  const [confirm,  setConfirm]  = React.useState('demo');
+  const [deities,  setDeities]  = React.useState('Hecate, Brigid');
   const [error,    setError]    = React.useState('');
   const [visible,  setVisible]  = React.useState(false);
   const [focused,  setFocused]  = React.useState(null);
@@ -5428,6 +5428,192 @@ function CreateProfile({ onComplete, onBack, hasFrame }) {
 }
 
 window.CreateProfile = CreateProfile;
+
+// ── Onboarding overlay ────────────────────────────────────────────────────────
+function Onboarding({ name, onDone, onTabChange }) {
+  const [step, setStep] = React.useState(0);
+  const [visible, setVisible] = React.useState(false);
+  const [exiting, setExiting] = React.useState(false);
+
+  React.useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 60);
+    return () => clearTimeout(t);
+  }, []);
+
+  function dismiss() {
+    setExiting(true);
+    if (onTabChange) onTabChange('altar');
+    setTimeout(onDone, 380);
+  }
+
+  const steps = [
+    {
+      icon: Ico.sparkle,
+      iconColor: 'var(--amber)',
+      iconBg: 'rgba(244,175,89,0.15)',
+      title: `Welcome, ${name || 'Witch'}`,
+      body: "Your altar is ready. Here's a quick look at what's inside — tap through to get oriented.",
+      tab: 'altar',
+    },
+    {
+      icon: Ico.altar,
+      iconColor: 'var(--indigo-300)',
+      iconBg: 'rgba(45,78,166,0.18)',
+      title: 'Home',
+      body: "Your practice at a glance. See the moon phase, active spells, and jump straight into casting or journaling.",
+      tab: 'altar',
+    },
+    {
+      icon: Ico.sparkle,
+      iconColor: 'var(--amber)',
+      iconBg: 'rgba(244,175,89,0.15)',
+      title: 'The Grimoire',
+      body: 'Your catalog of spells and rituals. Add ingredients, set moon phase associations, and track every casting over time.',
+      tab: 'workings',
+    },
+    {
+      icon: Ico.book,
+      iconColor: 'var(--moss)',
+      iconBg: 'rgba(135,158,88,0.18)',
+      title: 'The Journal',
+      body: 'Log your castings and reflect on outcomes. Mark entries pending, ongoing, or complete as your work unfolds.',
+      tab: 'book',
+    },
+    {
+      icon: Ico.cabinet,
+      iconColor: 'var(--fg-2)',
+      iconBg: 'rgba(253,254,235,0.08)',
+      title: 'The Cabinet',
+      body: 'Keep inventory of your magical tools and supplies. Know what you have before you cast.',
+      tab: 'cabinet',
+    },
+    {
+      icon: Ico.candle,
+      iconColor: 'var(--amber)',
+      iconBg: 'rgba(244,175,89,0.15)',
+      title: "You're all set",
+      body: 'Your altar awaits. Everything you add here stays private on your device. Now go make some magic.',
+      tab: 'altar',
+      final: true,
+    },
+  ];
+
+  function goToStep(n) {
+    setStep(n);
+    if (onTabChange) onTabChange(steps[n].tab);
+  }
+
+  const s = steps[step];
+  const isLast = step === steps.length - 1;
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, zIndex: 400,
+      background: 'rgba(7,9,10,0.40)',
+      backdropFilter: 'blur(0.5px)',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'flex-end',
+      opacity: visible && !exiting ? 1 : 0,
+      transition: 'opacity 0.38s ease',
+      padding: '0 0 0 0',
+    }}>
+
+
+      {/* Card */}
+      <div style={{
+        width: '100%',
+        background: 'var(--bg-surface)',
+        borderTop: '1px solid var(--line-soft)',
+        borderRadius: '20px 20px 0 0',
+        padding: '28px 28px 40px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        gap: 16,
+        transform: visible && !exiting ? 'translateY(0)' : 'translateY(40px)',
+        transition: 'transform 0.38s cubic-bezier(0.22,1,0.36,1)',
+      }}>
+
+        {/* Drag handle */}
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--line-medium)', marginBottom: 4 }} />
+
+        {/* Icon */}
+        <div style={{
+          width: 72, height: 72, borderRadius: '50%',
+          background: s.iconBg,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: s.iconColor,
+        }}>
+          {React.cloneElement(s.icon, { size: 32 })}
+        </div>
+
+        {/* Text */}
+        <div style={{ textAlign: 'center', maxWidth: 300 }}>
+          <div style={{
+            fontFamily: 'var(--font-display)', fontSize: 22,
+            color: 'var(--fg-1)', marginBottom: 10, lineHeight: 1.15,
+          }}>
+            {s.title}
+          </div>
+          <div style={{
+            fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.6,
+          }}>
+            {s.body}
+          </div>
+        </div>
+
+        {/* Step dots */}
+        <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+          {steps.map((_, i) => (
+            <div key={i} style={{
+              width: i === step ? 18 : 6, height: 6,
+              borderRadius: 3,
+              background: i === step ? 'var(--amber)' : 'var(--line-medium)',
+              transition: 'width 0.25s ease, background 0.25s ease',
+            }} />
+          ))}
+        </div>
+
+        {/* Buttons */}
+        <div style={{ width: '100%', display: 'flex', gap: 10, marginTop: 4 }}>
+          {!isLast && (
+            <button onClick={dismiss} style={{
+              flex: 1, padding: '15px',
+              background: 'none',
+              border: '1px solid var(--line-medium)',
+              borderRadius: 14, color: 'var(--fg-2)',
+              fontFamily: 'var(--font-body)', fontWeight: 600,
+              fontSize: 15, letterSpacing: '0.03em', cursor: 'pointer',
+            }}>
+              Dismiss
+            </button>
+          )}
+          <button onClick={isLast ? dismiss : () => goToStep(step + 1)} style={{
+            flex: isLast ? undefined : 1,
+            width: isLast ? '100%' : undefined,
+            padding: '15px',
+            background: 'linear-gradient(135deg, #96A560 0%, #7d8c4e 100%)',
+            border: 'none', borderRadius: 14, color: '#FDFEEB',
+            fontFamily: 'var(--font-body)', fontWeight: 700,
+            fontSize: 15, letterSpacing: '0.03em', cursor: 'pointer',
+            boxShadow: '0 4px 18px rgba(244,175,89,0.18)',
+          }}>
+            {isLast ? 'Enter the Altar' : 'Next'}
+          </button>
+          {false && (
+            <button onClick={() => setStep(s => s - 1)} style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: 'var(--fg-3)', fontFamily: 'var(--font-body)',
+              fontSize: 13, padding: '6px 0', textAlign: 'center',
+            }}>
+              Back
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+window.Onboarding = Onboarding;
 
   </script>
 
@@ -6280,6 +6466,7 @@ function SplashScreen({ theme, onDone }) {
 function App({ theme, setTheme, isMobile }) {
   const [splashDone, setSplashDone] = React.useState(false);
   const [authScreen, setAuthScreen] = React.useState(null); // always start in app for demo
+  const [showOnboarding, setShowOnboarding] = React.useState(false);
 
   function handleLogOut() {
     setAuthScreen('login');
@@ -6790,6 +6977,7 @@ function App({ theme, setTheme, isMobile }) {
       onComplete={data => {
         if (data) setProfile(p => ({ ...p, name: data.name || p.name, deities: data.deities && data.deities.length ? data.deities : p.deities }));
         setAuthScreen(null);
+        setShowOnboarding(true);
       }}
       onBack={() => setAuthScreen('login')}
       hasFrame={!isMobile}
@@ -6830,6 +7018,11 @@ function App({ theme, setTheme, isMobile }) {
         onClose={() => setConfirmState(null)}
         invertedTheme={theme === 'dark' ? 'light' : 'dark'}
       />
+
+      {/* Onboarding overlay */}
+      {showOnboarding && (
+        <Onboarding name={profile.name} onDone={() => setShowOnboarding(false)} onTabChange={t => setTab(t)} />
+      )}
 
       {/* Drawer navigation */}
       <Drawer
