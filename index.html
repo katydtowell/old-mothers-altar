@@ -5644,6 +5644,7 @@ function App({ theme, setTheme, isMobile }) {
   const newWorkingSubmitRef  = React.useRef(null);
   const newEntrySubmitRef    = React.useRef(null);
   const cabinetFormSubmitRef = React.useRef(null);
+  const scrollRef            = React.useRef(null);
 
   // ── Persisted state ────────────────────────────────────────────────────────
   const [workings, setWorkings] = React.useState(() =>
@@ -5669,6 +5670,11 @@ function App({ theme, setTheme, isMobile }) {
   React.useEffect(() => { localStorage.setItem('oma_entries', JSON.stringify(entries)); }, [entries]);
   React.useEffect(() => { localStorage.setItem('oma_cabinet', JSON.stringify(cabinet)); }, [cabinet]);
   React.useEffect(() => { localStorage.setItem('oma_profile', JSON.stringify(profile)); }, [profile]);
+
+  // Reset scroll to top on every page/view change
+  React.useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [tab, openWorkingId, viewEntryId, composerOpen, cabinetFormOpen, entryOpen]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   function handleCreateWorking(w) {
@@ -6044,7 +6050,7 @@ function App({ theme, setTheme, isMobile }) {
       transition: 'background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out)',
     }}>
       {topBar}
-      <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
+      <div ref={scrollRef} style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
         {body}
         <div style={{
           padding: '28px 16px 22px',
