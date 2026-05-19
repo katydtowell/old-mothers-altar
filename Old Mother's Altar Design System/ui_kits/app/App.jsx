@@ -806,8 +806,6 @@ function SplashScreen({ theme, onDone }) {
 }
 
 function App({ theme, setTheme }) {
-  const [splashDone, setSplashDone] = React.useState(false);
-  const [isLoggedIn, setIsLoggedIn] = React.useState(true); // skip login after splash; only show login on logout
   const [tab, setTab]                     = React.useState('altar');
   const [openWorkingId, setOpenWorkingId] = React.useState(null);
   const [editWorkingId, setEditWorkingId] = React.useState(null);
@@ -1134,7 +1132,7 @@ function App({ theme, setTheme }) {
     body = (
       <Profile profile={profile} onUpdateProfile={handleUpdateProfile}
         workings={workings} entries={entries} cabinet={cabinet}
-        theme={theme} setTheme={setTheme} onLogOut={() => setIsLoggedIn(false)} />
+        theme={theme} setTheme={setTheme} onLogOut={() => window.OMA_ON_LOGOUT?.()} />
     );
   } else if (tab === 'help') {
     topBar = (
@@ -1142,13 +1140,6 @@ function App({ theme, setTheme }) {
         leading={homeBtn} trailing={rightBtns} />
     );
     body = <HelpScreen />;
-  }
-
-  if (!splashDone) {
-    return <SplashScreen theme={theme} onDone={() => setSplashDone(true)} />;
-  }
-  if (!isLoggedIn) {
-    return <LoginScreen theme={theme} onLogin={() => setIsLoggedIn(true)} />;
   }
 
   return (
@@ -1185,7 +1176,7 @@ function App({ theme, setTheme }) {
         onClose={() => setDrawerOpen(false)}
         activeTab={tab}
         onChangeTab={t => { setTab(t); setOpenWorkingId(null); setViewEntryId(null); }}
-        onLogOut={() => setIsLoggedIn(false)}
+        onLogOut={() => window.OMA_ON_LOGOUT?.()}
         theme={theme}
       />
     </div>

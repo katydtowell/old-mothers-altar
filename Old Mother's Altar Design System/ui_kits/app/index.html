@@ -78,26 +78,28 @@
   <script type="text/babel" src="Login.jsx"></script>
 
   <script type="text/babel">
-    // Breakpoint above which the iOS device frame is shown
-    const DESKTOP_BREAKPOINT = 600;
-
     function Root() {
       const [theme, setTheme] = React.useState('dark');
       // 'splash' → 'app' on first launch (login is skipped)
       // 'app' → 'login' on logout (then 'login' → 'app' on sign-in)
       const [screen, setScreen] = React.useState('splash');
-      const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
 
+      // Use matchMedia instead of window.innerWidth + resize so the JS breakpoint
+      // stays in perfect sync with CSS media queries — including DevTools device emulation.
+      const [isMobile, setIsMobile] = React.useState(
+        () => window.matchMedia('(max-width: 599px)').matches
+      );
       React.useEffect(() => {
-        function handleResize() { setWindowWidth(window.innerWidth); }
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        const mq = window.matchMedia('(max-width: 599px)');
+        function handler(e) { setIsMobile(e.matches); }
+        mq.addEventListener('change', handler);
+        return () => mq.removeEventListener('change', handler);
       }, []);
 
       // Logout shows the login screen instead of splash
       window.OMA_ON_LOGOUT = () => setScreen('login');
 
-      const isDesktop = windowWidth >= DESKTOP_BREAKPOINT;
+      const isDesktop = !isMobile;
 
       const content = (
         <>
