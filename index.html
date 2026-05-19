@@ -2210,6 +2210,8 @@ function TheBook({ entries, workings, onWrite, onOpenEntry }) {
   const [filters,    setFilters]    = React.useState({
     status: [], spell: [], type: [], cat: [],
   });
+  const [dateFrom, setDateFrom] = React.useState('');
+  const [dateTo,   setDateTo]   = React.useState('');
 
   const statusTone = { Pending: 'amber', Ongoing: 'pending', Active: 'pending', Completed: 'sealed' };
 
@@ -2232,7 +2234,7 @@ function TheBook({ entries, workings, onWrite, onOpenEntry }) {
     return [...new Set((workings || []).filter(w => ids.has(w.id)).flatMap(w => w.category || []))].sort();
   }, [entries, workings]);
 
-  const totalActive = Object.values(filters).reduce((n, a) => n + a.length, 0);
+  const totalActive = Object.values(filters).reduce((n, a) => n + a.length, 0) + ((dateFrom || dateTo) ? 1 : 0);
 
   // Moon cycle count since first entry (synodic months elapsed)
   const moonCycles = React.useMemo(() => {
@@ -2255,7 +2257,7 @@ function TheBook({ entries, workings, onWrite, onOpenEntry }) {
   }, []);
 
   function setFilter(key, val) { setFilters(prev => ({ ...prev, [key]: val })); }
-  function clearAll() { setFilters({ status: [], spell: [], type: [], cat: [] }); }
+  function clearAll() { setFilters({ status: [], spell: [], type: [], cat: [] }); setDateFrom(''); setDateTo(''); }
 
   function previewText(e) {
     if (e.notes && e.notes.length > 0) return e.notes[e.notes.length - 1].text;
@@ -2270,13 +2272,20 @@ function TheBook({ entries, workings, onWrite, onOpenEntry }) {
       if (filters.type.length && !filters.type.some(v => (w?.magicType || []).includes(v))) return false;
       if (filters.cat.length  && !filters.cat.some(v  => (w?.category  || []).includes(v))) return false;
     }
+    if (dateFrom || dateTo) {
+      const d = new Date(e.date || e.createdAt || e.ts);
+      if (isNaN(d)) return false;
+      const dayStr = d.toISOString().slice(0, 10);
+      if (dateFrom && dayStr < dateFrom) return false;
+      if (dateTo   && dayStr > dateTo)   return false;
+    }
     if (query) {
       const q = query.toLowerCase();
       const text = previewText(e).toLowerCase();
       if (!e.title?.toLowerCase().includes(q) && !text.includes(q) && !e.workingName?.toLowerCase().includes(q)) return false;
     }
     return true;
-  }), [entries, workings, filters, query]);
+  }), [entries, workings, filters, dateFrom, dateTo, query]);
 
   const sectionLabel = txt => (
     <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: '"New Kansas", var(--font-body)', fontWeight: 300, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -2355,6 +2364,30 @@ function TheBook({ entries, workings, onWrite, onOpenEntry }) {
                   value={filters.cat} onChange={v => setFilter('cat', v)} multi placeholder="Any category…" />
               </div>
             )}
+            <div>
+              {sectionLabel('DATE RANGE')}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+                  max={dateTo || undefined}
+                  style={{
+                    flex: 1, background: 'var(--bg-page)', border: '1px solid var(--line-medium)',
+                    borderRadius: 'var(--r-xs)', padding: '8px 10px',
+                    color: dateFrom ? 'var(--fg-1)' : 'var(--fg-3)',
+                    fontFamily: 'var(--font-body)', fontSize: 13, outline: 'none',
+                    colorScheme: 'dark',
+                  }} />
+                <span style={{ color: 'var(--fg-3)', fontSize: 12, flexShrink: 0 }}>to</span>
+                <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+                  min={dateFrom || undefined}
+                  style={{
+                    flex: 1, background: 'var(--bg-page)', border: '1px solid var(--line-medium)',
+                    borderRadius: 'var(--r-xs)', padding: '8px 10px',
+                    color: dateTo ? 'var(--fg-1)' : 'var(--fg-3)',
+                    fontFamily: 'var(--font-body)', fontSize: 13, outline: 'none',
+                    colorScheme: 'dark',
+                  }} />
+              </div>
+            </div>
             <div style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
               paddingTop: 8, borderTop: '1px solid var(--line-soft)',
@@ -3584,11 +3617,13 @@ function JournalEntry({ editId, onClose, onSave, onDelete, workings, entries, su
   const [time,        setTime]        = React.useState(defaultTime);
   const [status,      setStatus]      = React.useState('Pending');
   const [workingId,   setWorkingId]   = React.useState('');
-  const [noteText,    setNoteText]    = React.useState('');
-  const [notes,       setNotes]       = React.useState([]);
+  const [noteText,      setNoteText]      = React.useState('');
+  const [notes,         setNotes]         = React.useState([]);
+  const [editingNoteId,   setEditingNoteId]   = React.useState(null);
+  const [editingNoteText, setEditingNoteText] = React.useState('');
   const [result,      setResult]      = React.useState('');
   const [tasksDone,   setTasksDone]   = React.useState({});
-  const [imgSrc,      setImgSrc]      = React.useState(null);
+  const [images,      setImages]      = React.useState([]);
   const [spellError,  setSpellError]  = React.useState(false);
   const fileRef = React.useRef(null);
 
@@ -3604,7 +3639,7 @@ function JournalEntry({ editId, onClose, onSave, onDelete, workings, entries, su
         setNotes(e.notes ? e.notes.map(n => ({...n})) : []);
         setResult(e.result || '');
         setTasksDone(e.tasksDone ? {...e.tasksDone} : {});
-        setImgSrc(e.img || null);
+        setImages(e.images || (e.img ? [e.img] : []));
         setNoteText('');
       }
     }
@@ -3627,17 +3662,25 @@ function JournalEntry({ editId, onClose, onSave, onDelete, workings, entries, su
   }
 
   function removeNote(id) { setNotes(prev => prev.filter(n => n.id !== id)); }
+  function saveNoteEdit(id) {
+    const text = editingNoteText.trim();
+    if (!text) return;
+    setNotes(prev => prev.map(n => n.id === id ? { ...n, text } : n));
+    setEditingNoteId(null); setEditingNoteText('');
+  }
 
   function toggleTask(taskId) {
     setTasksDone(prev => ({ ...prev, [taskId]: !prev[taskId] }));
   }
 
   function onFileChange(e) {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = ev => setImgSrc(ev.target.result);
-    reader.readAsDataURL(f);
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    files.forEach(f => {
+      const reader = new FileReader();
+      reader.onload = ev => setImages(prev => [...prev, ev.target.result]);
+      reader.readAsDataURL(f);
+    });
     e.target.value = '';
   }
 
@@ -3663,7 +3706,8 @@ function JournalEntry({ editId, onClose, onSave, onDelete, workings, entries, su
       notes: allNotes,
       result: result.trim(),
       tasksDone: { ...tasksDone },
-      img: imgSrc,
+      images,
+      img: images[0] || null,
     });
     setNoteText('');
   }
@@ -3868,15 +3912,39 @@ function JournalEntry({ editId, onClose, onSave, onDelete, workings, entries, su
                     padding: '10px 12px', borderRadius: 'var(--r-xs)',
                     background: 'var(--bg-page)', border: '1px solid var(--line-soft)',
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                      <div style={{ flex: 1, color: 'var(--fg-1)', fontSize: 13, lineHeight: 1.55 }}>{n.text}</div>
-                      <button onClick={() => removeNote(n.id)} style={{
-                        background: 'none', border: 0, cursor: 'pointer', color: 'var(--fg-3)', padding: '2px 4px', flexShrink: 0,
-                      }}>{React.cloneElement(Ico.close, { size: 13 })}</button>
-                    </div>
-                    <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', marginTop: 5 }}>
-                      {fmtTs(n.ts)}
-                    </div>
+                    {editingNoteId === n.id ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <textarea
+                          autoFocus
+                          value={editingNoteText}
+                          onChange={e => setEditingNoteText(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Escape') { setEditingNoteId(null); setEditingNoteText(''); } }}
+                          rows={3}
+                          style={{ ...field, resize: 'none', lineHeight: 1.55, fontSize: 13 }}
+                        />
+                        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                          <Btn variant="ghost" size="sm" onClick={() => { setEditingNoteId(null); setEditingNoteText(''); }}>Cancel</Btn>
+                          <Btn variant="primary" size="sm" onClick={() => saveNoteEdit(n.id)}>Save</Btn>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                          <div style={{ flex: 1, color: 'var(--fg-1)', fontSize: 13, lineHeight: 1.55 }}>{n.text}</div>
+                          <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                            <button onClick={() => { setEditingNoteId(n.id); setEditingNoteText(n.text); }} style={{
+                              background: 'none', border: 0, cursor: 'pointer', color: 'var(--fg-3)', padding: '2px 4px',
+                            }}>{React.cloneElement(Ico.edit, { size: 13 })}</button>
+                            <button onClick={() => removeNote(n.id)} style={{
+                              background: 'none', border: 0, cursor: 'pointer', color: 'var(--fg-3)', padding: '2px 4px',
+                            }}>{React.cloneElement(Ico.close, { size: 13 })}</button>
+                          </div>
+                        </div>
+                        <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', marginTop: 5 }}>
+                          {fmtTs(n.ts)}
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
@@ -3902,30 +3970,34 @@ function JournalEntry({ editId, onClose, onSave, onDelete, workings, entries, su
             </label>
           )}
 
-          {/* Photo */}
+          {/* Photos */}
           <div>
-            <span className="oma-eyebrow" style={{ fontSize: 10, display: 'block', marginBottom: 8 }}>Photo (optional)</span>
-            {imgSrc ? (
-              <div style={{ position: 'relative' }}>
-                <img src={imgSrc} alt="" style={{
-                  width: '100%', maxHeight: 180, objectFit: 'cover',
-                  borderRadius: 'var(--r-md)', display: 'block', border: '1px solid var(--line-soft)',
-                }} />
-                <button onClick={() => setImgSrc(null)} style={{
-                  position: 'absolute', top: 6, right: 6, width: 24, height: 24, borderRadius: 50,
-                  background: 'rgba(0,0,0,0.55)', border: 0, cursor: 'pointer', color: 'var(--bone)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>{React.cloneElement(Ico.close, { size: 12 })}</button>
-              </div>
-            ) : (
-              <>
-                <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} style={{ display: 'none' }} />
-                <Btn variant="secondary" size="sm" icon={Ico.photo}
-                  onClick={() => fileRef.current && fileRef.current.click()}>
-                  Add Photo
-                </Btn>
-              </>
-            )}
+            <span className="oma-eyebrow" style={{ fontSize: 10, display: 'block', marginBottom: 8 }}>Photos (optional)</span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {images.map((src, i) => (
+                <div key={i} style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
+                  <img src={src} alt="" style={{
+                    width: 80, height: 80, objectFit: 'cover',
+                    borderRadius: 'var(--r-md)', border: '1px solid var(--line-soft)', display: 'block',
+                  }} />
+                  <button onClick={() => setImages(prev => prev.filter((_, j) => j !== i))} style={{
+                    position: 'absolute', top: 4, right: 4, width: 20, height: 20, borderRadius: 50,
+                    background: 'rgba(0,0,0,0.60)', border: 0, cursor: 'pointer', color: '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>{React.cloneElement(Ico.close, { size: 10 })}</button>
+                </div>
+              ))}
+              <button onClick={() => fileRef.current && fileRef.current.click()} style={{
+                width: 80, height: 80, borderRadius: 'var(--r-md)', flexShrink: 0,
+                border: '1.5px dashed var(--line-medium)', background: 'var(--bg-page)',
+                cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', gap: 5, color: 'var(--fg-3)',
+              }}>
+                {React.cloneElement(Ico.plus, { size: 18 })}
+                <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>ADD</span>
+              </button>
+            </div>
+            <input ref={fileRef} type="file" accept="image/*" multiple onChange={onFileChange} style={{ display: 'none' }} />
           </div>
 
           {/* Delete (edit mode only) */}
@@ -3995,13 +4067,22 @@ function EntryDetail({ entryId, entries, workings }) {
       {/* Body */}
       <div style={{ padding: '18px 18px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-        {/* Photo */}
-        {e.img && (
-          <img src={e.img} alt="" style={{
-            width: '100%', maxHeight: 220, objectFit: 'cover',
-            borderRadius: 'var(--r-md)', border: '1px solid var(--line-soft)', display: 'block',
-          }} />
-        )}
+        {/* Photos */}
+        {((e.images && e.images.length > 0) || e.img) && (() => {
+          const imgs = e.images && e.images.length > 0 ? e.images : [e.img];
+          return (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {imgs.map((src, i) => (
+                <img key={i} src={src} alt="" style={{
+                  width: imgs.length === 1 ? '100%' : 'calc(50% - 3px)',
+                  maxHeight: imgs.length === 1 ? 220 : 150,
+                  objectFit: 'cover',
+                  borderRadius: 'var(--r-md)', border: '1px solid var(--line-soft)', display: 'block',
+                }} />
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Legacy body fallback for old-format entries */}
         {(!e.notes || e.notes.length === 0) && e.body && (
