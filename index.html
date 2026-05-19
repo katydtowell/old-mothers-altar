@@ -5197,7 +5197,7 @@ function Login({ onSignIn, onCreateProfile }) {
             background: 'linear-gradient(135deg, #96A560 0%, #7d8c4e 100%)',
             border: 'none',
             borderRadius: 14,
-            color: '#FDFEEB',
+            color: '#2A1230',
             fontFamily: 'var(--font-body)',
             fontWeight: 700,
             fontSize: 15,
@@ -5396,7 +5396,7 @@ function CreateProfile({ onComplete, onBack, hasFrame }) {
         <button onClick={handleCreate} style={{
           marginTop: 4, width: '100%', padding: '15px',
           background: 'linear-gradient(135deg, #96A560 0%, #7d8c4e 100%)',
-          border: 'none', borderRadius: 14, color: '#FDFEEB',
+          border: 'none', borderRadius: 14, color: '#2A1230',
           fontFamily: 'var(--font-body)', fontWeight: 700,
           fontSize: 15, letterSpacing: '0.03em', cursor: 'pointer',
           boxShadow: '0 4px 18px rgba(244,175,89,0.22)',
@@ -5525,7 +5525,7 @@ function Onboarding({ name, onDone, onTabChange }) {
         background: 'var(--bg-surface)',
         borderTop: '1px solid var(--line-soft)',
         borderRadius: '20px 20px 0 0',
-        padding: '28px 28px 40px',
+        padding: '28px 20px 40px',
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         gap: 16,
         transform: visible && !exiting ? 'translateY(0)' : 'translateY(40px)',
@@ -5573,7 +5573,7 @@ function Onboarding({ name, onDone, onTabChange }) {
         </div>
 
         {/* Buttons */}
-        <div style={{ width: '100%', display: 'flex', gap: 10, marginTop: 4 }}>
+        <div style={{ width: '100%', display: 'flex', gap: 10, marginTop: 4, padding: '0 4px' }}>
           {!isLast && (
             <button onClick={dismiss} style={{
               flex: 1, padding: '15px',
@@ -5591,7 +5591,7 @@ function Onboarding({ name, onDone, onTabChange }) {
             width: isLast ? '100%' : undefined,
             padding: '15px',
             background: 'linear-gradient(135deg, #96A560 0%, #7d8c4e 100%)',
-            border: 'none', borderRadius: 14, color: '#FDFEEB',
+            border: 'none', borderRadius: 14, color: '#2A1230',
             fontFamily: 'var(--font-body)', fontWeight: 700,
             fontSize: 15, letterSpacing: '0.03em', cursor: 'pointer',
             boxShadow: '0 4px 18px rgba(244,175,89,0.18)',
