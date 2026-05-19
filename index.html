@@ -2035,9 +2035,14 @@ window.Workings = Workings;
   <script type="text/babel">
 // WorkingDetail.jsx — single working with cast history, ingredients
 
-function WorkingDetail({ working, onBack, onCast, onDelete, onEdit, onToggleFavorite }) {
+function WorkingDetail({ working, onBack, onCast, onDelete, onEdit, onToggleFavorite, entries = [], onOpenEntry }) {
   if (!working) return null;
-  const { name, summary, ingredients, casts, color, icon, tags, moonPhase } = working;
+  const { name, summary, ingredients, color, icon, tags, moonPhase } = working;
+
+  // Journal entries linked to this spell, sorted oldest→newest
+  const spellEntries = entries
+    .filter(e => e.workingId === working.id)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -2086,7 +2091,7 @@ function WorkingDetail({ working, onBack, onCast, onDelete, onEdit, onToggleFavo
           <MoonGlyph phase={moonPhase} size={14} color="var(--fg-2)" />
           <span>BEST UNDER {moonPhase.replace('-', ' ').toUpperCase()}</span>
           <span>·</span>
-          <span>{casts.length} CAST</span>
+          <span>{spellEntries.length} CAST</span>
           {working.duration && working.duration.val && (
             <>
               <span>·</span>
@@ -2148,27 +2153,64 @@ function WorkingDetail({ working, onBack, onCast, onDelete, onEdit, onToggleFavo
         </div>
       )}
 
-      {/* cast history */}
+      {/* words spoken */}
+      {working.chant && (
+        <div style={{ padding: '0 18px 8px' }}>
+          <span className="oma-eyebrow">Words Spoken</span>
+          <div style={{
+            marginTop: 10, padding: '14px 16px',
+            background: 'var(--bg-surface)', border: '1px solid var(--line-soft)',
+            borderRadius: 'var(--r-lg)',
+            color: 'var(--fg-2)', fontSize: 14, lineHeight: 1.65,
+            fontStyle: 'italic', whiteSpace: 'pre-wrap',
+          }}>
+            {working.chant}
+          </div>
+        </div>
+      )}
+
+      {/* cast history — journal entries linked to this spell */}
       <div style={{ padding: '14px 18px 18px' }}>
         <span className="oma-eyebrow">Cast history</span>
-        <div style={{ marginTop: 12, position: 'relative', paddingLeft: 12 }}>
-          {/* vertical line */}
-          <div style={{ position: 'absolute', left: 4, top: 6, bottom: 6, width: 1, background: 'var(--line-medium)' }} />
-          {casts.map((c, i) => (
-            <div key={c.id} style={{ position: 'relative', paddingLeft: 18, paddingBottom: i === casts.length - 1 ? 0 : 18 }}>
-              <div style={{
-                position: 'absolute', left: -2, top: 4, width: 11, height: 11,
-                borderRadius: 50, background: c.outcome === 'sealed' ? 'var(--success)' : c.outcome === 'broken' ? 'var(--crimson-300)' : 'var(--ember)',
-                boxShadow: '0 0 0 3px var(--bg-page)',
-              }} />
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
-                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 600, color: 'var(--fg-1)', fontSize: 14 }}>{c.title}</span>
-                <span style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)' }}>{c.date}</span>
+        {spellEntries.length === 0 ? (
+          <div style={{ marginTop: 10, color: 'var(--fg-3)', fontSize: 13, fontStyle: 'italic' }}>
+            No journal entries yet for this spell.
+          </div>
+        ) : (
+          <div style={{ marginTop: 12, position: 'relative', paddingLeft: 12 }}>
+            {/* vertical line */}
+            <div style={{ position: 'absolute', left: 4, top: 6, bottom: 6, width: 1, background: 'var(--line-medium)' }} />
+            {spellEntries.map((entry, i) => (
+              <div
+                key={entry.id}
+                onClick={() => onOpenEntry?.(entry.id)}
+                style={{
+                  position: 'relative', paddingLeft: 18,
+                  paddingBottom: i === spellEntries.length - 1 ? 0 : 18,
+                  cursor: onOpenEntry ? 'pointer' : 'default',
+                }}
+                onMouseEnter={onOpenEntry ? e => e.currentTarget.style.opacity = '0.75' : undefined}
+                onMouseLeave={onOpenEntry ? e => e.currentTarget.style.opacity = '1' : undefined}
+              >
+                <div style={{
+                  position: 'absolute', left: -2, top: 4, width: 11, height: 11,
+                  borderRadius: 50,
+                  background: entry.kind === 'cast' ? 'var(--ember)' : entry.status === 'Completed' ? 'var(--success)' : 'var(--fg-3)',
+                  boxShadow: '0 0 0 3px var(--bg-page)',
+                }} />
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+                  <span style={{ fontFamily: 'var(--font-body)', fontWeight: 600, color: 'var(--fg-1)', fontSize: 14 }}>{entry.title}</span>
+                  <span style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', flexShrink: 0 }}>{entry.date}</span>
+                </div>
+                {entry.notes && entry.notes[0] && (
+                  <div style={{ color: 'var(--fg-2)', fontSize: 12, marginTop: 4, lineHeight: 1.5 }}>
+                    {entry.notes[0].text.length > 110 ? entry.notes[0].text.slice(0, 110) + '…' : entry.notes[0].text}
+                  </div>
+                )}
               </div>
-              {c.note && <div style={{ color: 'var(--fg-2)', fontSize: 12, marginTop: 4, lineHeight: 1.5 }}>{c.note}</div>}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* footer cta */}
@@ -3441,7 +3483,7 @@ function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [], profi
       {/* ── Spellwork ── */}
       <NWSection title="Spellwork">
         <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span className="oma-eyebrow" style={{ fontSize: 10 }}>Chant or Meditation</span>
+          <span className="oma-eyebrow" style={{ fontSize: 10 }}>Words Spoken</span>
           <textarea value={chant} onChange={e => setChant(e.target.value)}
             rows={4} autoComplete="off" placeholder="Words to speak or hold in mind…"
             style={{ ...field, resize: 'none', lineHeight: 1.55 }} />
@@ -5576,7 +5618,7 @@ function LoginScreen({ theme, onLogin }) {
           padding: '14px 0', width: '100%', cursor: 'pointer',
           fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 15,
           letterSpacing: 'var(--tk-button)',
-        }}>Enter the Altar</button>
+        }}>Log In</button>
       </form>
       <style>{`
         @keyframes oma-shake {
@@ -6038,25 +6080,9 @@ function App({ theme, setTheme, isMobile }) {
       </BottomBar>
     );
 
-  } else if (openWorking) {
-    // ── Spell detail ──
-    topBar = (
-      <TopBar title={openWorking.name} eyebrow="SPELL"
-        leading={<IconBtn icon={Ico.back} onClick={() => setOpenWorkingId(null)} label="Back" />}
-        trailing={rightBtns} />
-    );
-    body = (
-      <WorkingDetail working={openWorking}
-        onBack={() => setOpenWorkingId(null)}
-        onCast={() => openEntryForm(null)}
-        onDelete={() => handleDeleteWorking(openWorking.id)}
-        onEdit={() => openComposer(openWorking.id)}
-        onToggleFavorite={() => handleToggleFavorite(openWorking.id)} />
-    );
-    // WorkingDetail has its own sticky footer
-
   } else if (viewEntry) {
-    // ── Entry detail (read-only) ──
+    // ── Entry detail (read-only) — checked before openWorking so navigating from
+    //    a spell's cast history to an entry preserves the spell in the back stack ──
     topBar = (
       <TopBar title={viewEntry.title} eyebrow="JOURNAL ENTRY"
         leading={<IconBtn icon={Ico.back} onClick={() => setViewEntryId(null)} label="Back" />}
@@ -6076,6 +6102,25 @@ function App({ theme, setTheme, isMobile }) {
         </Btn>
       </BottomBar>
     );
+
+  } else if (openWorking) {
+    // ── Spell detail ──
+    topBar = (
+      <TopBar title={openWorking.name} eyebrow="SPELL"
+        leading={<IconBtn icon={Ico.back} onClick={() => setOpenWorkingId(null)} label="Back" />}
+        trailing={rightBtns} />
+    );
+    body = (
+      <WorkingDetail working={openWorking}
+        entries={entries}
+        onOpenEntry={id => setViewEntryId(id)}
+        onBack={() => setOpenWorkingId(null)}
+        onCast={() => openEntryForm(null)}
+        onDelete={() => handleDeleteWorking(openWorking.id)}
+        onEdit={() => openComposer(openWorking.id)}
+        onToggleFavorite={() => handleToggleFavorite(openWorking.id)} />
+    );
+    // WorkingDetail has its own sticky footer
 
   } else if (tab === 'altar') {
     const logoSrc = theme === 'dark' ? window.OMA_LOGO_WHITE : window.OMA_LOGO_PRIMARY;
