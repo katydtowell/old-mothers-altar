@@ -5479,15 +5479,15 @@ function HelpScreen() {
         },
         {
           q: 'What goes in a spell?',
-          a: 'Each spell holds a title, a short intention, magic type (e.g. protection, divination, abundance), categories, a status, the moon phase it was written under, a list of ingredients or materials, and any written notes or instructions.',
-        },
-        {
-          q: 'What do the spell statuses mean?',
-          a: 'Active — ready to cast. Ongoing — a spell you return to repeatedly (e.g. a monthly ritual). Completed — finished and closed. Sealed — complete and marked as sacred record, not to be changed.',
+          a: 'Each spell holds a title, a short intention, magic type (e.g. protection, divination, abundance), categories, a status, a rating, the ideal timing for casting it, a list of supplies or materials required, a list of tasks for completion if needed, and any spoken words.',
         },
         {
           q: 'What is the author filter?',
           a: 'If multiple people share a practice, each spell can be attributed to an author. The author filter lets you view spells by a specific person.',
+        },
+        {
+          q: 'Can tasks repeat on a schedule?',
+          a: 'Yes. When creating or editing a spell, each task has an optional "Repeats every" field. Set a number and a unit (minutes, hours, days, weeks, months, or years) and the task will resurface on Home each time that interval comes due after a casting. The available units are automatically limited to increments shorter than the spell\'s duration. The repeat cadence appears in small text next to each task on the spell page and on journal entry read-only views.',
         },
       ],
     },
@@ -5505,8 +5505,8 @@ function HelpScreen() {
           a: 'Tap "Write an Entry" from the Journal page, the Home screen, or the detail view of any spell. You\'ll be asked to link the entry to a spell from your Grimoire, then fill in the date, ideal timing (such as moon phase), notes, and any observations.',
         },
         {
-          q: 'What does "completed" mean on a journal entry?',
-          a: 'A completed entry marks that casting as finished — the spell was performed and the record is closed. You can still read it, but it\'s flagged as done. The Journal intro card counts how many of your entries are completed.',
+          q: 'What do journal statuses mean?',
+          a: 'Pending — an in-progress casting. Ongoing — a spell you return to repeatedly (e.g. a monthly ritual). Completed — finished and closed. Once a journal casting is completed, you won\'t see any more progress report or task reminders.',
         },
       ],
     },
@@ -5541,6 +5541,14 @@ function HelpScreen() {
         {
           q: 'What are the astrological events?',
           a: 'The "Today\'s Events" card lists significant celestial moments — moon sign ingresses, planetary aspects, and lunar quarters. These are calculated for the current date.',
+        },
+        {
+          q: 'What is the Progress Report?',
+          a: 'When you cast a spell that has a set duration, a Progress Report card appears on Home once that duration has elapsed — an amber-tinted prompt to check in on how the working went. It shows the journal entry title and which spell it came from. Tap it to go directly to that entry, or dismiss it with the × button. One reminder shows at a time, in the order they came due. Entries marked Completed never produce a reminder.',
+        },
+        {
+          q: 'What are repeating tasks?',
+          a: 'Any task in a spell can have a repeat cadence — for example, every 1 day or every 2 weeks. Once that spell is cast in a journal entry, the task reappears on your Home To Do list at each interval. Completing it for one cycle resets it for the next rather than removing it permanently. The cadence is shown inline on both the spell page and the journal entry.',
         },
         {
           q: 'How do I navigate to other parts of the app?',
@@ -6000,12 +6008,33 @@ function App({ theme, setTheme, isMobile }) {
   }, []);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
+  // Auto-add any spell ingredients not already in the cabinet (case-insensitive match).
+  // New items land under type "other" with no quantity — user can edit later.
+  function syncIngredientsToCabinet(ingredients) {
+    if (!ingredients || ingredients.length === 0) return;
+    setCabinet(prev => {
+      const existing = new Set(prev.map(c => c.name.toLowerCase().trim()));
+      const newItems = ingredients
+        .filter(ing => ing.name && ing.name.trim() && !existing.has(ing.name.toLowerCase().trim()))
+        .map(ing => ({
+          id: Date.now().toString() + Math.random().toString(36).slice(2, 7),
+          name: ing.name.trim(),
+          type: 'other',
+          inv: null,
+          note: '',
+        }));
+      return newItems.length > 0 ? [...newItems, ...prev] : prev;
+    });
+  }
+
   function handleCreateWorking(w) {
     setWorkings(prev => [hydrateWorking(w), ...prev]);
+    syncIngredientsToCabinet(w.ingredients);
     setComposerOpen(false); setEditWorkingId(null);
   }
   function handleSaveWorking(w) {
     setWorkings(prev => prev.map(x => x.id === w.id ? hydrateWorking(w) : x));
+    syncIngredientsToCabinet(w.ingredients);
     setComposerOpen(false); setEditWorkingId(null);
   }
   function handleDeleteWorking(id) { setWorkings(prev => prev.filter(w => w.id !== id)); setOpenWorkingId(null); }
