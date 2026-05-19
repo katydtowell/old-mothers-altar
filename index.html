@@ -2502,7 +2502,7 @@ function typeLabel(type) {
 }
 
 // ── Item Form (bottom sheet) ────────────────────────────────────────────────
-function CabinetForm({ open, item, onClose, onSave, onDelete }) {
+function CabinetForm({ item, onSave, onDelete, submitRef }) {
   const [name,      setName]      = React.useState('');
   const [type,      setType]      = React.useState('herb');
   const [color,     setColor]     = React.useState('');
@@ -2511,19 +2511,15 @@ function CabinetForm({ open, item, onClose, onSave, onDelete }) {
   const [note,      setNote]      = React.useState('');
 
   React.useEffect(() => {
-    if (open) {
-      setName(item?.name || '');
-      setType(item?.type || 'herb');
-      const c = item?.color || '';
-      const isPreset = RITUAL_COLORS.some(rc => rc.name === c);
-      setColor(c);
-      setColorMode(c && !isPreset ? 'custom' : 'preset');
-      setInv(item?.inv != null ? String(item.inv) : '');
-      setNote(item?.note || '');
-    }
-  }, [open, item]);
-
-  if (!open) return null;
+    setName(item?.name || '');
+    setType(item?.type || 'herb');
+    const c = item?.color || '';
+    const isPreset = RITUAL_COLORS.some(rc => rc.name === c);
+    setColor(c);
+    setColorMode(c && !isPreset ? 'custom' : 'preset');
+    setInv(item?.inv != null ? String(item.inv) : '');
+    setNote(item?.note || '');
+  }, []);
 
   const field = {
     background: 'var(--bg-page)', border: '1px solid var(--line-medium)',
@@ -2542,40 +2538,12 @@ function CabinetForm({ open, item, onClose, onSave, onDelete }) {
       inv: inv !== '' ? parseInt(inv) : null,
       note: note.trim(),
     });
-    onClose();
   }
 
-  return (
-    <div style={{
-      position: 'absolute', inset: 0, zIndex: 100,
-      background: 'var(--bg-overlay)',
-      display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-      animation: 'omaFadeIn 220ms var(--ease-out)',
-    }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{
-        background: 'var(--bg-surface)',
-        borderTopLeftRadius: 'var(--r-2xl)', borderTopRightRadius: 'var(--r-2xl)',
-        borderTop: '1px solid var(--line-medium)',
-        padding: '14px 18px 30px',
-        boxShadow: 'var(--shadow-3)',
-        animation: 'omaSheetUp 320ms var(--ease-candle)',
-        maxHeight: '88%', overflowY: 'auto',
-        display: 'flex', flexDirection: 'column', gap: 16,
-      }}>
-        {/* Grabber */}
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--line-medium)' }} />
-        </div>
+  if (submitRef) submitRef.current = handleSave;
 
-        {/* Header */}
-        <div>
-          <div className="oma-eyebrow">The Cabinet</div>
-          <div style={{
-            fontFamily: '"Ohno Blazeface 24", var(--font-display)', fontStyle: 'normal',
-            fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.02em',
-            fontSize: 26, color: 'var(--fg-1)', marginTop: 4,
-          }}>{item ? 'Edit Item' : 'Add to Cabinet'}</div>
-        </div>
+  return (
+    <div style={{ padding: '14px 18px 22px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* Type chips */}
         <div>
@@ -2665,34 +2633,23 @@ function CabinetForm({ open, item, onClose, onSave, onDelete }) {
             placeholder="e.g. dried, fresh, color, size…" style={{ ...field }} />
         </label>
 
-        {/* Footer */}
-        <div style={{ display: 'flex', gap: 8, flexDirection: 'column' }}>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Btn variant="secondary" size="lg" style={{ flex: '0 0 auto' }} onClick={onClose}>Cancel</Btn>
-            <Btn variant="primary" size="lg" icon={Ico.check} fullWidth onClick={handleSave}>
-              {item ? 'Save Changes' : 'Add to Cabinet'}
-            </Btn>
-          </div>
-          {item && (
-            <Btn variant="ghost" size="sm" fullWidth onClick={() => {
-              if (window.confirm(`Remove "${item.name}" from the cabinet?`)) { onDelete(item.id); onClose(); }
-            }} style={{ color: 'var(--crimson-300)', fontSize: 12 }}>
-              Remove from cabinet
-            </Btn>
-          )}
-        </div>
-      </div>
+        {/* Delete — edit only */}
+        {item && (
+          <Btn variant="ghost" size="sm" fullWidth onClick={() => {
+            if (window.confirm(`Remove "${item.name}" from the cabinet?`)) { onDelete(item.id); }
+          }} style={{ color: 'var(--crimson-300)', fontSize: 12 }}>
+            Remove from cabinet
+          </Btn>
+        )}
     </div>
   );
 }
 
 // ── Cabinet main view ───────────────────────────────────────────────────────
-function Cabinet({ cabinet, onSave, onDelete, addRef }) {
+function Cabinet({ cabinet, onAdd, onEditItem }) {
   const [search,     setSearch]    = React.useState('');
   const [typeFilter, setTypeFilter] = React.useState([]);
   const [filterOpen, setFilterOpen] = React.useState(false);
-  const [formOpen,   setFormOpen]  = React.useState(false);
-  const [editItem,   setEditItem]  = React.useState(null);
   const filterRef = React.useRef(null);
 
   const field = {
@@ -2728,11 +2685,6 @@ function Cabinet({ cabinet, onSave, onDelete, addRef }) {
     if (!grouped[c.type]) grouped[c.type] = [];
     grouped[c.type].push(c);
   });
-
-  function openAdd() { setEditItem(null); setFormOpen(true); }
-  function openEdit(item) { setEditItem(item); setFormOpen(true); }
-
-  if (addRef) addRef.current = openAdd;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
@@ -2820,7 +2772,7 @@ function Cabinet({ cabinet, onSave, onDelete, addRef }) {
               {cabinet.length === 0 ? 'Add your ritual supplies and ingredients.' : 'Try a different search or filter.'}
             </div>
             {cabinet.length === 0 && (
-              <Btn variant="primary" size="md" icon={Ico.plus} onClick={openAdd}>Add an Item</Btn>
+              <Btn variant="primary" size="md" icon={Ico.plus} onClick={onAdd}>Add an Item</Btn>
             )}
           </div>
         ) : (
@@ -2831,7 +2783,7 @@ function Cabinet({ cabinet, onSave, onDelete, addRef }) {
               </div>
               <div style={{ borderRadius: 'var(--r-lg)', border: '1px solid var(--line-soft)', overflow: 'hidden', background: 'var(--bg-surface)' }}>
                 {items.map((item, i) => (
-                  <button key={item.id} onClick={() => openEdit(item)} style={{
+                  <button key={item.id} onClick={() => onEditItem(item)} style={{
                     width: '100%', background: 'none', border: 0, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', gap: 12,
                     padding: '12px 14px',
@@ -2866,9 +2818,6 @@ function Cabinet({ cabinet, onSave, onDelete, addRef }) {
         )}
       </div>
 
-      <CabinetForm open={formOpen} item={editItem}
-        onClose={() => { setFormOpen(false); setEditItem(null); }}
-        onSave={onSave} onDelete={onDelete} />
     </div>
   );
 }
@@ -5461,14 +5410,17 @@ function App({ theme, setTheme, isMobile }) {
   const [viewEntryId, setViewEntryId]     = React.useState(null);
   const [composerOpen, setComposerOpen]   = React.useState(false);
   const [composerKey, setComposerKey]     = React.useState(0);
-  const [entryOpen, setEntryOpen]         = React.useState(false);
-  const [entryKey, setEntryKey]           = React.useState(0);
-  const [editEntryId, setEditEntryId]     = React.useState(null);
-  const [drawerOpen, setDrawerOpen]       = React.useState(false);
+  const [entryOpen, setEntryOpen]               = React.useState(false);
+  const [entryKey, setEntryKey]                 = React.useState(0);
+  const [editEntryId, setEditEntryId]           = React.useState(null);
+  const [cabinetFormOpen, setCabinetFormOpen]   = React.useState(false);
+  const [cabinetFormKey, setCabinetFormKey]     = React.useState(0);
+  const [editCabinetItem, setEditCabinetItem]   = React.useState(null);
+  const [drawerOpen, setDrawerOpen]             = React.useState(false);
 
-  const newWorkingSubmitRef = React.useRef(null);
-  const newEntrySubmitRef   = React.useRef(null);
-  const cabinetAddRef       = React.useRef(null);
+  const newWorkingSubmitRef  = React.useRef(null);
+  const newEntrySubmitRef    = React.useRef(null);
+  const cabinetFormSubmitRef = React.useRef(null);
 
   // ── Persisted state ────────────────────────────────────────────────────────
   const [workings, setWorkings] = React.useState(() =>
@@ -5529,6 +5481,11 @@ function App({ theme, setTheme, isMobile }) {
     setEditEntryId(editId);
     setEntryKey(k => k + 1);
     setEntryOpen(true);
+  }
+  function openCabinetForm(item = null) {
+    setEditCabinetItem(item);
+    setCabinetFormKey(k => k + 1);
+    setCabinetFormOpen(true);
   }
 
   function handleSaveCabinetItem(item) {
@@ -5638,6 +5595,36 @@ function App({ theme, setTheme, isMobile }) {
       </BottomBar>
     );
 
+  } else if (cabinetFormOpen) {
+    // ── New / Edit Cabinet Item — full page ──
+    const isEditItem = !!editCabinetItem;
+    topBar = (
+      <TopBar title={isEditItem ? 'Edit Item' : 'Add to Cabinet'} eyebrow="THE CABINET"
+        leading={<IconBtn icon={Ico.back} onClick={() => { setCabinetFormOpen(false); setEditCabinetItem(null); }} label="Back" />}
+        trailing={rightBtns} />
+    );
+    body = (
+      <CabinetForm
+        key={cabinetFormKey}
+        item={editCabinetItem}
+        onSave={item => { handleSaveCabinetItem(item); setCabinetFormOpen(false); setEditCabinetItem(null); }}
+        onDelete={id => { handleDeleteCabinetItem(id); setCabinetFormOpen(false); setEditCabinetItem(null); }}
+        submitRef={cabinetFormSubmitRef}
+      />
+    );
+    bottomBar = (
+      <BottomBar>
+        <Btn variant="secondary" size="lg" style={{ flex: '0 0 auto' }}
+          onClick={() => { setCabinetFormOpen(false); setEditCabinetItem(null); }}>
+          Cancel
+        </Btn>
+        <Btn variant="primary" size="lg" icon={Ico.check} fullWidth
+          onClick={() => cabinetFormSubmitRef.current?.()}>
+          {isEditItem ? 'Save Changes' : 'Save Item'}
+        </Btn>
+      </BottomBar>
+    );
+
   } else if (entryOpen) {
     // ── New / Edit Journal Entry — full page ──
     const isEditEntry = !!editEntryId;
@@ -5663,7 +5650,7 @@ function App({ theme, setTheme, isMobile }) {
           onClick={() => { setEntryOpen(false); setEditEntryId(null); }}>
           Cancel
         </Btn>
-        <Btn variant="primary" size="lg" icon={Ico.feather} fullWidth
+        <Btn variant="primary" size="lg" icon={Ico.penTool} fullWidth
           onClick={() => newEntrySubmitRef.current?.()}>
           Save Entry
         </Btn>
@@ -5765,10 +5752,10 @@ function App({ theme, setTheme, isMobile }) {
       <TopBar title="The Cabinet" eyebrow="YOUR STORES"
         leading={homeBtn} trailing={rightBtns} />
     );
-    body = <Cabinet cabinet={cabinet} onSave={handleSaveCabinetItem} onDelete={handleDeleteCabinetItem} addRef={cabinetAddRef} />;
+    body = <Cabinet cabinet={cabinet} onAdd={() => openCabinetForm()} onEditItem={item => openCabinetForm(item)} />;
     bottomBar = (
       <BottomBar>
-        <Btn variant="primary" size="md" icon={Ico.plus} fullWidth onClick={() => cabinetAddRef.current?.()}>
+        <Btn variant="primary" size="md" icon={Ico.plus} fullWidth onClick={() => openCabinetForm()}>
           Add to Cabinet
         </Btn>
       </BottomBar>
@@ -5832,7 +5819,14 @@ function App({ theme, setTheme, isMobile }) {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         activeTab={tab}
-        onChangeTab={t => { setTab(t); setOpenWorkingId(null); setViewEntryId(null); }}
+        onChangeTab={t => {
+          setTab(t);
+          setOpenWorkingId(null);
+          setViewEntryId(null);
+          setComposerOpen(false); setEditWorkingId(null);
+          setEntryOpen(false);    setEditEntryId(null);
+          setCabinetFormOpen(false); setEditCabinetItem(null);
+        }}
         onLogOut={() => setIsLoggedIn(false)}
         theme={theme}
       />
