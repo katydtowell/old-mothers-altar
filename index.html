@@ -2927,7 +2927,7 @@ function NWSection({ title, children }) {
   );
 }
 
-function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [] }) {
+function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [], profileDeities = [] }) {
   const [name,         setName]        = React.useState('');
   const [summary,      setSummary]     = React.useState('');
   const [authorSelf,   setAuthorSelf]  = React.useState(true);
@@ -2944,6 +2944,7 @@ function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [] }) {
   const [chant,        setChant]       = React.useState('');
   const [deityInput,   setDeityInput]  = React.useState('');
   const [deities,      setDeities]     = React.useState([]);
+  const [deityDropOpen, setDeityDropOpen] = React.useState(false);
   const [ingName,      setIngName]     = React.useState('');
   const [ingAmt,       setIngAmt]      = React.useState('');
   const [ingNote,      setIngNote]     = React.useState('');
@@ -3280,10 +3281,67 @@ function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [] }) {
             </div>
           )}
           <div style={{ display: 'flex', gap: 8 }}>
-            <input value={deityInput} onChange={e => setDeityInput(e.target.value)} autoComplete="off"
-              placeholder="Add a deity…" style={{ ...field, flex: 1 }}
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addDeity(); } }} />
-            <Btn variant="secondary" size="sm" onClick={addDeity}>Add</Btn>
+            <div style={{ flex: 1, position: 'relative' }}>
+              <input value={deityInput}
+                onChange={e => {
+                  const val = e.target.value;
+                  setDeityInput(val);
+                  const q = val.trim().toLowerCase();
+                  if (q.length > 0 && profileDeities.length > 0) {
+                    const matches = profileDeities.filter(d => d.toLowerCase().includes(q) && !deities.includes(d));
+                    setDeityDropOpen(matches.length > 0);
+                  } else if (q.length === 0 && profileDeities.length > 0) {
+                    const matches = profileDeities.filter(d => !deities.includes(d));
+                    setDeityDropOpen(matches.length > 0);
+                  } else {
+                    setDeityDropOpen(false);
+                  }
+                }}
+                autoComplete="off"
+                placeholder="Add a deity…"
+                style={{ ...field, width: '100%' }}
+                onFocus={() => {
+                  if (profileDeities.length > 0) {
+                    const q = deityInput.trim().toLowerCase();
+                    const matches = profileDeities.filter(d => (q.length === 0 || d.toLowerCase().includes(q)) && !deities.includes(d));
+                    setDeityDropOpen(matches.length > 0);
+                  }
+                }}
+                onBlur={() => setTimeout(() => setDeityDropOpen(false), 150)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { e.preventDefault(); setDeityDropOpen(false); addDeity(); }
+                  if (e.key === 'Escape') setDeityDropOpen(false);
+                }}
+              />
+              {deityDropOpen && (() => {
+                const q = deityInput.trim().toLowerCase();
+                const matches = profileDeities.filter(d => (q.length === 0 || d.toLowerCase().includes(q)) && !deities.includes(d));
+                return matches.length > 0 ? (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                    background: 'var(--bg-elevated)', border: '1px solid var(--line-medium)',
+                    borderRadius: 'var(--r-xs)', marginTop: 2,
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.35)', overflow: 'hidden',
+                  }}>
+                    {matches.map(d => (
+                      <button key={d}
+                        onMouseDown={e => { e.preventDefault(); setDeities([...deities, d]); setDeityInput(''); setDeityDropOpen(false); }}
+                        style={{
+                          display: 'block', width: '100%', padding: '9px 12px',
+                          background: 'none', border: 0,
+                          borderBottom: '1px solid var(--line-soft)',
+                          cursor: 'pointer', textAlign: 'left',
+                          color: 'var(--fg-1)', fontFamily: 'var(--font-body)', fontSize: 13,
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-elevated)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                      >{d}</button>
+                    ))}
+                  </div>
+                ) : null;
+              })()}
+            </div>
+            <Btn variant="secondary" size="sm" onClick={() => { setDeityDropOpen(false); addDeity(); }}>Add</Btn>
           </div>
         </div>
       </NWSection>
@@ -3626,16 +3684,16 @@ function JournalEntry({ editId, onClose, onSave, onDelete, workings, entries, su
           </div>
 
           {/* Date + Time */}
-          <div style={{ display: 'flex', gap: 10 }}>
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+          <div style={{ display: 'flex', gap: 10, minWidth: 0 }}>
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 0 }}>
               <span className="oma-eyebrow" style={{ fontSize: 10 }}>Date</span>
               <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                style={{ ...field, colorScheme: 'dark' }} />
+                style={{ ...field, colorScheme: 'dark', minWidth: 0 }} />
             </label>
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 0 }}>
               <span className="oma-eyebrow" style={{ fontSize: 10 }}>Time</span>
               <input type="time" value={time} onChange={e => setTime(e.target.value)}
-                style={{ ...field, colorScheme: 'dark' }} />
+                style={{ ...field, colorScheme: 'dark', minWidth: 0 }} />
             </label>
           </div>
 
@@ -5557,6 +5615,7 @@ function App({ theme, setTheme, isMobile }) {
         onSave={handleSaveWorking}
         submitRef={newWorkingSubmitRef}
         cabinet={cabinet}
+        profileDeities={profile.deities || []}
       />
     );
     bottomBar = (
