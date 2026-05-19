@@ -443,6 +443,14 @@
     65%      { transform: scaleY(0.97) scaleX(1.03) translateX(-0.5px); opacity: 0.85; }
   }
   ::-webkit-scrollbar { width: 0; height: 0; }
+  /* On mobile: fill the screen, no centering or background needed */
+  @media (max-width: 599px) {
+    html, body { height: 100%; overflow: hidden; }
+    body { padding: 0; background: none; display: block; }
+    #root { width: 100%; height: 100%; }
+    /* Zero out the IOSDevice-specific inset on mobile */
+    :root { --bottom-inset: env(safe-area-inset-bottom, 0px); }
+  }
 </style>
 </head>
 <body>
@@ -5379,7 +5387,7 @@ function SplashScreen({ theme, onDone }) {
   );
 }
 
-function App({ theme, setTheme }) {
+function App({ theme, setTheme, isMobile }) {
   const [splashDone, setSplashDone] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(true); // skip login after splash; only show login on logout
   const [tab, setTab]                     = React.useState('altar');
@@ -5732,7 +5740,7 @@ function App({ theme, setTheme }) {
       fontFamily: 'var(--font-body)',
       display: 'flex', flexDirection: 'column',
       position: 'relative', overflow: 'hidden',
-      paddingTop: 62, boxSizing: 'border-box',
+      paddingTop: isMobile ? 0 : 62, boxSizing: 'border-box',
       transition: 'background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out)',
     }}>
       {topBar}
@@ -5774,9 +5782,23 @@ window.getMagicalEvents = getMagicalEvents;
   <script type="text/babel">
     function Root() {
       const [theme, setTheme] = React.useState('dark');
+
+      // matchMedia keeps JS in sync with CSS media queries — works correctly
+      // in DevTools device emulation and on real mobile devices.
+      const [isMobile, setIsMobile] = React.useState(
+        () => window.matchMedia('(max-width: 599px)').matches
+      );
       const [scale, setScale] = React.useState(
         () => Math.min(1, (window.innerHeight - 40) / 874)
       );
+
+      React.useEffect(() => {
+        const mq = window.matchMedia('(max-width: 599px)');
+        function onMQ(e) { setIsMobile(e.matches); }
+        mq.addEventListener('change', onMQ);
+        return () => mq.removeEventListener('change', onMQ);
+      }, []);
+
       React.useEffect(() => {
         function onResize() {
           setScale(Math.min(1, (window.innerHeight - 40) / 874));
@@ -5784,6 +5806,23 @@ window.getMagicalEvents = getMagicalEvents;
         window.addEventListener('resize', onResize);
         return () => window.removeEventListener('resize', onResize);
       }, []);
+
+      // Mobile: fill the screen with no device frame
+      if (isMobile) {
+        return (
+          <div data-theme={theme} style={{
+            position: 'fixed', inset: 0,
+            width: '100vw', height: '100dvh',
+            background: 'var(--bg-page)',
+            display: 'flex', flexDirection: 'column',
+            overflow: 'hidden',
+          }}>
+            <App theme={theme} setTheme={setTheme} isMobile={true} />
+          </div>
+        );
+      }
+
+      // Desktop: show inside the iOS device frame, scaled to fit the window
       const scaledH = Math.round(874 * scale);
       const scaledW = Math.round(402 * scale);
       return (
