@@ -1571,7 +1571,7 @@ function Altar({ data, onOpenWorking, onCompose, onNewEntry, onOpenEntry, onGoTo
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ color: 'var(--fg-1)', fontSize: 13, fontWeight: 500, lineHeight: 1.3 }}>{task.taskText}</div>
                   <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', marginTop: 3, letterSpacing: '0.04em' }}>
-                    {task.spellName}
+                    {task.entryTitle}
                   </div>
                 </div>
                 {React.cloneElement(Ico.chevron, { size: 14, style: { color: 'var(--fg-3)', flexShrink: 0 } })}
