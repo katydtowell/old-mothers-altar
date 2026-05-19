@@ -48,19 +48,40 @@
 
   <script type="text/babel" src="ios-frame.jsx"></script>
   <script type="text/babel" src="components.jsx"></script>
+  <script type="text/babel" src="illustrations.jsx"></script>
   <script type="text/babel" src="Altar.jsx"></script>
   <script type="text/babel" src="Workings.jsx"></script>
   <script type="text/babel" src="WorkingDetail.jsx"></script>
   <script type="text/babel" src="TheBook.jsx"></script>
   <script type="text/babel" src="NewWorking.jsx"></script>
+  <script type="text/babel" src="Cabinet.jsx"></script>
+  <script type="text/babel" src="Profile.jsx"></script>
+  <script type="text/babel" src="NewEntry.jsx"></script>
   <script type="text/babel" src="App.jsx"></script>
+  <script type="text/babel" src="Splash.jsx"></script>
+  <script type="text/babel" src="Login.jsx"></script>
 
   <script type="text/babel">
     function Root() {
       const [theme, setTheme] = React.useState('dark');
+      // 'splash' → 'app' on first launch (login is skipped)
+      // 'app' → 'login' on logout (then 'login' → 'app' on sign-in)
+      const [screen, setScreen] = React.useState('splash');
+
+      // Logout shows the login screen instead of splash
+      window.OMA_ON_LOGOUT = () => setScreen('login');
+
       return (
         <IOSDevice width={402} height={874} dark={theme === 'dark'}>
-          <App theme={theme} setTheme={setTheme} />
+          {screen === 'splash' && (
+            <Splash onDone={() => setScreen('app')} />
+          )}
+          {screen === 'login' && (
+            <Login onSignIn={() => setScreen('app')} />
+          )}
+          {screen === 'app' && (
+            <App theme={theme} setTheme={setTheme} />
+          )}
         </IOSDevice>
       );
     }

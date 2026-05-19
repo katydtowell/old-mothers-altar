@@ -297,7 +297,7 @@
   --action-ghost-fg:       var(--ink-100);
 
   /* amber chrome accent — light-mode tuned (deeper amber for legibility on bone) */
-  --chrome-active-bg:      rgba(201, 135, 54, 0.16);
+  --chrome-active-bg:      rgba(244, 175, 89, 0.16);
   --chrome-active-fg:      var(--olive);
   --chrome-active-line:    var(--olive);
 
@@ -968,7 +968,7 @@ function Badge({ tone = 'pending', dot = true, children, style }) {
     pending: { bg: 'var(--action-secondary-bg)', fg: 'var(--fg-2)',   dot: 'var(--fg-2)' },   // ~8.9:1 ✓
     sealed:  { bg: 'rgba(0,194,138,0.14)',        fg: 'var(--success)', dot: 'var(--success)' }, // ~6.6:1 ✓
     burning: { bg: 'rgba(243,83,33,0.18)',        fg: 'var(--saffron)', dot: 'var(--ember)' },   // saffron ~6.8:1 ✓; dot stays ember
-    moss:    { bg: 'rgba(150,165,96,0.22)',       fg: 'var(--moss)',   dot: 'var(--moss)' },    // moss ~4.7:1 ✓ (was --olive: 2.8:1 ✗)
+    moss:    { bg: 'rgba(244,175,89,0.22)',       fg: 'var(--moss)',   dot: 'var(--moss)' },    // moss ~4.7:1 ✓ (was --olive: 2.8:1 ✗)
     plum:    { bg: 'rgba(118,72,131,0.26)',       fg: 'var(--fg-1)',   dot: 'var(--plum)' },    // bone ~15:1 ✓ (was --plum: 2.1:1 ✗)
     amber:   { bg: 'rgba(244,175,89,0.18)',       fg: 'var(--amber)',  dot: 'var(--amber)' },   // amber ~6.9:1 ✓ (was --olive: 2.8:1 ✗)
     indigo:  { bg: 'rgba(45,78,166,0.26)',        fg: 'var(--fg-1)',   dot: 'var(--indigo-300)' }, // bone ~15:1 ✓ (was --indigo-500: 2.0:1 ✗)
@@ -1034,9 +1034,9 @@ function TopBar({ title, leading, trailing, eyebrow }) {
 function TabBar({ active, onChange }) {
   const tabs = [
     { id: 'altar',    label: 'Home',     icon: Ico.altar },
-    { id: 'workings', label: 'Grimoire', icon: Ico.sparkle },
-    { id: 'book',     label: 'Journal',  icon: Ico.book },
-    { id: 'cabinet',  label: 'Cabinet',  icon: Ico.cabinet },
+    { id: 'workings', label: 'The Grimoire', icon: Ico.sparkle },
+    { id: 'book',     label: 'Journal',     icon: Ico.book },
+    { id: 'cabinet',  label: 'Cabinet',     icon: Ico.cabinet },
     { id: 'profile',  label: 'Settings', icon: Ico.settings },
   ];
   return (
@@ -1089,7 +1089,7 @@ function BottomBar({ children, style }) {
 function Drawer({ open, onClose, activeTab, onChangeTab, onLogOut, theme }) {
   const tabs = [
     { id: 'altar',    label: 'Home',        icon: Ico.altar   },
-    { id: 'workings', label: 'Grimoire',     icon: Ico.sparkle },
+    { id: 'workings', label: 'The Grimoire',  icon: Ico.sparkle },
     { id: 'book',     label: 'The Journal',  icon: Ico.book    },
     { id: 'cabinet',  label: 'The Cabinet',  icon: Ico.cabinet },
     { id: 'profile',  label: 'Settings',     icon: Ico.settings },
@@ -2054,7 +2054,7 @@ function WorkingDetail({ working, onBack, onCast, onDelete, onEdit, onToggleFavo
             }}>
               <div style={{
                 width: 26, height: 26, borderRadius: 50,
-                background: 'rgba(150,165,96,0.18)', color: 'var(--moss)',
+                background: 'rgba(244,175,89,0.18)', color: 'var(--moss)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>{React.cloneElement(Ico.leaf, { size: 14 })}</div>
               <div style={{ flex: 1 }}>
@@ -3015,7 +3015,7 @@ function NewWorking({ editData, onCreate, onSave, submitRef, cabinet = [] }) {
       sealed: editData ? editData.sealed : false,
       castCount: editData ? (editData.castCount || 0) : 0,
       tags: [...category.slice(0, 2), ...magicType.slice(0, 1)],
-      color: editData?.color || '#96A560',
+      color: editData?.color || '#F4AF59',
       iconKey: ik,
       moonPhase: moonPhase || 'full',
       season, tod, dow, timingCustom,
@@ -3882,11 +3882,12 @@ window.EntryDetail = EntryDetail;
 // Profile.jsx — profile, preferences, and settings
 
 function Profile({ profile, onUpdateProfile, workings, entries, cabinet, theme, setTheme, onLogOut }) {
-  const [editingName, setEditingName] = React.useState(false);
-  const [nameVal,     setNameVal]     = React.useState(profile.name || '');
-  const [editingNote, setEditingNote] = React.useState(false);
-  const [noteVal,     setNoteVal]     = React.useState(profile.practiceNote || '');
-  const [newDeity,    setNewDeity]    = React.useState('');
+  const [editingName,  setEditingName]  = React.useState(false);
+  const [nameVal,      setNameVal]      = React.useState(profile.name || '');
+  const [editingNote,  setEditingNote]  = React.useState(false);
+  const [noteVal,      setNoteVal]      = React.useState(profile.practiceNote || '');
+  const [newDeity,     setNewDeity]     = React.useState('');
+  const [privacyLock,  setPrivacyLock]  = React.useState(false);
 
   function saveName() {
     onUpdateProfile({ ...profile, name: nameVal.trim() || 'Witch' });
@@ -4088,6 +4089,7 @@ function Profile({ profile, onUpdateProfile, workings, entries, cabinet, theme, 
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '13px 14px',
+            borderBottom: '1px solid var(--line-soft)',
           }}>
             <div>
               <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>APPEARANCE</div>
@@ -4096,6 +4098,51 @@ function Profile({ profile, onUpdateProfile, workings, entries, cabinet, theme, 
               </div>
             </div>
             <ThemeToggle theme={theme} onChange={setTheme} />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Privacy ── */}
+      <div>
+        <div className="oma-eyebrow" style={{ marginBottom: 10 }}>Privacy</div>
+        <div style={{ borderRadius: 'var(--r-lg)', border: '1px solid var(--line-soft)', overflow: 'hidden', background: 'var(--bg-surface)' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '13px 14px',
+          }}>
+            <div style={{ flex: 1, paddingRight: 12 }}>
+              <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>LOCK ON BACKGROUND</div>
+              <div style={{ color: 'var(--fg-1)', fontSize: 14, fontWeight: 600, marginTop: 3 }}>Require login on re-entry</div>
+              <div style={{ color: 'var(--fg-3)', fontSize: 12, marginTop: 4, lineHeight: 1.45 }}>
+                When enabled, leaving the app requires you to log in again before your grimoire is accessible.
+              </div>
+            </div>
+            {/* Toggle */}
+            <button
+              onClick={() => setPrivacyLock(p => !p)}
+              aria-pressed={privacyLock}
+              style={{
+                flexShrink: 0,
+                width: 44, height: 26,
+                borderRadius: 13,
+                background: privacyLock ? 'var(--amber)' : 'var(--line-medium)',
+                border: 'none',
+                cursor: 'pointer',
+                position: 'relative',
+                transition: 'background 0.2s',
+                padding: 0,
+              }}
+            >
+              <span style={{
+                position: 'absolute',
+                top: 3, left: privacyLock ? 21 : 3,
+                width: 20, height: 20,
+                borderRadius: '50%',
+                background: '#fff',
+                transition: 'left 0.2s',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+              }} />
+            </button>
           </div>
         </div>
       </div>
@@ -4370,7 +4417,7 @@ function Login({ onSignIn }) {
   function inputStyle(name) {
     return {
       ...baseInput,
-      borderColor: focused === name ? 'rgba(150,165,96,0.55)' : 'rgba(253,254,235,0.12)',
+      borderColor: focused === name ? 'rgba(244,175,89,0.55)' : 'rgba(253,254,235,0.12)',
       background: focused === name ? 'rgba(253,254,235,0.07)' : 'rgba(253,254,235,0.05)',
     };
   }
@@ -4466,7 +4513,7 @@ function Login({ onSignIn }) {
           fontSize: 15,
           letterSpacing: '0.03em',
           cursor: 'pointer',
-          boxShadow: '0 4px 18px rgba(150,165,96,0.22)',
+          boxShadow: '0 4px 18px rgba(244,175,89,0.22)',
           transition: 'opacity 0.15s',
         }}
         onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
@@ -4776,7 +4823,7 @@ const DEFAULT_CABINET = [
   { id: 'cab7', name: 'Pyrite Chunk', type: 'crystal', inv: 1, note: '' },
 ];
 
-const DEFAULT_PROFILE = { name: 'Annie', practiceNote: '', deities: ['Hecate', 'Lilith'] };
+const DEFAULT_PROFILE = { name: 'Zola', practiceNote: '', deities: ['Hecate', 'Lilith'] };
 
 // ── localStorage helpers ──────────────────────────────────────────────────────
 function loadLS(key, fallback) {
@@ -5613,7 +5660,7 @@ function App({ theme, setTheme }) {
 
   } else if (tab === 'workings') {
     topBar = (
-      <TopBar title="Grimoire" eyebrow="YOUR SPELLS"
+      <TopBar title="The Grimoire" eyebrow="YOUR SPELLS"
         leading={homeBtn} trailing={rightBtns} />
     );
     body = <Workings workings={workings} onOpenWorking={setOpenWorkingId} onCompose={() => openComposer()} onToggleFavorite={handleToggleFavorite} />;
@@ -5627,7 +5674,7 @@ function App({ theme, setTheme }) {
 
   } else if (tab === 'book') {
     topBar = (
-      <TopBar title="Journal" eyebrow="YOUR PRACTICE"
+      <TopBar title="The Journal" eyebrow="YOUR PRACTICE"
         leading={homeBtn} trailing={rightBtns} />
     );
     body = <TheBook entries={entries} workings={workings} onWrite={() => openEntryForm()} onOpenEntry={id => setViewEntryId(id)} />;

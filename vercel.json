@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/design-brief", "destination": "/Design Brief.html" }
+  ]
+}

@@ -27,7 +27,7 @@ outputs HTML artifacts *or* production code, depending on the need.
 
 ## The single sentence
 
-> A dark altar surface with art-nouveau display serif, warmed sparingly by
+> A deep eggplant altar surface with art-nouveau display serif, warmed sparingly by
 > Aquarian-Tarot ember/saffron/moss. Terse, archaic, attentive. No emoji,
 > no exclamation marks, no streaks or gamification.
 
@@ -40,7 +40,9 @@ outputs HTML artifacts *or* production code, depending on the need.
   own journal entries. Sentence case for sentences, ALL CAPS for labels with
   `0.18em` tracking.
 - DO use roman numerals for chapter / count marks (III, VII, XVII).
-- DO keep the altar dark — `var(--bg-page)` is `#0E0F0E`.
+- DO keep the altar dark — `var(--bg-page)` is `#100B18`.
+- DO always edit source files in `Old Mother's Altar Design System/` — that
+  folder is the single source of truth for all tokens, components, and assets.
 
 - DON'T use emoji. Ever.
 - DON'T add gradients to page backgrounds. The page is a flat field.

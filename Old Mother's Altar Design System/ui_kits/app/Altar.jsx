@@ -1,26 +1,38 @@
 // Altar.jsx — home / today view
 
-function Altar({ data, onOpenWorking, onCompose }) {
-  const { activeCast, recentWorkings, moonPhase, moonLabel, monthRoman } = data;
+function Altar({ data, onOpenWorking, onCompose, onNewEntry, onOpenEntry, onGoToJournal }) {
+  const { moonPhase, moonLabel, monthRoman, recentEntries, totalEntries, pendingTasks, magicalEvents, timeOfDay, userName } = data;
+  const [showAllTasks, setShowAllTasks] = React.useState(false);
+
+  const statusTone = { Pending: 'amber', Ongoing: 'pending', Active: 'pending', Completed: 'sealed' };
+
+  // Get first note text for preview
+  function firstNote(e) {
+    if (e.notes && e.notes.length > 0) return e.notes[0].text;
+    return e.body || '';
+  }
 
   return (
     <div style={{ padding: '14px 16px 22px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* greeting */}
+
+      {/* ── Greeting ── */}
       <div>
-        <div className="oma-eyebrow">Evensong · 9:41</div>
+        <div className="oma-eyebrow">
+          {timeOfDay} · {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+        </div>
         <div style={{
-          fontFamily: '"Ohno Blazeface 48", var(--font-display)', fontStyle: 'normal', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.02em',
+          fontFamily: '"Ohno Blazeface 48", var(--font-display)', fontStyle: 'normal', fontWeight: 400,
+          textTransform: 'uppercase', letterSpacing: '-0.01em',
           fontSize: 36, lineHeight: 1.0, color: 'var(--fg-1)', marginTop: 4,
-          letterSpacing: '-0.01em',
-        }}>Welcome Back<span style={{ color: 'var(--fg-3)' }}>,</span></div>
+        }}>Welcome back<span style={{ color: 'var(--fg-3)' }}>,</span></div>
         <div style={{
-          fontFamily: '"Ohno Blazeface 48", var(--font-display)', fontStyle: 'normal', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.02em',
+          fontFamily: '"Ohno Blazeface 48", var(--font-display)', fontStyle: 'normal', fontWeight: 400,
+          textTransform: 'uppercase', letterSpacing: '-0.01em',
           fontSize: 36, lineHeight: 1.0, color: 'var(--amber)',
-          letterSpacing: '-0.01em',
-        }}>Margaux.</div>
+        }}>{userName}.</div>
       </div>
 
-      {/* the moon */}
+      {/* ── The Moon ── */}
       <Card padding={18} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <div style={{
           width: 56, height: 56, borderRadius: 50,
@@ -31,95 +43,150 @@ function Altar({ data, onOpenWorking, onCompose }) {
           <MoonGlyph phase={moonPhase} size={36} color="var(--fg-1)" />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="oma-eyebrow" style={{ fontSize: 10 }}>The {monthRoman} moon</div>
+          <div className="oma-eyebrow" style={{ fontSize: 10 }}>Today's Events</div>
           <div style={{
-            fontFamily: '"Ohno Blazeface 24", var(--font-display)', fontStyle: 'normal', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.02em',
+            fontFamily: '"Ohno Blazeface 24", var(--font-display)', fontStyle: 'normal', fontWeight: 400,
+            textTransform: 'uppercase', letterSpacing: '0.02em',
             fontSize: 20, color: 'var(--fg-1)', marginTop: 2,
           }}>{moonLabel}</div>
           <div style={{ color: 'var(--fg-2)', fontSize: 12, marginTop: 2 }}>
-            Wanes through Friday. Good for releasing, less for binding.
+            {['full','waxing-gibbous','waxing-crescent','first-quarter','new'].includes(moonPhase)
+              ? 'Good for growth, attraction, and binding.'
+              : 'Good for releasing, banishing, and clearing.'}
           </div>
         </div>
       </Card>
 
-      {/* active cast */}
-      {activeCast && (
-        <Card glow="ember" padding={0} style={{ overflow: 'hidden' }}>
-          <div style={{
-            padding: '16px 18px 14px',
-            display: 'flex', alignItems: 'center', gap: 14,
-            background: 'linear-gradient(180deg, rgba(243,83,33,0.10), transparent 70%)',
-          }}>
-            <div style={{
-              width: 54, height: 64, position: 'relative',
-              display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
-            }}>
-              <div style={{ position: 'absolute', top: -6 }}><Flame size={30} /></div>
-              <div style={{
-                width: 12, height: 38, borderRadius: 2,
-                background: 'linear-gradient(180deg, var(--wax-1) 0%, var(--wax-2) 100%)',
-                boxShadow: '0 0 0 1px var(--wax-outline), 0 0 14px rgba(243,83,33,0.35)',
-              }} />
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <Badge tone="burning">Burning · 22m</Badge>
-              <div style={{
-                fontFamily: '"Ohno Blazeface 24", var(--font-display)', fontStyle: 'normal', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.02em',
-                fontSize: 22, color: 'var(--fg-1)', marginTop: 6, lineHeight: 1.05,
-              }}>{activeCast.name}</div>
-              <div style={{ color: 'var(--fg-2)', fontSize: 12, marginTop: 4 }}>
-                Lit at {activeCast.lit}. About II hours remain.
+      {/* ── Magical Events (Today) ── */}
+      {magicalEvents && magicalEvents.length > 0 && (
+        <div>
+          <div className="oma-eyebrow" style={{ marginBottom: 8 }}>Today</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {magicalEvents.map((ev, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '10px 14px',
+                borderRadius: 'var(--r-md)',
+                border: '1px solid var(--line-soft)',
+                background: 'var(--bg-surface)',
+              }}>
+                {ev.glyph ? (
+                  <MoonGlyph phase={ev.glyph} size={18} color="var(--amber)" />
+                ) : (
+                  <span style={{ fontSize: 16 }}>✦</span>
+                )}
+                <span style={{ color: 'var(--fg-1)', fontSize: 14, fontWeight: 500 }}>{ev.name}</span>
               </div>
-            </div>
+            ))}
           </div>
-          <div style={{
-            padding: '10px 14px',
-            display: 'flex', gap: 8, justifyContent: 'flex-end',
-            borderTop: '1px solid var(--line-soft)',
-          }}>
-            <Btn variant="ghost" size="sm">Add a Note</Btn>
-            <Btn variant="ember" size="sm">Tend the Flame</Btn>
-          </div>
-        </Card>
+        </div>
       )}
 
-      {/* recent workings */}
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <span className="oma-eyebrow">Recent workings</span>
-          <span style={{ color: 'var(--fg-2)', fontSize: 12 }}>{recentWorkings.length} in the book</span>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {recentWorkings.map(w => (
-            <Card key={w.id} onClick={() => onOpenWorking(w.id)} padding={14} style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-            }}>
-              <div style={{
-                width: 38, height: 38, borderRadius: 'var(--r-md)',
-                background: w.color + '22',
-                color: w.color,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-              }}>{React.cloneElement(w.icon, { size: 18 })}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
+      {/* ── Pending Tasks ── */}
+      {pendingTasks && pendingTasks.length > 0 && (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <span className="oma-eyebrow">To Do</span>
+            <span style={{ color: 'var(--fg-2)', fontSize: 12 }}>{pendingTasks.length} remaining</span>
+          </div>
+          <div style={{
+            borderRadius: 'var(--r-lg)', overflow: 'hidden',
+            border: '1px solid var(--line-soft)', background: 'var(--bg-surface)',
+          }}>
+            {(showAllTasks ? pendingTasks : pendingTasks.slice(0, 3)).map((task, i) => (
+              <button key={task.taskId + task.entryId} onClick={() => onOpenEntry && onOpenEntry(task.entryId)}
+                style={{
+                  width: '100%', background: 'none', border: 0, cursor: 'pointer', textAlign: 'left',
+                  display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
+                  borderTop: i === 0 ? 0 : '1px solid var(--line-soft)',
+                }}>
                 <div style={{
-                  fontFamily: 'var(--font-body)', fontWeight: 600,
-                  fontSize: 14, color: 'var(--fg-1)',
-                }}>{w.name}</div>
-                <div style={{ color: 'var(--fg-3)', fontSize: 11, marginTop: 2, fontFamily: 'var(--font-mono)' }}>
-                  LAST CAST · {w.lastCast}
+                  width: 18, height: 18, borderRadius: 4, flexShrink: 0,
+                  border: '1.5px solid var(--line-medium)', background: 'transparent',
+                }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: 'var(--fg-1)', fontSize: 13, fontWeight: 500, lineHeight: 1.3 }}>{task.taskText}</div>
+                  <div style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)', marginTop: 3, letterSpacing: '0.04em' }}>
+                    {task.spellName}
+                  </div>
                 </div>
-              </div>
-              <Badge tone={w.tone}>{w.castCount} · CAST</Badge>
-            </Card>
-          ))}
+                {React.cloneElement(Ico.chevron, { size: 14, style: { color: 'var(--fg-3)', flexShrink: 0 } })}
+              </button>
+            ))}
+            {pendingTasks.length > 3 && (
+              <button onClick={() => setShowAllTasks(v => !v)} style={{
+                width: '100%', background: 'none', border: 0, cursor: 'pointer', textAlign: 'center',
+                padding: '10px 14px', borderTop: '1px solid var(--line-soft)',
+                color: 'var(--fg-3)', fontSize: 12, fontFamily: 'var(--font-body)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}>
+                {showAllTasks
+                  ? <>Show less {React.cloneElement(Ico.chevron, { size: 12, style: { transform: 'rotate(180deg)' } })}</>
+                  : <>{pendingTasks.length - 3} more {React.cloneElement(Ico.chevron, { size: 12 })}</>
+                }
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* compose CTA */}
-      <Btn variant="primary" size="lg" icon={Ico.plus} fullWidth onClick={onCompose}>
-        Begin a Working
-      </Btn>
+      {/* ── Recent Entries ── */}
+      {recentEntries && recentEntries.length > 0 && (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <span className="oma-eyebrow">Recent Entries</span>
+          </div>
+          <div style={{
+            borderRadius: 'var(--r-lg)', overflow: 'hidden',
+            border: '1px solid var(--line-soft)', background: 'var(--bg-surface)',
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {recentEntries.slice(0, 3).map((e, i) => (
+                <div key={e.id} style={{ borderTop: i === 0 ? 0 : '1px solid var(--line-soft)' }}>
+                  <Card padding={14} onClick={() => onOpenEntry && onOpenEntry(e.id)} style={{ borderRadius: 0, border: 0, background: 'none' }}>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                      <div style={{ flexShrink: 0, textAlign: 'center', paddingTop: 2, width: 30 }}>
+                        <div style={{
+                          fontFamily: '"Ohno Blazeface 24", var(--font-display)', fontStyle: 'normal',
+                          fontWeight: 400, textTransform: 'uppercase',
+                          fontSize: 18, color: 'var(--amber)', lineHeight: 1,
+                        }}>{e.romanDay}</div>
+                        <div style={{ color: 'var(--fg-3)', fontSize: 9, fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', marginTop: 3 }}>{e.month}</div>
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', marginBottom: 5 }}>
+                          {e.status && <Badge tone={statusTone[e.status] || 'pending'} dot={false}>{e.status}</Badge>}
+                          <span style={{ color: 'var(--fg-3)', fontSize: 10, fontFamily: 'var(--font-mono)' }}>{e.time}</span>
+                        </div>
+                        <div style={{
+                          fontFamily: '"Ohno Blazeface 18", var(--font-display)', fontStyle: 'normal',
+                          fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.02em',
+                          fontSize: 14, lineHeight: 1.1, color: 'var(--fg-1)',
+                        }}>{e.title}</div>
+                        <div style={{
+                          color: 'var(--fg-2)', fontSize: 12, lineHeight: 1.5, marginTop: 4,
+                          overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                        }}>{firstNote(e)}</div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              ))}
+            </div>
+            {(totalEntries > 3) && (
+              <button onClick={() => onGoToJournal && onGoToJournal()} style={{
+                width: '100%', background: 'none', border: 0, cursor: 'pointer', textAlign: 'center',
+                padding: '10px 14px', borderTop: '1px solid var(--line-soft)',
+                color: 'var(--fg-3)', fontSize: 12, fontFamily: 'var(--font-body)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}>
+                {totalEntries - 3} more {React.cloneElement(Ico.chevron, { size: 12 })}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

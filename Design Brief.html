@@ -278,16 +278,21 @@
     }
 
     .persona-avatar {
-      width: 60px;
-      height: 60px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
       background: var(--bg-surface-2);
       border: 1px solid var(--line-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
+      overflow: hidden;
       margin-bottom: 16px;
+      flex-shrink: 0;
+    }
+
+    .persona-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .persona-name {
@@ -553,12 +558,121 @@
       line-height: 1.5;
     }
 
+    /* ── Swatch grid ────────────────────────────────────────────────── */
+    .swatch-group { margin-bottom: 36px; }
+
+    .swatch-group-label {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--fg-3);
+      margin-bottom: 14px;
+    }
+
+    .swatch-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .swatch { flex: 0 0 auto; width: 128px; }
+
+    .swatch-color {
+      height: 68px;
+      border-radius: 8px;
+      border: 1px solid var(--line-soft);
+      margin-bottom: 10px;
+    }
+
+    .swatch-name { font-size: 12px; font-weight: 600; color: var(--fg-1); margin-bottom: 2px; }
+    .swatch-hex  { font-size: 11px; color: var(--fg-3); font-family: 'Courier New', monospace; margin-bottom: 3px; letter-spacing: 0.04em; }
+    .swatch-use  { font-size: 11px; color: var(--fg-3); line-height: 1.4; }
+
+    .swatch-badge {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(150,165,96,0.14);
+      color: var(--moss);
+      border: 1px solid rgba(150,165,96,0.30);
+      margin-top: 5px;
+    }
+
+    /* ── Palette strip ───────────────────────────────────────────────── */
+    .palette-strip {
+      display: flex;
+      height: 44px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 16px 0 8px;
+      border: 1px solid var(--line-soft);
+    }
+
+    .palette-strip-swatch { flex: 1; }
+
+    /* ── Type specimens ──────────────────────────────────────────────── */
+    .type-specimen {
+      background: var(--bg-surface);
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 28px 32px;
+      margin-bottom: 16px;
+    }
+
+    .type-label {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--fg-3);
+      margin-bottom: 22px;
+    }
+
+    /* ── Design principle cards ──────────────────────────────────────── */
+    .principle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .principle {
+      background: var(--bg-surface);
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      padding: 20px 22px;
+    }
+
+    .principle-num {
+      font-family: 'Ohno Blazeface 24', 'Ohno Blazeface', Georgia, serif;
+      font-size: 18px;
+      color: var(--moss);
+      text-transform: uppercase;
+      letter-spacing: 0.015em;
+      margin-bottom: 8px;
+    }
+
+    .principle-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--fg-1);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .principle p { font-size: 13px; line-height: 1.65; max-width: 100%; margin: 0; }
+
     /* ── Responsive ─────────────────────────────────────────────────── */
     @media (max-width: 760px) {
       aside { display: none; }
       main { margin-left: 0; padding: 28px 20px 60px; }
       .persona { grid-template-columns: 1fr; }
-      .card-grid, .spec-grid, .stat-row { grid-template-columns: 1fr; }
+      .card-grid, .spec-grid, .stat-row, .principle-grid { grid-template-columns: 1fr; }
+      .swatch-row { gap: 8px; }
+      .swatch { width: 100px; }
       h1 { font-size: 36px; }
       h2 { font-size: 24px; }
     }
@@ -588,6 +702,9 @@
     <div class="nav-item" onclick="show('p4',this)">
       <span class="nav-num">IV</span> UX Flow
     </div>
+    <div class="nav-item" onclick="show('p5',this)">
+      <span class="nav-num">V</span> Moodboard
+    </div>
   </aside>
 
   <!-- ── Main ── -->
@@ -599,11 +716,15 @@
     <div class="page active" id="p1">
 
       <div class="page-header">
-        <div class="eyebrow">Design Brief · Section I of IV</div>
+        <div class="eyebrow">Design Brief · Section I of V</div>
         <h1>Problem Statement</h1>
-        <p>Old Mother's Altar is a private, ritual-minded mobile app for practitioners of witchcraft and folk magic — a spell journal and tracker that takes the work as seriously as the practitioner does.</p>
-        <p>This brief establishes the design foundation: what the app must accomplish, who it serves, how it compares to existing tools, and how users move through it.</p>
       </div>
+
+      <h2>Summary</h2>
+      <p>Old Mother's Altar is a private, ritual-minded mobile app for practitioners of witchcraft and folk magic — a spell journal and tracker that takes the work as seriously as the practitioner does.</p>
+      <p>This brief establishes the design foundation: what the app must accomplish, who it serves, how it compares to existing tools, and how users move through it.</p>
+
+      <div class="divider"></div>
 
       <h2>The Problem</h2>
       <p>Serious practitioners have no purpose-built, private tool for their working life. Generic notes apps lack ritual structure. Existing "witch apps" skew toward reference libraries, wellness aesthetics, or social features. None treat the practitioner's own record as the primary object.</p>
@@ -615,7 +736,7 @@
 
       <ul class="brief-list" style="margin-bottom: 32px;">
         <li><strong>Serve as a private, secure, offline-first spell journal.</strong> All data lives on the device. No account required. No cloud sync. Biometric lock available. Notifications use discreet wording. The practitioner's record is theirs alone — including those in the broom closet.</li>
-        <li><strong>Enable creation of spells with full ritual metadata.</strong> Each spell should capture intent, ingredients with amounts and notes, timing affinity (moon phase, day, season, time of day), chant or spoken words, deities invoked, duration, and a sealed/draft state — not just a title and text block.</li>
+        <li><strong>Enable creation of spells with full ritual metadata.</strong> Each spell should capture intent, ingredients with amounts and notes, timing affinity (moon phase, day, season, time of day), chant or spoken words, deities invoked, duration, task checklists, and a star rating — not just a title and text block.</li>
         <li><strong>Record cast history as a first-class concept.</strong> Every time a spell is performed, the event is logged with a date, notes, task completion, and outcome. Multiple casts of the same working build a real history over time. The practitioner can see what they've done and what came of it.</li>
         <li><strong>Provide a running journal of practice.</strong> Beyond spells, the practitioner records notes, observations, and dreams on a shared timeline — all linked to their broader practice, not siloed in a separate app.</li>
         <li><strong>Integrate live magical calendar data.</strong> The current moon phase, current sabbat, Mercury retrograde windows, and eclipse dates surface automatically in the home view and as context when logging entries. The practitioner never has to look this up.</li>
@@ -667,7 +788,7 @@
     <div class="page" id="p2">
 
       <div class="page-header">
-        <div class="eyebrow">Design Brief · Section II of IV</div>
+        <div class="eyebrow">Design Brief · Section II of V</div>
         <h1>User Personas</h1>
         <p>Three personas grounded in documented demographic data. Women account for a substantially larger share of new age practitioners than men. Gen Z is the least institutionally religious generation on record, with roughly one third claiming no religion — yet actively seeking spiritual structure outside those institutions. The #WitchTok community is the most visible expression of this shift.</p>
         <div class="cite">Demographic sources: <a href="https://www.pewresearch.org/religious-landscape-study/religious-family/new-age/" target="_blank">Pew Research: New Age Religious Landscape Study</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10784987/" target="_blank">PMC: Gen Z &amp; Spiritual Self-Care Apps (2024)</a> · <a href="https://www.newstatesman.com/politics/religion/2023/08/strongfaith-faithless-age-strong" target="_blank">New Statesman: The Witchcraft Generation</a> · <a href="https://thegauntlet.ca/2024/10/17/witchcraft-is-making-a-comeback-among-genz/" target="_blank">The Gauntlet, 2024</a></div>
@@ -676,7 +797,7 @@
       <!-- Persona 1: Margot -->
       <div class="persona">
         <div>
-          <div class="persona-avatar">🌙</div>
+          <div class="persona-avatar"><img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200&h=200&fit=crop&crop=face&q=80" alt="Margot"></div>
           <div class="persona-name">Margot</div>
           <div class="persona-role">The Solitary Millennial</div>
           <div class="persona-stat">Age: <strong>29</strong></div>
@@ -716,7 +837,7 @@
       <!-- Persona 2: Rowan -->
       <div class="persona">
         <div>
-          <div class="persona-avatar">🕯</div>
+          <div class="persona-avatar"><img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=200&h=200&fit=crop&crop=face&q=80" alt="Rowan"></div>
           <div class="persona-name">Rowan</div>
           <div class="persona-role">The Established Practitioner</div>
           <div class="persona-stat">Age: <strong>38</strong></div>
@@ -756,7 +877,7 @@
       <!-- Persona 3: Zola -->
       <div class="persona">
         <div>
-          <div class="persona-avatar">✦</div>
+          <div class="persona-avatar"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop&crop=face&q=80" alt="Zola"></div>
           <div class="persona-name">Zola</div>
           <div class="persona-role">The Gen Z Seeker</div>
           <div class="persona-stat">Age: <strong>22</strong></div>
@@ -811,7 +932,7 @@
     <div class="page" id="p3">
 
       <div class="page-header">
-        <div class="eyebrow">Design Brief · Section III of IV</div>
+        <div class="eyebrow">Design Brief · Section III of V</div>
         <h1>Competitor Analysis</h1>
         <p>Three competitors assessed across Old Mother's Altar's core feature set. Feature data drawn directly from App Store listings and published user reviews.</p>
       </div>
@@ -1085,7 +1206,7 @@
     <div class="page" id="p4">
 
       <div class="page-header">
-        <div class="eyebrow">Design Brief · Section IV of IV</div>
+        <div class="eyebrow">Design Brief · Section IV of V</div>
         <h1>UX Flow Outline</h1>
         <p>Primary navigation structure and key user flows for Old Mother's Altar, based on the current app build — May 2026.</p>
       </div>
@@ -1107,11 +1228,11 @@
             </div>
             <div style="display:flex; align-items:center; gap:12px; font-size:13px;">
               <span style="color:var(--amber); font-size:9px; letter-spacing:0.1em; width:14px;">II</span>
-              <span><strong style="color:var(--fg-1);">Grimoire</strong> — Spell library</span>
+              <span><strong style="color:var(--fg-1);">The Grimoire</strong> — Spell library</span>
             </div>
             <div style="display:flex; align-items:center; gap:12px; font-size:13px;">
               <span style="color:var(--amber); font-size:9px; letter-spacing:0.1em; width:14px;">III</span>
-              <span><strong style="color:var(--fg-1);">Journal</strong> — Practice timeline</span>
+              <span><strong style="color:var(--fg-1);">The Journal</strong> — Practice timeline</span>
             </div>
             <div style="display:flex; align-items:center; gap:12px; font-size:13px;">
               <span style="color:var(--amber); font-size:9px; letter-spacing:0.1em; width:14px;">IV</span>
@@ -1136,7 +1257,7 @@
 
       <!-- Flow I: Home -->
       <h2>Flow I — Home</h2>
-      <p>The ambient entry point. Greets the practitioner by name with time-of-day awareness, surfaces the current moon phase and live magical events (sabbats, Mercury retrograde, eclipses), shows the last three journal entries, and lists pending tasks from active spells. Two primary actions live at the bottom of every Home view.</p>
+      <p>The ambient entry point. Greets the practitioner by name with time-of-day awareness, surfaces the current moon phase and live magical events (sabbats, Mercury retrograde, eclipses), shows the last three journal entries, and lists pending tasks from active spells — each displaying the journal entry title and linking directly to that entry. Two primary actions live at the bottom of every Home view.</p>
 
       <div class="flow-group">
         <div class="flow-group-label">Home</div>
@@ -1178,8 +1299,8 @@
             <span class="flow-arrow">→</span>
             <span class="fn fn-action">Tap pending task</span>
             <span class="flow-arrow">→</span>
-            <span class="fn fn-screen">Spell Detail</span>
-            <span class="flow-note">(routes to linked spell)</span>
+            <span class="fn fn-screen">Entry Detail</span>
+            <span class="flow-note">(routes to the journal entry that cast that spell)</span>
           </div>
         </div>
       </div>
@@ -1194,7 +1315,7 @@
           </ul>
           <ul class="brief-list">
             <li>Recent journal entries (last 3)</li>
-            <li>Pending tasks from active spells</li>
+            <li>Pending tasks from active spells — each task shows the journal entry title (links to that entry)</li>
             <li>New Journal Entry + New Spell bottom CTAs</li>
           </ul>
         </div>
@@ -1202,15 +1323,15 @@
 
       <div class="divider"></div>
 
-      <!-- Flow II: Grimoire -->
-      <h2>Flow II — Grimoire</h2>
-      <p>The spell library. Every spell the practitioner has written lives here — searchable by name or tag, filterable by sealed / draft status, sorted by recency. Each card shows name, color, moon phase affinity, tags, cast count, rating (when set), and a favorite heart. Tapping the heart marks a spell as a favorite (solid heart) or removes it. The full spell composer is a separate page, not a modal sheet.</p>
+      <!-- Flow II: The Grimoire -->
+      <h2>Flow II — The Grimoire</h2>
+      <p>The spell library. Every spell the practitioner has written lives here — searchable by name or tag, filterable by category, magic type, and timing, sorted by recency. Each card shows name, color, timing affinity, tags, cast count, rating (when set), and a favorite heart. Tapping the heart marks a spell as a favorite (solid heart) or removes it. The full spell composer is a separate page, not a modal sheet.</p>
 
       <div class="flow-group">
-        <div class="flow-group-label">Grimoire · YOUR SPELLS</div>
+        <div class="flow-group-label">The Grimoire · YOUR SPELLS</div>
         <div class="flow-tree">
           <div class="flow-row">
-            <span class="fn fn-screen">Grimoire</span>
+            <span class="fn fn-screen">The Grimoire</span>
             <span class="flow-arrow">→</span>
             <span class="fn fn-action">Tap spell card</span>
             <span class="flow-arrow">→</span>
@@ -1218,7 +1339,7 @@
           </div>
           <div class="flow-indent">
             <div class="flow-row">
-              <span class="fn fn-action">Cast Now</span>
+              <span class="fn fn-action">Send to Journal</span>
               <span class="flow-arrow">→</span>
               <span class="fn fn-end">Journal Entry Editor</span>
               <span class="flow-note">(pre-linked to this spell)</span>
@@ -1230,32 +1351,27 @@
               <span class="flow-note">(prefilled)</span>
             </div>
             <div class="flow-row">
-              <span class="fn fn-action">Seal / Unseal toggle</span>
-              <span class="flow-arrow">→</span>
-              <span class="fn fn-end">Status updated</span>
-            </div>
-            <div class="flow-row">
               <span class="fn fn-action">Delete</span>
               <span class="flow-arrow">→</span>
               <span class="fn fn-danger">Confirm → Removed</span>
             </div>
           </div>
           <div class="flow-row">
-            <span class="fn fn-screen">Grimoire</span>
+            <span class="fn fn-screen">The Grimoire</span>
             <span class="flow-arrow">→</span>
             <span class="fn fn-action">Add a Spell (bottom)</span>
             <span class="flow-arrow">→</span>
             <span class="fn fn-end">Spell Composer (new)</span>
           </div>
           <div class="flow-row">
-            <span class="fn fn-screen">Grimoire</span>
+            <span class="fn fn-screen">The Grimoire</span>
             <span class="flow-arrow">→</span>
             <span class="fn fn-action">Tap heart on card</span>
             <span class="flow-arrow">→</span>
             <span class="fn fn-end">Spell favorited / unfavorited</span>
           </div>
           <div class="flow-row">
-            <span class="fn fn-screen">Grimoire</span>
+            <span class="fn fn-screen">The Grimoire</span>
             <span class="flow-arrow">→</span>
             <span class="fn fn-action">Search / filter</span>
             <span class="flow-arrow">→</span>
@@ -1270,18 +1386,16 @@
         <div class="spec-grid">
           <ul class="brief-list">
             <li>Name + intent summary</li>
-            <li>Icon + accent color</li>
-            <li>Moon phase affinity</li>
-            <li>Timing tags: season, time of day, day of week</li>
+            <li>Ideal Time: moon phase affinity, day of week, season, time of day</li>
             <li>Magic type + category tags</li>
             <li>Rating (1–5 stars, outline when unset)</li>
+            <li>Ingredients list (name, amount, note per item; cabinet autocomplete on name)</li>
           </ul>
           <ul class="brief-list">
-            <li>Ingredients list (name, amount, note per item; cabinet autocomplete on name)</li>
-            <li>Task checklist (step-by-step)</li>
+            <li>Tasks: each task has a title, optional note, and completion state (tasks surface on Home as pending tasks and are checked off in Journal)</li>
             <li>Chant / spoken words</li>
             <li>Deities invoked</li>
-            <li>Duration + Sealed toggle</li>
+            <li>Duration</li>
           </ul>
         </div>
       </div>
@@ -1298,15 +1412,15 @@
 
       <div class="divider"></div>
 
-      <!-- Flow III: Journal -->
-      <h2>Flow III — Journal</h2>
+      <!-- Flow III: The Journal -->
+      <h2>Flow III — The Journal</h2>
       <p>The practice timeline. All recorded activity surfaces here in reverse-chronological order: cast entries (linked to spells), freeform notes, and moon observations — all on one timeline. Each entry can carry multiple timestamped note blocks, an outcome field, task-completion state, and an image attachment.</p>
 
       <div class="flow-group">
-        <div class="flow-group-label">Journal · YOUR PRACTICE</div>
+        <div class="flow-group-label">The Journal · YOUR PRACTICE</div>
         <div class="flow-tree">
           <div class="flow-row">
-            <span class="fn fn-screen">Journal</span>
+            <span class="fn fn-screen">The Journal</span>
             <span class="flow-arrow">→</span>
             <span class="fn fn-action">Tap entry</span>
             <span class="flow-arrow">→</span>
@@ -1326,7 +1440,7 @@
             </div>
           </div>
           <div class="flow-row">
-            <span class="fn fn-screen">Journal</span>
+            <span class="fn fn-screen">The Journal</span>
             <span class="flow-arrow">→</span>
             <span class="fn fn-action">Write an Entry (bottom)</span>
             <span class="flow-arrow">→</span>
@@ -1340,7 +1454,6 @@
         <div class="spec-grid">
           <ul class="brief-list">
             <li>Title + date + time</li>
-            <li>Entry kind: Cast · Note · Dream · Moon</li>
             <li>Link to spell (optional)</li>
             <li>Timestamped note blocks (multi-entry, additive)</li>
           </ul>
@@ -1391,6 +1504,7 @@
         <ul class="brief-list" style="max-width: 480px;">
           <li>Name</li>
           <li>Type: herb · crystal · candle · cord · other</li>
+          <li>Color (where applicable — candles, cords, and similar items)</li>
           <li>Quantity on hand (numeric, or null if not tracked)</li>
           <li>Free-text note (e.g. "Dried," "Thin twine," "Unscented pillar")</li>
         </ul>
@@ -1400,7 +1514,7 @@
 
       <!-- Flow V: Settings -->
       <h2>Flow V — Settings</h2>
-      <p>Profile and preferences. Minimal and direct. No account management, no subscription, no social profile — just the practitioner's name, their practice note, the deities they work with, and the theme toggle. The app summary (spell count, entry count, cabinet count) is visible here.</p>
+      <p>Profile and preferences. Minimal and direct. No account management, no subscription, no social profile — just the practitioner's name, their practice note, the deities they work with, the theme toggle, and privacy controls. The app summary (spell count, entry count, cabinet count) is visible here.</p>
 
       <div class="flow-group">
         <div class="flow-group-label">Settings · YOUR PRACTICE</div>
@@ -1433,6 +1547,13 @@
             <span class="flow-arrow">→</span>
             <span class="fn fn-end">Theme applied globally</span>
           </div>
+          <div class="flow-row">
+            <span class="fn fn-screen">Settings → Privacy</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-action">Toggle "Require login on re-entry" (off by default)</span>
+            <span class="flow-arrow">→</span>
+            <span class="fn fn-end">App prompts for login whenever user leaves and returns</span>
+          </div>
         </div>
       </div>
 
@@ -1445,6 +1566,250 @@
       </div>
 
     </div><!-- /p4 -->
+
+
+    <!-- ════════════════════════════════════════════
+         PAGE V — MOODBOARD & DESIGN LANGUAGE
+    ════════════════════════════════════════════ -->
+    <div class="page" id="p5">
+
+      <div class="page-header">
+        <div class="eyebrow">Design Brief · Section V of V</div>
+        <h1>Moodboard &amp; Design Language</h1>
+        <p>The visual language of Old Mother's Altar is rooted in a single source: David Palladini's Aquarian Tarot, published 1970. Every color decision, every typographic choice, every stroke weight in the icon system is traceable to that deck.</p>
+      </div>
+
+      <!-- ─── Visual Influence ─── -->
+      <h2>Visual Influence</h2>
+
+      <div class="card">
+        <div class="eyebrow">Primary Reference — Aquarian Tarot, 1970</div>
+        <p class="wide" style="margin-bottom: 14px;"><strong style="color: var(--fg-1);">David Palladini</strong> was commissioned by Stuart Kaplan at U.S. Games Systems to illustrate the Aquarian Tarot, published in 1970. The deck fuses Art Nouveau ornament with the flat geometric shapes of 1960s Pop Art illustration — bold symbolic linework, archetypal figures, and a palette drawn from candlelight, indigo ink, deep earth, and aged parchment. It became one of the most influential tarot decks of the 20th century.</p>
+        <p class="wide" style="margin-bottom: 20px;">The design system lifts five specific things from the deck: the near-black ink-eggplant ground (the altar cloth at night), the bone-parchment card stock, the tarot pigment accent family (ember, saffron, amber, moss, plum), the bold clean linework with rounded joins, and the letterpress serif quality of the card typography. The app does not reproduce or reference the card imagery — it absorbs the palette and visual grammar, then applies them to a purpose-built UI.</p>
+
+        <div style="font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 10px;">Palette lifted from Palladini 1970</div>
+        <div class="palette-strip">
+          <div class="palette-strip-swatch" style="background: #100D18;" title="Ink — altar cloth at night"></div>
+          <div class="palette-strip-swatch" style="background: #1A1528;" title="Deep eggplant — card ground"></div>
+          <div class="palette-strip-swatch" style="background: #261D38;" title="Elevated surface"></div>
+          <div class="palette-strip-swatch" style="background: #2D4EA6;" title="Indigo — robes, deep water"></div>
+          <div class="palette-strip-swatch" style="background: #4F71C7;" title="Indigo light — sky, sigil glow"></div>
+          <div class="palette-strip-swatch" style="background: #764883;" title="Plum — twilight, the mystical"></div>
+          <div class="palette-strip-swatch" style="background: #D41840;" title="Crimson — the wound, danger"></div>
+          <div class="palette-strip-swatch" style="background: #F35321;" title="Ember — fire, completed spell"></div>
+          <div class="palette-strip-swatch" style="background: #F59823;" title="Saffron — solar halos, a struck match"></div>
+          <div class="palette-strip-swatch" style="background: #F4AF59;" title="Amber — warm glow, active chrome"></div>
+          <div class="palette-strip-swatch" style="background: #96A560;" title="Moss — earth, herbs, growth"></div>
+          <div class="palette-strip-swatch" style="background: #BFAA84;" title="Taupe — dry parchment, secondary text"></div>
+          <div class="palette-strip-swatch" style="background: #FDFEEB;" title="Bone — card stock, parchment surface"></div>
+        </div>
+        <div class="cite" style="margin-top: 16px;">Sources: Kaplan, S. R. (1970). <em>Aquarian Tarot</em>. U.S. Games Systems. · <a href="https://en.wikipedia.org/wiki/Aquarian_Tarot" target="_blank">Aquarian Tarot — Wikipedia</a> · <a href="https://www.usgamesinc.com/Aquarian-Tarot-Deck/" target="_blank">U.S. Games Systems — Aquarian Tarot</a></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ─── Color Palette ─── -->
+      <h2>Color Palette</h2>
+
+      <div class="swatch-group">
+        <div class="swatch-group-label">Surfaces &amp; Ground — the altar cloth</div>
+        <div class="swatch-row">
+          <div class="swatch">
+            <div class="swatch-color" style="background: #100D18;"></div>
+            <div class="swatch-name">Ink 100</div>
+            <div class="swatch-hex">#100D18</div>
+            <div class="swatch-use">Page bg, altar cloth</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #1A1528;"></div>
+            <div class="swatch-name">Ink 200</div>
+            <div class="swatch-hex">#1A1528</div>
+            <div class="swatch-use">Card surface</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #261D38;"></div>
+            <div class="swatch-name">Ink 300</div>
+            <div class="swatch-hex">#261D38</div>
+            <div class="swatch-use">Elevated, hover</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #3E2F52;"></div>
+            <div class="swatch-name">Ink 400</div>
+            <div class="swatch-hex">#3E2F52</div>
+            <div class="swatch-use">Divider lines</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #FDFEEB; border: 1px solid rgba(191,170,132,0.3);"></div>
+            <div class="swatch-name">Bone</div>
+            <div class="swatch-hex">#FDFEEB</div>
+            <div class="swatch-use">Parchment, light mode bg</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swatch-group">
+        <div class="swatch-group-label">Ritual Accents — lifted from Palladini 1970</div>
+        <div class="swatch-row">
+          <div class="swatch">
+            <div class="swatch-color" style="background: #F4AF59;"></div>
+            <div class="swatch-name">Amber</div>
+            <div class="swatch-hex">#F4AF59</div>
+            <div class="swatch-use">Warm glow, chrome</div>
+            <div class="swatch-badge" style="background:rgba(244,175,89,0.14);color:var(--amber);border-color:rgba(244,175,89,0.3);">Primary chrome</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #2D4EA6;"></div>
+            <div class="swatch-name">Indigo</div>
+            <div class="swatch-hex">#2D4EA6</div>
+            <div class="swatch-use">Sigil, primary action</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #F35321;"></div>
+            <div class="swatch-name">Ember</div>
+            <div class="swatch-hex">#F35321</div>
+            <div class="swatch-use">Fire, completed spell</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #F59823;"></div>
+            <div class="swatch-name">Saffron</div>
+            <div class="swatch-hex">#F59823</div>
+            <div class="swatch-use">Ritual highlight</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #96A560;"></div>
+            <div class="swatch-name">Moss</div>
+            <div class="swatch-hex">#96A560</div>
+            <div class="swatch-use">Herb, growth, earth</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #764883;"></div>
+            <div class="swatch-name">Plum</div>
+            <div class="swatch-hex">#764883</div>
+            <div class="swatch-use">Twilight, dream</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #D41840;"></div>
+            <div class="swatch-name">Crimson</div>
+            <div class="swatch-hex">#D41840</div>
+            <div class="swatch-use">Warning, danger</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swatch-group">
+        <div class="swatch-group-label">Text &amp; Chrome — warm taupe, not gray</div>
+        <div class="swatch-row">
+          <div class="swatch">
+            <div class="swatch-color" style="background: #FDFEEB; border: 1px solid rgba(191,170,132,0.3);"></div>
+            <div class="swatch-name">Slate 200</div>
+            <div class="swatch-hex">#FDFEEB</div>
+            <div class="swatch-use">Primary text on ink</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #BFAA84;"></div>
+            <div class="swatch-name">Slate 300</div>
+            <div class="swatch-hex">#BFAA84</div>
+            <div class="swatch-use">Secondary text, icons</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #A99378;"></div>
+            <div class="swatch-name">Slate 400</div>
+            <div class="swatch-hex">#A99378</div>
+            <div class="swatch-use">Eyebrow, labels</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #7A6850;"></div>
+            <div class="swatch-name">Slate 500</div>
+            <div class="swatch-hex">#7A6850</div>
+            <div class="swatch-use">Tertiary, disabled</div>
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size: 12px; color: var(--fg-3); margin-top: -16px;">There are no neutral grays anywhere in this palette. Every surface and text color carries warmth — derived from the eggplant-purple ink or the parchment-taupe family. Cool grays would break the altar-at-night atmosphere.</p>
+
+      <div class="divider"></div>
+
+      <!-- ─── Typography ─── -->
+      <h2>Typography</h2>
+
+      <div class="type-specimen">
+        <div class="type-label">Display — Ohno Blazeface · James Edmondson / OH no Type Co.</div>
+        <div style="font-family: 'Ohno Blazeface', Georgia, serif; font-size: 52px; color: var(--fg-1); text-transform: uppercase; line-height: 1.0; letter-spacing: 0.015em; margin-bottom: 14px;">Old Mother's Altar</div>
+        <div style="font-family: 'Ohno Blazeface 36', 'Ohno Blazeface', Georgia, serif; font-size: 30px; color: var(--fg-1); text-transform: uppercase; line-height: 1.05; letter-spacing: 0.015em; margin-bottom: 14px;">The Grimoire</div>
+        <div style="font-family: 'Ohno Blazeface 24', 'Ohno Blazeface', Georgia, serif; font-size: 22px; color: var(--fg-1); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.015em; margin-bottom: 24px;">Spell Composer</div>
+        <div class="divider" style="margin: 20px 0;"></div>
+        <ul class="brief-list">
+          <li><strong>Nine optical sizes</strong> — 12pt through 72pt, each drawn for its intended size. The app maps headings to the correct optical file rather than scaling a single master.</li>
+          <li><strong>Roman upright only</strong> — the italic cuts are registered but almost never used. Blazeface's italic is expressive; restraint preserves its impact for rare emphasis.</li>
+          <li><strong>Used for</strong>: all screen titles, spell names, section headers, the splash screen logotype, and Roman numeral chapter marks in journal entries.</li>
+          <li><strong>Why Blazeface</strong>: Letterpress-quality thick-thin contrast and sturdy serifs give it the warmth of mid-century print without historical pastiche. It reads as contemporary and purpose-made.</li>
+        </ul>
+      </div>
+
+      <div class="type-specimen">
+        <div class="type-label">Body &amp; UI — New Kansas · Connary Fagen</div>
+        <div style="font-family: 'New Kansas', Georgia, serif; font-weight: 600; font-size: 13px; color: var(--fg-1); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px;">Your Practice · Moon Phase · Day of Week</div>
+        <p class="wide" style="font-family: 'New Kansas', Georgia, serif; font-weight: 400; font-size: 15px; line-height: 1.75; margin-bottom: 20px; color: var(--fg-2);">Every time a spell is performed, the event is logged with a date, notes, task completion, and outcome. Multiple casts of the same working build a real history over time. The practitioner can see what they have done and what came of it.</p>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; padding: 14px 0; border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); margin-bottom: 20px;">
+          <span style="font-family: 'New Kansas', Georgia, serif; font-weight: 300; font-size: 13px; color: var(--fg-3);">Light</span>
+          <span style="font-family: 'New Kansas', Georgia, serif; font-weight: 400; font-size: 13px; color: var(--fg-3);">Regular</span>
+          <span style="font-family: 'New Kansas', Georgia, serif; font-weight: 500; font-size: 13px; color: var(--fg-3);">Medium</span>
+          <span style="font-family: 'New Kansas', Georgia, serif; font-weight: 600; font-size: 13px; color: var(--fg-3);">Semibold</span>
+          <span style="font-family: 'New Kansas', Georgia, serif; font-weight: 700; font-size: 13px; color: var(--fg-3);">Bold</span>
+          <span style="font-family: 'New Kansas', Georgia, serif; font-weight: 800; font-size: 13px; color: var(--fg-3);">Black</span>
+        </div>
+        <ul class="brief-list">
+          <li><strong>Nine weights</strong> — Thin through Heavy. The UI uses Regular (400) for body, Medium (500) for navigation labels, and Semibold (600) for field headers and buttons.</li>
+          <li><strong>Used for</strong>: all body copy, metadata, tags, navigation text, form labels, button text, and the eyebrow label style (tracked, uppercase, weight 300).</li>
+          <li><strong>Why New Kansas</strong>: Humanist warmth without the academic stiffness of classical text serifs. It complements Blazeface without competing — sturdy enough at small sizes, expressive enough at display weights.</li>
+        </ul>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ─── Design Principles ─── -->
+      <h2>Design Principles</h2>
+
+      <div class="principle-grid">
+        <div class="principle">
+          <div class="principle-num">I</div>
+          <div class="principle-title">Dark by Default</div>
+          <p>The altar is lit by candle, not overhead fluorescent. The ink-eggplant ground (#100D18) is the primary design target. Light mode (parchment surface) is a secondary state for daylight conditions — it uses the same palette but inverted, never replacing the dark mode as the canonical experience.</p>
+        </div>
+        <div class="principle">
+          <div class="principle-num">II</div>
+          <div class="principle-title">Candlelit, Not Dashboard</div>
+          <p>Warm near-black with tarot pigments — not cool dark-mode grays. Every surface and text tone is derived from the eggplant-ink or parchment-taupe family. There are no neutral grays. The aesthetic is a candlelit room at night, not a developer tool.</p>
+        </div>
+        <div class="principle">
+          <div class="principle-num">III</div>
+          <div class="principle-title">Amber as Primary Chrome</div>
+          <p>Navigation active states, selected tabs, and interactive highlights use amber (#F4AF59) — the warm glow of candlelight on parchment, lifted directly from Palladini's golden haloes. Ember, saffron, moss, and plum remain in the ritual accent palette for tag states and cast outcomes.</p>
+        </div>
+        <div class="principle">
+          <div class="principle-num">IV</div>
+          <div class="principle-title">No Gamification Signals</div>
+          <p>The visual language contains no progress rings, badge aesthetics, streak markers, or achievement colors. Ritual completion is marked by the practitioner's own record — dates, notes, outcomes. The interface does not celebrate the practitioner; it records them.</p>
+        </div>
+        <div class="principle">
+          <div class="principle-num">V</div>
+          <div class="principle-title">Terse Everywhere</div>
+          <p>Labels are short. Copy is direct. No coach-y encouragement, no exclamation marks, no onboarding that presumes ignorance. The app speaks like a well-made tool — consistent with the voice of a working grimoire, not a wellness product.</p>
+        </div>
+        <div class="principle">
+          <div class="principle-num">VI</div>
+          <div class="principle-title">Privacy-Legible</div>
+          <p>Notification wording is discreet. The lock screen gives nothing away. The visual identity — candlelit, private, textural — communicates "personal record," not "social app." It should look at home on the practitioner's phone without outing their practice to anyone glancing over.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Icon System</div>
+        <p class="wide" style="margin-bottom: 0;">All icons are drawn in the Palladini Aquarian Tarot linework style: bold 2px strokes, rounded joins, filled center-dots and 8-point star accents as ritual highlights — a direct reference to Palladini's technique of animating flat shapes with a single focal point. Every icon is drawn to a 24×24 grid and inherits <code style="font-size:12px; color:var(--fg-3);">currentColor</code>, making them mode-agnostic. The icon for the app section formerly called Grimoire is a four-point sparkle — the same asterisk-star form that appears in Palladini's celestial card backgrounds.</p>
+      </div>
+
+    </div><!-- /p5 -->
 
   </main>
 </div><!-- /layout -->

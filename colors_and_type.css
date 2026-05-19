@@ -1,7 +1,7 @@
 /* =====================================================================
    OLD MOTHER'S ALTAR — colors & type tokens
-   A witchcraft spell journal & tracker. Dark slate ritual surface
-   warmed by the David Palladini Aquarian Tarot (1970) palette.
+   A witchcraft spell journal & tracker. Deep eggplant ritual surface
+   accented by the David Palladini Aquarian Tarot (1970) palette.
    ===================================================================== */
 
 /* ---- FONTS ---------------------------------------------------------- */
@@ -67,24 +67,24 @@
      COLOR — base palette
      ================================================================= */
 
-  /* Ink — the altar cloth. Near-black with a dark eggplant undertone,
-     ritual interior rather than cool dashboard. */
+  /* Ink — the altar cloth. Near-black with a deep eggplant undertone,
+     ritual chamber rather than candlelit hearth. */
   --ink-0:        #000000;
-  --ink-50:       #08060C;
-  --ink-100:      #100D18;  /* page bg, deepest — deep eggplant near-black */
-  --ink-200:      #1A1528;  /* card surface — dark eggplant */
-  --ink-300:      #261D38;  /* elevated / hover */
-  --ink-400:      #3E2F52;  /* line break */
+  --ink-50:       #070409;
+  --ink-100:      #100B18;  /* page bg, deepest — deep eggplant */
+  --ink-200:      #1A1228;  /* card surface — eggplant-midnight */
+  --ink-300:      #27193A;  /* elevated / hover */
+  --ink-400:      #3E2858;  /* line break */
 
-  /* Slate — bone & taupe; the smoke that drifts off the candle.
-     Was a cool cyan-gray, now a warm tarot-parchment family. */
+  /* Slate — lavender dusk; the smoke that hangs in the chamber.
+     Was a cool cyan-gray, now a cool lavender-twilight family. */
   --slate-100:    #FFFFFF;
   --slate-200:    #FDFEEB;  /* high-contrast text on ink — bone/parchment */
-  --slate-300:    #BFAA84;  /* secondary text, icons — warm taupe */
-  --slate-400:    #A99378;
-  --slate-500:    #7A6850;  /* eyebrow / tertiary — desaturated amber */
-  --slate-600:    #524736;
-  --slate-700:    #382F23;
+  --slate-300:    #BBA6D0;  /* secondary text, icons — soft lavender */
+  --slate-400:    #9A88B8;
+  --slate-500:    #6E5A8C;  /* eyebrow / tertiary — muted violet */
+  --slate-600:    #4A3869;
+  --slate-700:    #2E1F48;
 
   /* Indigo — the sigil, the sealed envelope, the action */
   --indigo-300:   #4F71C7;
@@ -123,7 +123,7 @@
   --bg-page:        var(--ink-100);
   --bg-surface:     var(--ink-200);
   --bg-elevated:    var(--ink-300);
-  --bg-overlay:     rgba(16, 13, 24, 0.74);
+  --bg-overlay:     rgba(16, 11, 24, 0.74);
   --bg-vellum:      var(--bone);       /* light-mode parchment, journal pages */
 
   /* foreground */
@@ -134,20 +134,20 @@
   --fg-accent:      var(--amber);
   --fg-link:        var(--slate-200);
 
-  /* lines — derived from warm slate-300 (#BFAA84 → rgb(191,170,132)) */
-  --line-soft:      rgba(191, 170, 132, 0.10);
-  --line-medium:    rgba(191, 170, 132, 0.22);
-  --line-strong:    rgba(191, 170, 132, 0.45);
-  --line-vellum:    rgba(16, 13, 24, 0.18);
+  /* lines — derived from cool slate-300 (#BBA6D0 → rgb(187,166,208)) */
+  --line-soft:      rgba(187, 166, 208, 0.10);
+  --line-medium:    rgba(187, 166, 208, 0.22);
+  --line-strong:    rgba(187, 166, 208, 0.45);
+  --line-vellum:    rgba(16, 11, 24, 0.18);
 
   /* actions */
   --action-primary-bg:     var(--indigo-500);
   --action-primary-fg:     var(--bone);
   --action-primary-hover:  #3760BD;
   --action-primary-press:  var(--indigo-700);
-  --action-secondary-bg:   rgba(191, 170, 132, 0.08);
+  --action-secondary-bg:   rgba(187, 166, 208, 0.08);
   --action-secondary-fg:   var(--slate-200);
-  --action-secondary-hover: rgba(191, 170, 132, 0.14);
+  --action-secondary-hover: rgba(187, 166, 208, 0.14);
   --action-ghost-fg:       var(--slate-200);
   --action-danger-bg:      var(--crimson-500);
   --action-danger-fg:      var(--bone);
@@ -286,7 +286,7 @@
   --action-ghost-fg:       var(--ink-100);
 
   /* amber chrome accent — light-mode tuned (deeper amber for legibility on bone) */
-  --chrome-active-bg:      rgba(244, 175, 89, 0.16);
+  --chrome-active-bg:      rgba(201, 135, 54, 0.16);
   --chrome-active-fg:      var(--olive);
   --chrome-active-line:    var(--olive);
 
@@ -377,7 +377,7 @@
 }
 .oma-eyebrow {
   font-family: var(--font-eyebrow);
-  font-weight: 300;
+  font-weight: 600;
   font-size: var(--t-2xs);
   letter-spacing: var(--tk-eyebrow);
   text-transform: uppercase;

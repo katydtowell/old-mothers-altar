@@ -168,7 +168,7 @@ function Badge({ tone = 'pending', dot = true, children, style }) {
     pending: { bg: 'var(--action-secondary-bg)', fg: 'var(--fg-2)',   dot: 'var(--fg-2)' },   // ~8.9:1 ✓
     sealed:  { bg: 'rgba(0,194,138,0.14)',        fg: 'var(--success)', dot: 'var(--success)' }, // ~6.6:1 ✓
     burning: { bg: 'rgba(243,83,33,0.18)',        fg: 'var(--saffron)', dot: 'var(--ember)' },   // saffron ~6.8:1 ✓; dot stays ember
-    moss:    { bg: 'rgba(150,165,96,0.22)',       fg: 'var(--moss)',   dot: 'var(--moss)' },    // moss ~4.7:1 ✓ (was --olive: 2.8:1 ✗)
+    moss:    { bg: 'rgba(244,175,89,0.22)',       fg: 'var(--moss)',   dot: 'var(--moss)' },    // moss ~4.7:1 ✓ (was --olive: 2.8:1 ✗)
     plum:    { bg: 'rgba(118,72,131,0.26)',       fg: 'var(--fg-1)',   dot: 'var(--plum)' },    // bone ~15:1 ✓ (was --plum: 2.1:1 ✗)
     amber:   { bg: 'rgba(244,175,89,0.18)',       fg: 'var(--amber)',  dot: 'var(--amber)' },   // amber ~6.9:1 ✓ (was --olive: 2.8:1 ✗)
     indigo:  { bg: 'rgba(45,78,166,0.26)',        fg: 'var(--fg-1)',   dot: 'var(--indigo-300)' }, // bone ~15:1 ✓ (was --indigo-500: 2.0:1 ✗)
@@ -234,7 +234,7 @@ function TopBar({ title, leading, trailing, eyebrow }) {
 function TabBar({ active, onChange }) {
   const tabs = [
     { id: 'altar',    label: 'Home',     icon: Ico.altar },
-    { id: 'workings', label: 'Grimoire', icon: Ico.sparkle },
+    { id: 'workings', label: 'The Grimoire', icon: Ico.sparkle },
     { id: 'book',     label: 'Journal',  icon: Ico.book },
     { id: 'cabinet',  label: 'Cabinet',  icon: Ico.cabinet },
     { id: 'profile',  label: 'Settings', icon: Ico.settings },
@@ -289,7 +289,7 @@ function BottomBar({ children, style }) {
 function Drawer({ open, onClose, activeTab, onChangeTab, onLogOut, theme }) {
   const tabs = [
     { id: 'altar',    label: 'Home',        icon: Ico.altar   },
-    { id: 'workings', label: 'Grimoire',     icon: Ico.sparkle },
+    { id: 'workings', label: 'The Grimoire',  icon: Ico.sparkle },
     { id: 'book',     label: 'The Journal',  icon: Ico.book    },
     { id: 'cabinet',  label: 'The Cabinet',  icon: Ico.cabinet },
     { id: 'profile',  label: 'Settings',     icon: Ico.settings },

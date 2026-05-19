@@ -249,7 +249,7 @@ const DEFAULT_CABINET = [
   { id: 'cab7', name: 'Pyrite Chunk', type: 'crystal', inv: 1, note: '' },
 ];
 
-const DEFAULT_PROFILE = { name: 'Annie', practiceNote: '', deities: ['Hecate', 'Lilith'] };
+const DEFAULT_PROFILE = { name: 'Zola', practiceNote: '', deities: ['Hecate', 'Lilith'] };
 
 // ── localStorage helpers ──────────────────────────────────────────────────────
 function loadLS(key, fallback) {
@@ -1086,7 +1086,7 @@ function App({ theme, setTheme }) {
 
   } else if (tab === 'workings') {
     topBar = (
-      <TopBar title="Grimoire" eyebrow="YOUR SPELLS"
+      <TopBar title="The Grimoire" eyebrow="YOUR SPELLS"
         leading={homeBtn} trailing={rightBtns} />
     );
     body = <Workings workings={workings} onOpenWorking={setOpenWorkingId} onCompose={() => openComposer()} onToggleFavorite={handleToggleFavorite} />;
@@ -1100,7 +1100,7 @@ function App({ theme, setTheme }) {
 
   } else if (tab === 'book') {
     topBar = (
-      <TopBar title="Journal" eyebrow="YOUR PRACTICE"
+      <TopBar title="The Journal" eyebrow="YOUR PRACTICE"
         leading={homeBtn} trailing={rightBtns} />
     );
     body = <TheBook entries={entries} workings={workings} onWrite={() => openEntryForm()} onOpenEntry={id => setViewEntryId(id)} />;
