@@ -668,13 +668,24 @@
     /* ── Responsive ─────────────────────────────────────────────────── */
     @media (max-width: 760px) {
       aside { display: none; }
-      main { margin-left: 0; padding: 82px 20px 60px; }
+      main { margin-left: 0; padding: 82px 20px 60px; overflow-x: hidden; }
+      html, body { overflow-x: hidden; }
+      /* All sections visible — scroll instead of paginate */
+      .page { display: block !important; scroll-margin-top: 68px; }
+      .page + .page { border-top: 1px solid var(--line-soft); margin-top: 16px; padding-top: 52px; }
       .persona { grid-template-columns: 1fr; }
       .card-grid, .spec-grid, .stat-row, .principle-grid { grid-template-columns: 1fr; }
       .swatch-row { gap: 8px; }
       .swatch { width: 100px; }
       h1 { font-size: 36px; }
       h2 { font-size: 24px; }
+      /* Fix overflowing tables */
+      .compare-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      /* Fix flow diagrams */
+      .flow-group { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .flow-indent { margin-left: 16px; padding-left: 10px; }
+      /* Prevent any other wide elements from breaking layout */
+      img, svg, video { max-width: 100%; height: auto; }
     }
 
     /* ── Mobile top bar ──────────────────────────────────────────────── */
@@ -1962,14 +1973,48 @@
   }
 
   function showMob(pageId, el) {
-    // Map to the corresponding desktop sidebar item so its active style is correct
-    const sidebarItems = document.querySelectorAll('aside .nav-item');
-    const pages = ['p1','p2','p3','p4','p5'];
-    const idx = pages.indexOf(pageId);
-    const desktopEl = (idx >= 0 && sidebarItems[idx]) ? sidebarItems[idx] : el;
-    show(pageId, desktopEl);
-    closeMobMenuDirect();
+    const isMobile = window.innerWidth <= 760;
+    if (isMobile) {
+      // Scroll to section; keep mobile menu active state in sync
+      document.querySelectorAll('.mob-nav-item').forEach(n => {
+        n.classList.toggle('active', n.dataset.page === pageId);
+      });
+      const lbl = document.getElementById('mob-section-label');
+      if (lbl) lbl.textContent = SECTION_LABELS[pageId] || '';
+      document.getElementById(pageId).scrollIntoView({ behavior: 'smooth' });
+      closeMobMenuDirect();
+    } else {
+      const sidebarItems = document.querySelectorAll('aside .nav-item');
+      const pages = ['p1','p2','p3','p4','p5'];
+      const idx = pages.indexOf(pageId);
+      const desktopEl = (idx >= 0 && sidebarItems[idx]) ? sidebarItems[idx] : el;
+      show(pageId, desktopEl);
+      closeMobMenuDirect();
+    }
   }
+
+  // Update top bar label as user scrolls through sections on mobile
+  (function () {
+    const pages = ['p1','p2','p3','p4','p5'];
+    if (!('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(function (entries) {
+      if (window.innerWidth > 760) return;
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          const pageId = entry.target.id;
+          const lbl = document.getElementById('mob-section-label');
+          if (lbl) lbl.textContent = SECTION_LABELS[pageId] || '';
+          document.querySelectorAll('.mob-nav-item').forEach(function (n) {
+            n.classList.toggle('active', n.dataset.page === pageId);
+          });
+        }
+      });
+    }, { threshold: 0.25 });
+    pages.forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+  })();
 
   function openMobMenu() {
     document.getElementById('mob-overlay').classList.add('open');
